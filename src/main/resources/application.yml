@@ -1,18 +1,18 @@
-#security:
-#  oauth2:
-#    client:
-#      clientId: 717361552560-gobijh408olcag1nitv4dk8mk2o1ul9k.apps.googleusercontent.com
-#      clientSecret: MLdQkmjHO5Cfz6pcs340vC4H
-#      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
-#      userAuthorizationUri: https://accounts.google.com/o/oauth2/v2/auth
-#      clientAuthenticationScheme: form
-#      scope:
-#        - openid
-#        - email
-#        - profile
-#    resource:
-#      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
-#      preferTokenInfo: true
+security:
+  oauth2:
+    client:
+      clientId: 717361552560-gobijh408olcag1nitv4dk8mk2o1ul9k.apps.googleusercontent.com
+      clientSecret: MLdQkmjHO5Cfz6pcs340vC4H
+      accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+      userAuthorizationUri: https://accounts.google.com/o/oauth2/v2/auth
+      clientAuthenticationScheme: form
+      scope:
+        - openid
+        - email
+        - profile
+    resource:
+      userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
+      preferTokenInfo: true
 server:
   port: 9100
 #  contextPath: /test
