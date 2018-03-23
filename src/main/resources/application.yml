@@ -18,7 +18,7 @@ server:
 #  contextPath: /test
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://localhost:5432/carto
+#    url: jdbc:postgresql://localhost:5432/tennisCorpo
 #    username: fca
 #    password: fca
 #    driver-class: org.postgresql.Driver
