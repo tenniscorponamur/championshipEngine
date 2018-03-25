@@ -80,6 +80,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public DefaultTokenServices tokenServices() {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());
+        //TODO : pour les tests d'interceptor au niveau angular
+        //defaultTokenServices.setAccessTokenValiditySeconds();
+        //defaultTokenServices.setRefreshTokenValiditySeconds();
         defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;
     }
