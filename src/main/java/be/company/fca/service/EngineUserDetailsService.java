@@ -17,7 +17,7 @@ public class EngineUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-        if(!"fca".equals(s)) {
+        if (!"fca".equals(s) && !"leopold".equals(s)) {
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", s));
         }
 
@@ -28,7 +28,7 @@ public class EngineUserDetailsService implements UserDetailsService {
         // UncryptedPassword : jwtpass
 
         UserDetails userDetails = new org.springframework.security.core.userdetails.
-                User("fca", "821f498d827d4edad2ed0960408a98edceb661d9f34287ceda2962417881231a" , authorities);
+                User(s, "821f498d827d4edad2ed0960408a98edceb661d9f34287ceda2962417881231a", authorities);
 
         return userDetails;
     }
