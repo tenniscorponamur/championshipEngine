@@ -15,7 +15,8 @@ security:
   jwt:
     client-id: tenniscorpoclientid
     client-secret: ABi8u34kPoDo
-    grant-type: password
+    grant-type-password: password
+    grant-type-refresh-token: refresh_token
     scope-read: read
     scope-write: write
     resource-ids: tenniscorporesourceid

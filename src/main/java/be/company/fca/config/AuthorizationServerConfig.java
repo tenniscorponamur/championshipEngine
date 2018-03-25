@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -24,14 +25,17 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Value("${security.jwt.client-secret}")
     private String clientSecret;
 
-    @Value("${security.jwt.grant-type}")
-    private String grantType;
+    @Value("${security.jwt.grant-type-password}")
+    private String grantTypePassword;
+
+    @Value("${security.jwt.grant-type-refresh-token}")
+    private String grantTypeRefreshToken;
 
     @Value("${security.jwt.scope-read}")
     private String scopeRead;
 
     @Value("${security.jwt.scope-write}")
-    private String scopeWrite = "write";
+    private String scopeWrite;
 
     @Value("${security.jwt.resource-ids}")
     private String resourceIds;
@@ -45,13 +49,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
     @Override
     public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
         configurer
                 .inMemory()
                 .withClient(clientId)
                 .secret(clientSecret)
-                .authorizedGrantTypes(grantType)
+                .authorizedGrantTypes(grantTypePassword,grantTypeRefreshToken)
                 .scopes(scopeRead, scopeWrite)
                 .resourceIds(resourceIds);
     }
@@ -63,7 +70,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         endpoints.tokenStore(tokenStore)
                 .accessTokenConverter(accessTokenConverter)
                 .tokenEnhancer(enhancerChain)
-                .authenticationManager(authenticationManager);
+                .authenticationManager(authenticationManager)
+                .userDetailsService(userDetailsService);
     }
 
 }
