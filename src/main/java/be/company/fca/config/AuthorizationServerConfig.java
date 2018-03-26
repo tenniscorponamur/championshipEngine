@@ -59,9 +59,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .withClient(clientId)
                 .secret(clientSecret)
                 .authorizedGrantTypes(grantTypePassword,grantTypeRefreshToken)
-                //TODO : pour les tests d'interceptor au niveau angular
-                .accessTokenValiditySeconds(10)
-//                .refreshTokenValiditySeconds(100)
+//                .accessTokenValiditySeconds(5)
+//                .refreshTokenValiditySeconds(10)
                 .scopes(scopeRead, scopeWrite)
                 .resourceIds(resourceIds);
     }
