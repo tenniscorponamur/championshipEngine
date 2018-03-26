@@ -10,8 +10,7 @@ security:
     resource:
       filter-order: 3
   signing-key: JouR3er6jIkFPo
-  encoding-strength: 256
-  security-realm: Spring Boot JWT Example Realm
+  security-realm: Tennis Corpo Engine Realm
   jwt:
     client-id: tenniscorpoclientid
     client-secret: ABi8u34kPoDo
