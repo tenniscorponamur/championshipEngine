@@ -8,14 +8,22 @@ import java.security.Principal;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api")
 public class UserController {
 
-    @RequestMapping("/user")
+    @RequestMapping("/private/user")
     public Principal user(Principal principal) {
         return principal;
     }
 
 }
+
+// TODO :
+// DEFINIR DES VERSIONS POUR L'API
+// DEFINIR UNE PARTIE PUBLIQUE ET UNE PARTIE PRIVEE
+// GESTION DES ROLES DANS LA PARTIE PRIVEE
+
+
 
 /*
 
