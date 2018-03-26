@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -14,6 +16,13 @@ public class UserController {
     @RequestMapping("/private/user")
     public Principal user(Principal principal) {
         return principal;
+    }
+
+    @RequestMapping("/public/user")
+    public Map userPublic(Principal principal) {
+        Map map = new HashMap();
+        map.put("principal","Essai");
+        return map;
     }
 
 }
