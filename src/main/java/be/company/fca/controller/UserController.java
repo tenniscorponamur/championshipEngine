@@ -1,8 +1,9 @@
 package be.company.fca.controller;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -11,15 +12,20 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
+@Api(description = "API REST pour la gestion des utilisateurs")
 public class UserController {
 
-    @RequestMapping("/private/user")
+    @ApiOperation(value = "Find user private",
+            notes = "Ceci est une méthode privée pour recupérer l'utilisateur reconnu par le token d'accès")
+    @RequestMapping(method=RequestMethod.GET, path="/private/user")
     public Principal user(Principal principal) {
         return principal;
     }
 
-    @RequestMapping("/public/user")
-    public Map userPublic(Principal principal) {
+    @ApiOperation(value = "Find user public",
+            notes = "Ceci est une méthode publique pour recupérer un utilisateur fictif...")
+    @RequestMapping(method=RequestMethod.GET, path="/public/user")
+    public Map userPublic(Principal principal, @ApiParam(value = "Nom d'utilisateur") @RequestParam(value="username",required = false) String username) {
         Map map = new HashMap();
         map.put("principal","Essai");
         return map;
