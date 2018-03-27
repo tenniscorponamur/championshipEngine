@@ -47,6 +47,18 @@ public class UserController {
 /*
 
 
+@ApiModel
+public class User {
+
+ private String userName;
+
+ @ApiModelProperty(position = 1, required = true, value = "username containing only lowercase letters or numbers")
+ public String getUserName() {
+     return userName;
+ }
+}
+
+
 Get access token
 curl tenniscorpoclientid:ABi8u34kPoDo@localhost:9100/oauth/token -d grant_type=password -d username=fca -d password=jwtpass
 
