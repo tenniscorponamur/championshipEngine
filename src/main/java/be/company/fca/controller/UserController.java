@@ -1,8 +1,7 @@
 package be.company.fca.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -25,6 +24,11 @@ public class UserController {
     @ApiOperation(value = "Find user public",
             notes = "Ceci est une méthode publique pour recupérer un utilisateur fictif...")
     @RequestMapping(method=RequestMethod.GET, path="/public/user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful retrieval of user detail", response = User.class),
+            @ApiResponse(code = 404, message = "User does not exist"),
+            @ApiResponse(code = 500, message = "Internal server error")}
+    )
     public Map userPublic(Principal principal, @ApiParam(value = "Nom d'utilisateur") @RequestParam(value="username",required = false) String username) {
         Map map = new HashMap();
         map.put("principal","Essai");
