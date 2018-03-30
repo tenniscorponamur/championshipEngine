@@ -60,7 +60,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .secret(clientSecret)
                 .authorizedGrantTypes(grantTypePassword,grantTypeRefreshToken)
 //                .accessTokenValiditySeconds(5)
-//                .refreshTokenValiditySeconds(10)
+//                .refreshTokenValiditySeconds(100)
                 .scopes(scopeRead, scopeWrite)
                 .resourceIds(resourceIds);
     }

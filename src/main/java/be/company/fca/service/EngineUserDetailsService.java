@@ -1,8 +1,8 @@
 package be.company.fca.service;
 
+import be.company.fca.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,9 +27,14 @@ public class EngineUserDetailsService implements UserDetailsService {
 
         // UncryptedPassword : jwtpass
 
-        UserDetails userDetails = new User(s, new BCryptPasswordEncoder().encode("jwtpass"), authorities);
-//        UserDetails userDetails = new User(s, "821f498d827d4edad2ed0960408a98edceb661d9f34287ceda2962417881231a", authorities);
+        User user = new User();
+        user.setUsername(s);
+        user.setPassword(new BCryptPasswordEncoder().encode("jwtpass"));
+        user.setAuthorities(authorities);
 
-        return userDetails;
+        user.setPrenom("Fabrice");
+        user.setNom("Calay");
+
+        return user;
     }
 }

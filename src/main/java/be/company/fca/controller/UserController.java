@@ -1,7 +1,7 @@
 package be.company.fca.controller;
 
+import be.company.fca.model.User;
 import io.swagger.annotations.*;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -17,8 +17,13 @@ public class UserController {
     @ApiOperation(value = "Find user private",
             notes = "Ceci est une méthode privée pour recupérer l'utilisateur reconnu par le token d'accès")
     @RequestMapping(method=RequestMethod.GET, path="/private/user")
-    public Principal user(Principal principal) {
-        return principal;
+    public User user(Principal principal) {
+        //TODO : find by username en se basant sur l'information disponible dans le principal (= authentification)
+        User user = new User();
+        user.setUsername(principal.getName());
+        user.setPrenom("Fabrice");
+        user.setNom("Calay");
+        return user;
     }
 
     @ApiOperation(value = "Find user public",
