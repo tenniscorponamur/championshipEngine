@@ -24,7 +24,6 @@ public class ClubController {
         return clubRepository.findAll();
     }
 
-
     @RequestMapping(method= RequestMethod.GET, path="/public/newClub")
     Club newClub() {
         Club club = new Club();

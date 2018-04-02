@@ -49,6 +49,7 @@ spring:
     password: fca
     driver-class: org.postgresql.Driver
   jpa:
+    show-sql: true
     generate-ddl: true
     properties:
       hibernate:

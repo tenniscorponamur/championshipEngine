@@ -3,16 +3,36 @@ package be.company.fca.model;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Entity
+@Table(name="UTILISATEUR")
 public class User implements UserDetails {
 
+    @Id
+    @SequenceGenerator(name = "utilisateurSeqGenerator", sequenceName = "utilisateurSeq", initialValue = 5, allocationSize = 100)
+    @GeneratedValue(generator = "utilisateurSeqGenerator")
+    private long id;
+
+    @Column( name =  "username", length = 500, nullable = false, unique = true)
     private String username;
+
+    @Column( name =  "password", length = 500, nullable = false)
     private String password;
+
+    @Column( name =  "prenom", length = 500, nullable = false)
     private String prenom;
+
+    @Column( name =  "nom", length = 500, nullable = false)
     private String nom;
+
+    //TODO :
+    // ForeignKey Membre
+
+    @Transient
     List<GrantedAuthority> authorities = new ArrayList<>();
 
     public String getPrenom() {
