@@ -25,11 +25,11 @@ public class EngineUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ADMIN_USER"));
 
-        // UncryptedPassword : jwtpass
+        // UncryptedPassword : fca
 
         User user = new User();
         user.setUsername(s);
-        user.setPassword(new BCryptPasswordEncoder().encode("jwtpass"));
+        user.setPassword(new BCryptPasswordEncoder().encode("fca"));
         user.setAuthorities(authorities);
 
         user.setPrenom("Fabrice");
