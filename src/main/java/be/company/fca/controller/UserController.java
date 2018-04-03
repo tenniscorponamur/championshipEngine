@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/user", method= RequestMethod.GET)
+    @RequestMapping(value = "/private/users", method= RequestMethod.GET)
     public Iterable<User> getAllUsers(){
         return userRepository.findAll();
     }
