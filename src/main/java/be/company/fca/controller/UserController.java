@@ -1,6 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.model.User;
+import be.company.fca.model.UserLight;
 import be.company.fca.repository.UserRepository;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,13 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user", method= RequestMethod.GET)
     public Iterable<User> getAllUsers(){
-        return null;
+        return userRepository.findAll();
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/{id}", method= RequestMethod.GET)
-    public User getUserById(@PathVariable Integer id){
-        return null;
+    public User getUserById(@PathVariable Long id){
+        return userRepository.findOne(id);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -58,9 +59,8 @@ public class UserController {
     }
 
 //    @RequestMapping(value = "/public/defaultUser", method = RequestMethod.GET)
-//    public User getDefaultUser(){
-//
-//
+//    public UserLight getDefaultUser(){
+//        return new UserLight(userRepository.findByUsername("fca"));
 //    }
 //
 //    @ApiOperation(value = "Find user public",

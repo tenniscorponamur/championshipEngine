@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="UTILISATEUR")
@@ -15,7 +16,7 @@ public class User implements UserDetails {
     @Id
     @SequenceGenerator(name = "utilisateurSeqGenerator", sequenceName = "utilisateurSeq", initialValue = 5, allocationSize = 100)
     @GeneratedValue(generator = "utilisateurSeqGenerator")
-    private long id;
+    private Long id;
 
     @Column( name =  "username", length = 500, nullable = false, unique = true)
     private String username;
@@ -69,6 +70,14 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public List<GrantedAuthority> getAuthorities() {
         return authorities;
@@ -96,5 +105,19 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id);
     }
 }
