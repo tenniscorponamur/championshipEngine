@@ -1,17 +1,14 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.UserDto;
 import be.company.fca.model.User;
-import be.company.fca.model.UserLight;
 import be.company.fca.repository.UserRepository;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -25,8 +22,8 @@ public class UserController {
     @ApiOperation(value = "Get current user",
             notes = "Ceci est une méthode privée pour récupérer l'utilisateur reconnu par le token d'accès")
     @RequestMapping(method=RequestMethod.GET, path="/private/currentUser")
-    public User getCurrentUser(Principal principal) {
-        return userRepository.findByUsername(principal.getName());
+    public UserDto getCurrentUser(Principal principal) {
+        return new UserDto(userRepository.findByUsername(principal.getName()));
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -59,8 +56,8 @@ public class UserController {
     }
 
 //    @RequestMapping(value = "/public/defaultUser", method = RequestMethod.GET)
-//    public UserLight getDefaultUser(){
-//        return new UserLight(userRepository.findByUsername("fca"));
+//    public UserDto getDefaultUser(){
+//        return new UserDto(userRepository.findByUsername("fca"));
 //    }
 //
 //    @ApiOperation(value = "Find user public",

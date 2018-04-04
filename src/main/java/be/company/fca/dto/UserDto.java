@@ -1,13 +1,15 @@
-package be.company.fca.model;
+package be.company.fca.dto;
 
-public class UserLight {
+import be.company.fca.model.User;
+
+public class UserDto {
 
     private Long id;
     private String username;
     private String prenom;
     private String nom;
 
-    public UserLight(User user) {
+    public UserDto(User user) {
         this.id=user.getId();
         this.username=user.getUsername();
         this.prenom=user.getPrenom();
