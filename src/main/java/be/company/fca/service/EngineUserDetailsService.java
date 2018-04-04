@@ -1,6 +1,9 @@
 package be.company.fca.service;
 
+import be.company.fca.dto.UserDto;
 import be.company.fca.model.User;
+import be.company.fca.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,25 +18,20 @@ import java.util.List;
 @Component
 public class EngineUserDetailsService implements UserDetailsService {
 
-    @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    @Autowired
+    private UserRepository userRepository;
 
-        if (!"fca".equals(s) && !"leopold".equals(s)) {
-            throw new UsernameNotFoundException(String.format("The username %s doesn't exist", s));
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
+
+        if (user==null){
+            throw new UsernameNotFoundException(String.format("The username %s doesn't exist", username));
         }
 
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ADMIN_USER"));
-
-        // UncryptedPassword : fca
-
-        User user = new User();
-        user.setUsername(s);
-        user.setPassword(new BCryptPasswordEncoder().encode("fca"));
         user.setAuthorities(authorities);
-
-        user.setPrenom("Fabrice");
-        user.setNom("Calay");
 
         return user;
     }
