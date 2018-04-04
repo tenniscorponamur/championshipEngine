@@ -3,6 +3,7 @@ package be.company.fca.controller;
 import be.company.fca.dto.UserDto;
 import be.company.fca.model.User;
 import be.company.fca.repository.UserRepository;
+import be.company.fca.utils.PasswordUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,19 +41,25 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/{id}", method = RequestMethod.PUT)
-    public User updateUser(@PathVariable Integer id, @RequestBody User user){
-//        players.set(id, player);
-//        return player;
-        return null;
+    public UserDto updateUser(@PathVariable Integer id, @RequestBody UserDto userDto){
+        User user = userRepository.findOne(userDto.getId());
+        user.setUsername(userDto.getUsername());
+        user.setPrenom(userDto.getPrenom());
+        user.setNom(userDto.getNom());
+        userRepository.save(user);
+        return new UserDto(user);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user", method = RequestMethod.POST)
-    public User addUser(@RequestBody User player){
-//        player.setId(players.size());
-//        players.add(player);
-//        return player;
-        return null;
+    public UserDto addUser(@RequestBody UserDto userDto){
+        User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setPrenom(userDto.getPrenom());
+        user.setNom(userDto.getNom());
+        user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
+        userRepository.save(user);
+        return new UserDto(user);
     }
 
 //    @RequestMapping(value = "/public/defaultUser", method = RequestMethod.GET)

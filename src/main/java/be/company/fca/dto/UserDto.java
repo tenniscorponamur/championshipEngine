@@ -9,6 +9,9 @@ public class UserDto {
     private String prenom;
     private String nom;
 
+    public UserDto() {
+    }
+
     public UserDto(User user) {
         this.id=user.getId();
         this.username=user.getUsername();
