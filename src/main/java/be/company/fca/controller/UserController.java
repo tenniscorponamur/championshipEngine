@@ -1,5 +1,6 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.ChangePasswordDto;
 import be.company.fca.dto.UserDto;
 import be.company.fca.model.User;
 import be.company.fca.repository.UserRepository;
@@ -22,7 +23,7 @@ public class UserController {
 
     @ApiOperation(value = "Get current user",
             notes = "Ceci est une méthode privée pour récupérer l'utilisateur reconnu par le token d'accès")
-    @RequestMapping(method=RequestMethod.GET, path="/private/currentUser")
+    @RequestMapping(method=RequestMethod.GET, path="/private/user/current")
     public UserDto getCurrentUser(Principal principal) {
         return new UserDto(userRepository.findByUsername(principal.getName()));
     }
@@ -34,14 +35,14 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/user/{id}", method= RequestMethod.GET)
-    public User getUserById(@PathVariable Long id){
+    @RequestMapping(value = "/private/user", method= RequestMethod.GET)
+    public User getUserById(@RequestParam Long id){
         return userRepository.findOne(id);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/user/{id}", method = RequestMethod.PUT)
-    public UserDto updateUser(@PathVariable Integer id, @RequestBody UserDto userDto){
+    @RequestMapping(value = "/private/user", method = RequestMethod.PUT)
+    public UserDto updateUser(@RequestBody UserDto userDto){
         User user = userRepository.findOne(userDto.getId());
         user.setUsername(userDto.getUsername());
         user.setPrenom(userDto.getPrenom());
@@ -61,6 +62,30 @@ public class UserController {
         userRepository.save(user);
         return new UserDto(user);
     }
+
+
+    @RequestMapping(value = "/private/user/changePassword", method = RequestMethod.PUT)
+    public boolean updatePassword(@PathVariable Long id, @RequestBody ChangePasswordDto changePasswordDto ){
+
+        //TODO : return false si l'ancien mot de passe ne correspond pas a celui qui est connu
+
+        return false;
+    }
+
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/user/resetPassword", method = RequestMethod.POST)
+    public boolean resetPassword(@RequestParam Long id){
+
+        User user = userRepository.findOne(id);
+        user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
+        userRepository.save(user);
+
+        return true;
+    }
+
+
+
 
 //    @RequestMapping(value = "/public/defaultUser", method = RequestMethod.GET)
 //    public UserDto getDefaultUser(){
