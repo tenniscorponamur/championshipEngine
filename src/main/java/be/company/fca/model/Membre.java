@@ -25,6 +25,9 @@ public class Membre {
     @Column( name = "dateNaissance", nullable = false)
     private Date dateNaissance;
 
+    @Column( name = "actif", nullable = false)
+    private boolean actif=true;
+
     public Long getId() {
         return id;
     }
@@ -63,6 +66,14 @@ public class Membre {
 
     public void setDateNaissance(Date dateNaissance) {
         this.dateNaissance = dateNaissance;
+    }
+
+    public boolean isActif() {
+        return actif;
+    }
+
+    public void setActif(boolean actif) {
+        this.actif = actif;
     }
 
     @Override
