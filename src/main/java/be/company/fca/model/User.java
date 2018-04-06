@@ -31,6 +31,7 @@ public class User implements UserDetails {
     private String nom;
 
     //TODO :
+    // Admin role
     // ForeignKey Membre
 
     @Transient

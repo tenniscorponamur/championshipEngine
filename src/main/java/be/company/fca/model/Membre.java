@@ -1,6 +1,7 @@
 package be.company.fca.model;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name="MEMBRE")
@@ -19,6 +20,10 @@ public class Membre {
 
     @Column( name =  "nom", length = 500, nullable = false)
     private String nom;
+
+    @Temporal(TemporalType.DATE)
+    @Column( name = "dateNaissance", nullable = false)
+    private Date dateNaissance;
 
     public Long getId() {
         return id;
@@ -50,6 +55,14 @@ public class Membre {
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public Date getDateNaissance() {
+        return dateNaissance;
+    }
+
+    public void setDateNaissance(Date dateNaissance) {
+        this.dateNaissance = dateNaissance;
     }
 
     @Override
