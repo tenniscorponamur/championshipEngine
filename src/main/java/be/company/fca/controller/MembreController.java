@@ -47,7 +47,7 @@ public class MembreController {
 //    @RequestMapping(method= RequestMethod.GET, path="/public/membre/createDb")
 //    public Iterable<Membre> createMembreDb() throws IOException, InvalidFormatException {
 //
-//        Workbook wb = POIUtils.createWorkbook(new FileInputStream("D:/membres.xls"));
+//        Workbook wb = POIUtils.createWorkbook(new FileInputStream("/Users/fabricecalay/Downloads/membres.xls"));
 //        Sheet sheet = POIUtils.getSheet(wb,0,false);
 //
 //        for (int i=1;i<sheet.getPhysicalNumberOfRows();i++){
