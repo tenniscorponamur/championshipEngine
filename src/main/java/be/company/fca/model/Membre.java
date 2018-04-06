@@ -22,7 +22,7 @@ public class Membre {
     private String nom;
 
     @Temporal(TemporalType.DATE)
-    @Column( name = "dateNaissance", nullable = false)
+    @Column( name = "dateNaissance" )
     private Date dateNaissance;
 
     @Column( name = "actif", nullable = false)
