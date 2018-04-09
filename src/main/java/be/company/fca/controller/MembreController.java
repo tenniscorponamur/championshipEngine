@@ -10,10 +10,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,6 +41,18 @@ public class MembreController {
 
         return membreRepository.findAll();
     }
+
+
+    @RequestMapping(value = "/public/membre", method = RequestMethod.PUT)
+    public Membre updateMembre(@RequestBody Membre membre){
+        return membre;
+    }
+
+    @RequestMapping(value = "/public/membre", method = RequestMethod.POST)
+    public Membre addMembre(@RequestBody Membre membre){
+        return membre;
+    }
+
 
 //    @RequestMapping(method= RequestMethod.GET, path="/public/membre/createDb")
 //    public Iterable<Membre> createMembreDb() throws IOException, InvalidFormatException {
