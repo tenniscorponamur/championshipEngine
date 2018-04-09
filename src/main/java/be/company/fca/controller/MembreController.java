@@ -44,55 +44,55 @@ public class MembreController {
 
         return membreRepository.findAll();
     }
+
+//    @RequestMapping(method= RequestMethod.GET, path="/public/membre/createDb")
+//    public Iterable<Membre> createMembreDb() throws IOException, InvalidFormatException {
 //
-    @RequestMapping(method= RequestMethod.GET, path="/public/membre/createDb")
-    public Iterable<Membre> createMembreDb() throws IOException, InvalidFormatException {
-
-        Workbook wb = POIUtils.createWorkbook(new FileInputStream("/Users/fabricecalay/Downloads/membres.xls"));
-        Sheet sheet = POIUtils.getSheet(wb,0,false);
-
-        for (int i=1;i<sheet.getPhysicalNumberOfRows();i++){
-            String numero = POIUtils.readAsString(sheet,i,0);
-            String nom = POIUtils.readAsString(sheet,i,1);
-            String prenom = POIUtils.readAsString(sheet,i,2);
-            Object dateNaissanceObj = POIUtils.readDate(sheet,i,3);
-            String genre = POIUtils.readAsString(sheet,i,4);
-
-            if (!StringUtils.isEmpty(numero)){
-
-                //TODO : il y a des doublons dans la base initiale --> traiter lors de l'insertion
-
-                Membre membre = new Membre();
-                membre.setNumero(numero);
-                membre.setPrenom(prenom);
-                membre.setNom(nom);
-                if (dateNaissanceObj!=null && dateNaissanceObj instanceof Date){
-                    Date dateNaissance = (Date) dateNaissanceObj;
-                    Calendar gc = new GregorianCalendar();
-                    gc.setTime(dateNaissance);
-                    // Gestion bug de l'export Excel
-                    if (gc.get(Calendar.YEAR) > 2020){
-                        gc.add(Calendar.YEAR,-100);
-                    }
-                    membre.setDateNaissance(gc.getTime());
-                }
-                if ("F".equals(genre)){
-                    membre.setGenre(Genre.FEMME);
-                }else{
-                    membre.setGenre(Genre.HOMME);
-                }
-                try{
-                    membreRepository.save(membre);
-                }catch (Exception e){
-                    System.err.println("Doublon : " + numero);
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
-
-        return membreRepository.findAll();
-    }
+//        Workbook wb = POIUtils.createWorkbook(new FileInputStream("/Users/fabricecalay/Downloads/membres.xls"));
+//        Sheet sheet = POIUtils.getSheet(wb,0,false);
+//
+//        for (int i=1;i<sheet.getPhysicalNumberOfRows();i++){
+//            String numero = POIUtils.readAsString(sheet,i,0);
+//            String nom = POIUtils.readAsString(sheet,i,1);
+//            String prenom = POIUtils.readAsString(sheet,i,2);
+//            Object dateNaissanceObj = POIUtils.readDate(sheet,i,3);
+//            String genre = POIUtils.readAsString(sheet,i,4);
+//
+//            if (!StringUtils.isEmpty(numero)){
+//
+//                //TODO : il y a des doublons dans la base initiale --> traiter lors de l'insertion
+//
+//                Membre membre = new Membre();
+//                membre.setNumero(numero);
+//                membre.setPrenom(prenom);
+//                membre.setNom(nom);
+//                if (dateNaissanceObj!=null && dateNaissanceObj instanceof Date){
+//                    Date dateNaissance = (Date) dateNaissanceObj;
+//                    Calendar gc = new GregorianCalendar();
+//                    gc.setTime(dateNaissance);
+//                    // Gestion bug de l'export Excel
+//                    if (gc.get(Calendar.YEAR) > 2020){
+//                        gc.add(Calendar.YEAR,-100);
+//                    }
+//                    membre.setDateNaissance(gc.getTime());
+//                }
+//                if ("F".equals(genre)){
+//                    membre.setGenre(Genre.FEMME);
+//                }else{
+//                    membre.setGenre(Genre.HOMME);
+//                }
+//                try{
+//                    membreRepository.save(membre);
+//                }catch (Exception e){
+//                    System.err.println("Doublon : " + numero);
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        }
+//
+//
+//        return membreRepository.findAll();
+//    }
 
 }
