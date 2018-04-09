@@ -14,8 +14,7 @@ import java.util.Objects;
 public class User implements UserDetails {
 
     @Id
-    @SequenceGenerator(name = "utilisateurSeqGenerator", sequenceName = "utilisateurSeq", initialValue = 5, allocationSize = 100)
-    @GeneratedValue(generator = "utilisateurSeqGenerator")
+    @GeneratedValue
     private Long id;
 
     @Column( name =  "username", length = 500, nullable = false, unique = true)

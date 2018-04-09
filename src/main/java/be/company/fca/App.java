@@ -1,6 +1,5 @@
 package be.company.fca;
 
-import org.flywaydb.core.Flyway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -18,10 +17,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class App {
 
     public static void main(String[] args) throws Exception{
-//        Flyway flyway = new Flyway();
-//        flyway.setDataSource("jdbc:postgresql://localhost:5432/tennisCorpo", "fca", "fca");
-//        flyway.baseline();
-
         SpringApplication.run(App.class, args);
     }
 

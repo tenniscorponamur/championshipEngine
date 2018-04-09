@@ -8,8 +8,7 @@ import java.util.Date;
 public class Membre {
 
     @Id
-    @SequenceGenerator(name = "membreSeqGenerator", sequenceName = "membreSeq", initialValue = 5, allocationSize = 100)
-    @GeneratedValue(generator = "membreSeqGenerator")
+    @GeneratedValue
     private Long id;
 
     @Column( name =  "numero", length = 500, nullable = false, unique = true)
@@ -24,6 +23,10 @@ public class Membre {
     @Temporal(TemporalType.DATE)
     @Column( name = "dateNaissance" )
     private Date dateNaissance;
+
+    @Column ( name = "genre" )
+    @Enumerated(EnumType.STRING)
+    private Genre genre;
 
     @Column( name = "actif", nullable = false)
     private boolean actif=true;
@@ -74,6 +77,14 @@ public class Membre {
 
     public void setActif(boolean actif) {
         this.actif = actif;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
     }
 
     @Override

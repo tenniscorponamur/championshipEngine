@@ -8,8 +8,7 @@ import java.util.Objects;
 public class Club {
 
     @Id
-    @SequenceGenerator(name = "clubSeqGenerator", sequenceName = "clubSeq", initialValue = 5, allocationSize = 100)
-    @GeneratedValue(generator = "clubSeqGenerator")
+    @GeneratedValue
     private long id;
 
     @Column
