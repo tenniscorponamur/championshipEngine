@@ -12,7 +12,13 @@ public class Club {
     private long id;
 
     @Column
-    private String name;
+    private String numero;
+
+    @Column
+    private String nom;
+
+    @Column
+    private String description;
 
     public long getId() {
         return id;
@@ -22,12 +28,28 @@ public class Club {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNumero() {
+        return numero;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

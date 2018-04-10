@@ -3,7 +3,9 @@
 CREATE TABLE club
 (
     id bigint NOT NULL,
-    name character varying(255),
+    numero character varying(255) not null,
+    nom character varying(255) not null,
+    description character varying(500),
     CONSTRAINT club_pkey PRIMARY KEY (id)
 );
 
