@@ -11,7 +11,7 @@ public class Membre {
     @GeneratedValue
     private Long id;
 
-    @Column( name =  "numero", length = 500, nullable = false, unique = true)
+    @Column( name =  "numero", length = 500, unique = true)
     private String numero;
 
     @Column( name =  "prenom", length = 500, nullable = false)

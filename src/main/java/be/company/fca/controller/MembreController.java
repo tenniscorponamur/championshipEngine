@@ -43,20 +43,25 @@ public class MembreController {
     }
 
 
-    @RequestMapping(value = "/public/membre", method = RequestMethod.PUT)
-    public Membre updateMembre(@RequestBody Membre membre){
-
-        //TODO : avoir plusieurs methodes pour mettre a jour le membre (par groupe de donnees car securite va etre differente)
-
+    @RequestMapping(value = "/public/membre/infosGenerales", method = RequestMethod.PUT)
+    public Membre updateMembreInfosGenerales(@RequestBody Membre membre){
+        membreRepository.updateInfosGenerales(membre.getId(),
+                membre.getGenre(),
+                membre.getPrenom(),
+                membre.getNom(),
+                membre.getDateNaissance());
         return membre;
     }
 
     @RequestMapping(value = "/public/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
-
-        // TODO : ne sauver que les informations generales
-
-        return membre;
+        Membre newMembre = new Membre();
+        newMembre.setGenre(membre.getGenre());
+        newMembre.setPrenom(membre.getPrenom());
+        newMembre.setNom(membre.getNom());
+        newMembre.setDateNaissance(membre.getDateNaissance());
+        membreRepository.save(newMembre);
+        return newMembre;
     }
 
 

@@ -1,7 +1,14 @@
 package be.company.fca.repository;
 
+import be.company.fca.model.Genre;
 import be.company.fca.model.Membre;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 public interface MembreRepository extends PagingAndSortingRepository<Membre,Long> {
 
@@ -11,5 +18,20 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
      * @return Membre correspondant au numero
      */
     Membre findByNumero(String numero);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Membre membre " +
+            " set membre.genre =:genre, " +
+            " membre.prenom =:prenom, " +
+            " membre.nom =:nom, " +
+            " membre.dateNaissance =:dateNaissance" +
+            " where membre.id =:membreId")
+    void updateInfosGenerales(@Param("membreId") Long membreId,
+                              @Param("genre") Genre genre,
+                              @Param("prenom") String prenom,
+                              @Param("nom") String nom,
+                              @Param("dateNaissance") Date dateNaissance);
+
 
 }

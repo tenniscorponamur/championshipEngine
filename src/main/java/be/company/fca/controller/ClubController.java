@@ -33,12 +33,5 @@ public class ClubController {
     public Club addClub(@RequestBody Club club){
         return clubRepository.save(club);
     }
-//
-//    @RequestMapping(method= RequestMethod.GET, path="/public/newClub")
-//    Club newClub() {
-//        Club club = new Club();
-//        club.setName("TC WALLONIE");
-//        clubRepository.save(club);
-//        return club;
-//    }
+
 }

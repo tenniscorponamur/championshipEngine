@@ -27,7 +27,7 @@ CREATE TABLE membre
     date_naissance date,
     genre character varying(10) NOT NULL,
     nom character varying(500) NOT NULL,
-    numero character varying(500) NOT NULL,
+    numero character varying(500),
     prenom character varying(500) NOT NULL,
     CONSTRAINT membre_pkey PRIMARY KEY (id),
     CONSTRAINT membre_numero_unique UNIQUE (numero)
