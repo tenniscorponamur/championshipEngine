@@ -1,0 +1,1 @@
+alter table MEMBRE add column club_fk bigint references club(id);

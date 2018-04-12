@@ -31,6 +31,10 @@ public class Membre {
     @Column( name = "actif", nullable = false)
     private boolean actif=true;
 
+    @ManyToOne
+    @JoinColumn(name = "club_fk")
+    private Club club;
+
     public Long getId() {
         return id;
     }
@@ -85,6 +89,14 @@ public class Membre {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    public Club getClub() {
+        return club;
+    }
+
+    public void setClub(Club club) {
+        this.club = club;
     }
 
     @Override
