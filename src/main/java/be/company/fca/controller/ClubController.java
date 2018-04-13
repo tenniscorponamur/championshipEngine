@@ -22,6 +22,11 @@ public class ClubController {
         return clubRepository.findAll();
     }
 
+    @RequestMapping(path="/public/club", method= RequestMethod.GET)
+    Club getClub(@RequestParam Long id) {
+        return clubRepository.findOne(id);
+    }
+
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/club", method = RequestMethod.PUT)
     public Club updateClub(@RequestBody Club club){

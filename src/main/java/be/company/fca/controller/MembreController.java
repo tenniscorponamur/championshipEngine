@@ -53,6 +53,16 @@ public class MembreController {
         return membre;
     }
 
+
+    @RequestMapping(value = "/public/membre/clubInfos", method = RequestMethod.PUT)
+    public Membre updateClubInfos(@RequestBody Membre membre){
+        membreRepository.updateClubInfos(membre.getId(),
+                membre.getClub());
+        return membre;
+    }
+
+
+
     @RequestMapping(value = "/public/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
