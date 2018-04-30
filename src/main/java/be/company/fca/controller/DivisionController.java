@@ -6,12 +6,14 @@ import be.company.fca.model.Division;
 import be.company.fca.model.TypeChampionnat;
 import be.company.fca.repository.ChampionnatRepository;
 import be.company.fca.repository.DivisionRepository;
+import be.company.fca.service.DivisionService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -23,6 +25,9 @@ public class DivisionController {
 
     @Autowired
     private DivisionRepository divisionRepository;
+
+    @Autowired
+    private DivisionService divisionService;
 
     @RequestMapping(method= RequestMethod.GET, path="/public/divisions")
     public Iterable<Division> getDivisionsByChampionnat(@RequestParam Long championnatId) {
@@ -49,13 +54,17 @@ public class DivisionController {
         return divisionRepository.save(division);
     }
 
-    //TODO : liste de division avec nouveaux numeros
-    // Changer tous les numeros en leur opposé
-    // Sauvegarder les nouvelles divisions avec les nouveaux numeros
-    // Supprimer les divisions qui ne sont plus presentes dans la liste recue
-    // Tous les numeros auront ete changes, plus de negatif apres avoir parcouru l'ensemble
-    // Gerer l'aspect transactionnel des operations pour faire tout en une fois
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/division", method = RequestMethod.DELETE)
+    public void deleteDivision(@RequestParam Long id){
+        divisionRepository.delete(id);
+    }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/divisions", method = RequestMethod.PUT)
+    public List<Division> saveDivisionsInChampionship(@RequestParam Long championnatId, @RequestBody List<Division> divisionList){
+        return divisionService.saveDivisionsInChampionship(championnatId,divisionList);
+    }
 
     @RequestMapping(method= RequestMethod.GET, path="/public/division/createDivision")
     public Division createDivision() {

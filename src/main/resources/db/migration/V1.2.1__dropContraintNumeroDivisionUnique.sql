@@ -1,0 +1,1 @@
+  alter TABLE division drop constraint division_numero_unique;
