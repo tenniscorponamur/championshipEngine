@@ -34,12 +34,18 @@ public class DivisionController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/division", method = RequestMethod.PUT)
     public Division updateDivision(@RequestParam Long championnatId, @RequestBody Division division){
+        Championnat championnat = new Championnat();
+        championnat.setId(championnatId);
+        division.setChampionnat(championnat);
         return divisionRepository.save(division);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/division", method = RequestMethod.POST)
     public Division addDivision(@RequestParam Long championnatId, @RequestBody Division division){
+        Championnat championnat = new Championnat();
+        championnat.setId(championnatId);
+        division.setChampionnat(championnat);
         return divisionRepository.save(division);
     }
 
