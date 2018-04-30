@@ -11,17 +11,17 @@ public class Division {
     @GeneratedValue
     private Long id;
 
-    @Column( name =  "numero")
+    @Column( name =  "numero", nullable = false)
     private Integer numero;
 
-    @Column( name =  "points_min")
+    @Column( name =  "points_min", nullable = false)
     private Integer pointsMinimum;
 
-    @Column( name =  "points_max")
+    @Column( name =  "points_max", nullable = false)
     private Integer pointsMaximum;
 
     @ManyToOne
-    @JoinColumn(name = "championnat_fk")
+    @JoinColumn(name = "championnat_fk", nullable = false)
     private Championnat championnat;
 
     public Long getId() {

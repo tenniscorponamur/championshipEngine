@@ -2,14 +2,14 @@ package be.company.fca.controller;
 
 import be.company.fca.model.CategorieChampionnat;
 import be.company.fca.model.Championnat;
+import be.company.fca.model.Club;
 import be.company.fca.model.TypeChampionnat;
 import be.company.fca.repository.ChampionnatRepository;
 import be.company.fca.repository.MembreRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -24,9 +24,17 @@ public class ChampionnatController {
         return championnatRepository.findAll();
     }
 
-    //
-    //    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    // TODO : change championnat == private / ADMIN
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/championnat", method = RequestMethod.PUT)
+    public Championnat updateChampionnat(@RequestBody Championnat championnat){
+        return championnatRepository.save(championnat);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/championnat", method = RequestMethod.POST)
+    public Championnat addChampionnat(@RequestBody Championnat championnat){
+        return championnatRepository.save(championnat);
+    }
 
     @RequestMapping(method= RequestMethod.GET, path="/public/championnat/createChampionnat")
     public Championnat createChampionnat() {
