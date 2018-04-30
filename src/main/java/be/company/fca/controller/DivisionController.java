@@ -48,6 +48,11 @@ public class DivisionController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/division", method = RequestMethod.POST)
     public Division addDivision(@RequestParam Long championnatId, @RequestBody Division division){
+
+        //TODO : tester si le numero n'est pas deja present --> devrait etre une contrainte en DB mais probleme pour la renumerotation...
+
+        //TODO : methode de modificaiton d'un championnat interdite a partir d'un certain stade du championnat (avoir un etat)
+
         Championnat championnat = new Championnat();
         championnat.setId(championnatId);
         division.setChampionnat(championnat);
