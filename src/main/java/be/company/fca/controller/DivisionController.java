@@ -70,19 +70,19 @@ public class DivisionController {
     public List<Division> saveDivisionsInChampionship(@RequestParam Long championnatId, @RequestBody List<Division> divisionList){
         return divisionService.saveDivisionsInChampionship(championnatId,divisionList);
     }
-
-    @RequestMapping(method= RequestMethod.GET, path="/public/division/createDivision")
-    public Division createDivision() {
-        //Iterable<Championnat> championnats = championnatRepository.findAll();
-        //Championnat championnat = championnats.iterator().next();
-        Division division = new Division();
-        Championnat championnat = new Championnat();
-        championnat.setId(1102L);
-        division.setChampionnat(championnat);
-        division.setNumero(2);
-        division.setPointsMinimum(0);
-        division.setPointsMaximum(100);
-        divisionRepository.save(division);
-        return division;
-    }
+//
+//    @RequestMapping(method= RequestMethod.GET, path="/public/division/createDivision")
+//    public Division createDivision() {
+//        //Iterable<Championnat> championnats = championnatRepository.findAll();
+//        //Championnat championnat = championnats.iterator().next();
+//        Division division = new Division();
+//        Championnat championnat = new Championnat();
+//        championnat.setId(1102L);
+//        division.setChampionnat(championnat);
+//        division.setNumero(2);
+//        division.setPointsMinimum(0);
+//        division.setPointsMaximum(100);
+//        divisionRepository.save(division);
+//        return division;
+//    }
 }

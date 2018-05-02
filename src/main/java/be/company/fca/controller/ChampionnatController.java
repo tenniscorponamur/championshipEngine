@@ -36,14 +36,14 @@ public class ChampionnatController {
         return championnatRepository.save(championnat);
     }
 
-    @RequestMapping(method= RequestMethod.GET, path="/public/championnat/createChampionnat")
-    public Championnat createChampionnat() {
-        Championnat championnat = new Championnat();
-        championnat.setAnnee(2018);
-        championnat.setType(TypeChampionnat.ETE);
-        championnat.setCategorie(CategorieChampionnat.DAMES);
-        championnatRepository.save(championnat);
-        return championnat;
-    }
+//    @RequestMapping(method= RequestMethod.GET, path="/public/championnat/createChampionnat")
+//    public Championnat createChampionnat() {
+//        Championnat championnat = new Championnat();
+//        championnat.setAnnee(2018);
+//        championnat.setType(TypeChampionnat.ETE);
+//        championnat.setCategorie(CategorieChampionnat.DAMES);
+//        championnatRepository.save(championnat);
+//        return championnat;
+//    }
 
 }
