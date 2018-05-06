@@ -5,10 +5,14 @@ import be.company.fca.model.Division;
 import be.company.fca.model.Equipe;
 import be.company.fca.model.Poule;
 import be.company.fca.repository.EquipeRepository;
+import be.company.fca.service.DivisionService;
+import be.company.fca.service.EquipeService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -17,6 +21,9 @@ public class EquipeController {
 
     @Autowired
     private EquipeRepository equipeRepository;
+
+    @Autowired
+    private EquipeService equipeService;
 
     @RequestMapping(method= RequestMethod.GET, path="/public/equipes")
     public Iterable<Equipe> getEquipesByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId) {
@@ -53,6 +60,12 @@ public class EquipeController {
     @RequestMapping(value = "/private/equipe", method = RequestMethod.DELETE)
     public void deleteEquipe(@RequestParam Long id){
         equipeRepository.delete(id);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/equipes/names", method = RequestMethod.PUT)
+    public List<Equipe> updateEquipeNames(@RequestBody List<Equipe> equipeList){
+        return equipeService.updateEquipeNames(equipeList);
     }
 
     //1107, 1113, 1116, 1112: division
