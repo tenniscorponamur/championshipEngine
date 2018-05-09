@@ -68,6 +68,13 @@ public class EquipeController {
         return equipeService.updateEquipeNames(equipeList);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/equipe/poule", method = RequestMethod.PUT)
+    public Equipe updatePouleEquipe(@RequestParam Long equipeId, @RequestBody Poule poule){
+        equipeRepository.updatePoule(equipeId,poule);
+        return equipeRepository.findOne(equipeId);
+    }
+
     //1107, 1113, 1116, 1112: division
     //1093 : club
     //1092 : club
