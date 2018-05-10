@@ -5,6 +5,7 @@ import be.company.fca.model.Championnat;
 import be.company.fca.model.Club;
 import be.company.fca.model.TypeChampionnat;
 import be.company.fca.repository.ChampionnatRepository;
+import be.company.fca.repository.DivisionRepository;
 import be.company.fca.repository.MembreRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ChampionnatController {
 
     @Autowired
     private ChampionnatRepository championnatRepository;
+
+    @Autowired
+    private DivisionRepository divisionRepository;
 
     @RequestMapping(method= RequestMethod.GET, path="/public/championnats")
     public Iterable<Championnat> getChampionnats() {
@@ -39,6 +43,14 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat", method = RequestMethod.DELETE)
     public void deleteChampionnat(@RequestParam Long id){
+
+        Championnat championnat = new Championnat();
+        championnat.setId(id);
+
+        //TODO : idealement transactionnel...
+
+        divisionRepository.deleteByChampionnat(championnat);
+
         championnatRepository.delete(id);
     }
 
