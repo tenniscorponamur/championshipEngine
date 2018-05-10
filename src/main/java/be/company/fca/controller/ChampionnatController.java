@@ -36,6 +36,12 @@ public class ChampionnatController {
         return championnatRepository.save(championnat);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/championnat", method = RequestMethod.DELETE)
+    public void deleteChampionnat(@RequestParam Long id){
+        championnatRepository.delete(id);
+    }
+
 //    @RequestMapping(method= RequestMethod.GET, path="/public/championnat/createChampionnat")
 //    public Championnat createChampionnat() {
 //        Championnat championnat = new Championnat();
