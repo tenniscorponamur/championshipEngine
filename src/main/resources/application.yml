@@ -43,11 +43,11 @@ security:
 #### DATASOURCE ####
 
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/tennisCorpo
-    username: fca
-    password: fca
-    driver-class: org.postgresql.Driver
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/tennisCorpo
+#    username: fca
+#    password: fca
+#    driver-class: org.postgresql.Driver
   jpa:
     show-sql: true
     ###generate-ddl: true

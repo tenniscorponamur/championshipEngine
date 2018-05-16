@@ -2,9 +2,15 @@ package be.company.fca;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import springfox.documentation.swagger.web.*;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import javax.sql.DataSource;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * First class of Tennis Corpo Engine
@@ -18,6 +24,32 @@ public class App {
 
     public static void main(String[] args) throws Exception{
         SpringApplication.run(App.class, args);
+    }
+
+    @Bean
+    @Primary
+    public DataSource dataSource() throws URISyntaxException {
+
+        String username = "fca";
+        String password = "fca";
+        String dbUrl = "jdbc:postgresql://localhost:5432/tennisCorpo";
+
+        String databaseUrl = System.getenv("DATABASE_URL");
+        if (databaseUrl!=null) {
+            URI dbUri = new URI(databaseUrl);
+            username = dbUri.getUserInfo().split(":")[0];
+            password = dbUri.getUserInfo().split(":")[1];
+            dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+        }
+
+        return DataSourceBuilder
+                .create()
+                .username(username)
+                .password(password)
+                .url(dbUrl)
+                .driverClassName("org.postgresql.Driver")
+                .build();
+
     }
 
     // localhost:9100/swagger-ui.html
