@@ -23,7 +23,7 @@ public class EngineUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username.toLowerCase());
 
         if (user==null){
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", username));
