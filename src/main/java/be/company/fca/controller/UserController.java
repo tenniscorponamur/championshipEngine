@@ -25,7 +25,7 @@ public class UserController {
             notes = "Ceci est une méthode privée pour récupérer l'utilisateur reconnu par le token d'accès")
     @RequestMapping(method=RequestMethod.GET, path="/private/user/current")
     public UserDto getCurrentUser(Principal principal) {
-        return new UserDto(userRepository.findByUsername(principal.getName()));
+        return new UserDto(userRepository.findByUsername(principal.getName().toLowerCase()));
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -44,7 +44,7 @@ public class UserController {
     @RequestMapping(value = "/private/user", method = RequestMethod.PUT)
     public UserDto updateUser(@RequestBody UserDto userDto){
         User user = userRepository.findOne(userDto.getId());
-        user.setUsername(userDto.getUsername());
+        user.setUsername(userDto.getUsername().toLowerCase());
         user.setPrenom(userDto.getPrenom());
         user.setNom(userDto.getNom());
         userRepository.save(user);
@@ -55,7 +55,7 @@ public class UserController {
     @RequestMapping(value = "/private/user", method = RequestMethod.POST)
     public UserDto addUser(@RequestBody UserDto userDto){
         User user = new User();
-        user.setUsername(userDto.getUsername());
+        user.setUsername(userDto.getUsername().toLowerCase());
         user.setPrenom(userDto.getPrenom());
         user.setNom(userDto.getNom());
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
