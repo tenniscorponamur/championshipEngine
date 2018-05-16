@@ -20,8 +20,17 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SimpleCorsFilter implements Filter {
 
-    @Value("${security.allow-origin}")
+//    @Value("${security.allow-origin}")
     private String allowOrigin;
+
+    public SimpleCorsFilter() {
+        this.allowOrigin = "http://localhost:4200";
+
+        String frontEndUrl = System.getenv("FRONT_END_URL");
+        if (frontEndUrl!=null) {
+            this.allowOrigin = frontEndUrl;
+        }
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {

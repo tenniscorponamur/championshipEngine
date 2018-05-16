@@ -19,7 +19,8 @@ security:
     scope-read: read
     scope-write: write
     resource-ids: tenniscorporesourceid
-  allow-origin: http://localhost:4200
+#    Ajout dynamique de cette information dans SimpleCorsFilter (surcharge possible via variable d'environnement au runtime
+#  allow-origin: http://localhost:4200
 
 
 #### GOOGLE OAUTH2 #####
@@ -43,6 +44,7 @@ security:
 #### DATASOURCE ####
 
 spring:
+#    Ajout dynamique de ces informations dans App (surcharge possible via variable d'environnement au runtime
 #  datasource:
 #    url: jdbc:postgresql://localhost:5432/tennisCorpo
 #    username: fca
