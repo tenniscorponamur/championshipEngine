@@ -97,4 +97,11 @@ public class Equipe {
 
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "Equipe{" +
+                "codeAlphabetique='" + codeAlphabetique + '\'' +
+                '}';
+    }
 }
