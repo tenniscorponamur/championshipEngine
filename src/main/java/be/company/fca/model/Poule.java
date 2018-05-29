@@ -18,6 +18,9 @@ public class Poule {
     @JoinColumn(name = "division_fk", nullable = false)
     private Division division;
 
+    @Column( name = "allerRetour", nullable = false)
+    private boolean allerRetour=false;
+
     public Long getId() {
         return id;
     }

@@ -32,9 +32,9 @@ public class Equipe {
     @JoinColumn(name = "poule_fk")
     private Poule poule;
 
-
-    //    private Terrain terrainDomicile;
-
+    @ManyToOne
+    @JoinColumn(name = "terrain_fk")
+    private Terrain terrainDomicile;
 
     public Long getId() {
         return id;
@@ -82,6 +82,14 @@ public class Equipe {
 
     public void setPoule(Poule poule) {
         this.poule = poule;
+    }
+
+    public Terrain getTerrainDomicile() {
+        return terrainDomicile;
+    }
+
+    public void setTerrainDomicile(Terrain terrainDomicile) {
+        this.terrainDomicile = terrainDomicile;
     }
 
     @Override

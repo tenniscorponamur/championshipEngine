@@ -20,6 +20,10 @@ public class Club {
     @Column
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "terrain_fk")
+    private Terrain terrainDomicile;
+
     public long getId() {
         return id;
     }
@@ -50,6 +54,14 @@ public class Club {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Terrain getTerrainDomicile() {
+        return terrainDomicile;
+    }
+
+    public void setTerrainDomicile(Terrain terrainDomicile) {
+        this.terrainDomicile = terrainDomicile;
     }
 
     @Override
