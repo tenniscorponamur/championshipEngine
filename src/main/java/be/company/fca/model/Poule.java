@@ -18,7 +18,7 @@ public class Poule {
     @JoinColumn(name = "division_fk", nullable = false)
     private Division division;
 
-    @Column( name = "allerRetour", nullable = false)
+    @Column( name = "allerretour", nullable = false)
     private boolean allerRetour=false;
 
     public Long getId() {
@@ -43,6 +43,14 @@ public class Poule {
 
     public void setDivision(Division division) {
         this.division = division;
+    }
+
+    public boolean isAllerRetour() {
+        return allerRetour;
+    }
+
+    public void setAllerRetour(boolean allerRetour) {
+        this.allerRetour = allerRetour;
     }
 
     @Override

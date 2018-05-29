@@ -1,0 +1,23 @@
+package be.company.fca.repository;
+
+import be.company.fca.model.Division;
+import be.company.fca.model.Rencontre;
+import be.company.fca.model.Poule;
+import org.springframework.data.repository.CrudRepository;
+
+public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
+
+    /**
+     * Permet de recuperer les rencontres d'une division
+     * @param division Division
+     * @return Rencontres d'une division
+     */
+    Iterable<Rencontre> findByDivision(Division division);
+
+    /**
+     * Permet de recuperer les rencontres d'une poule
+     * @param poule Poule
+     * @return Rencontres d'une poule
+     */
+    Iterable<Rencontre> findByPoule(Poule poule);
+}

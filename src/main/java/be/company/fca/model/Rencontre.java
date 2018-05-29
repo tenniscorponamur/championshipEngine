@@ -12,11 +12,11 @@ public class Rencontre {
     @GeneratedValue
     private Long id;
 
-    @Column( name =  "numeroJournee")
+    @Column( name =  "numerojournee")
     private Integer numeroJournee;
 
-    @Column( name =  "dateRencontre")
-    private Date dateRencontre;
+    @Column( name =  "dateheurerencontre")
+    private Date dateHeureRencontre;
 
     @ManyToOne
     @JoinColumn(name = "division_fk", nullable = false)
@@ -107,12 +107,12 @@ public class Rencontre {
         this.terrain = terrain;
     }
 
-    public Date getDateRencontre() {
-        return dateRencontre;
+    public Date getDateHeureRencontre() {
+        return dateHeureRencontre;
     }
 
-    public void setDateRencontre(Date dateRencontre) {
-        this.dateRencontre = dateRencontre;
+    public void setDateHeureRencontre(Date dateHeureRencontre) {
+        this.dateHeureRencontre = dateHeureRencontre;
     }
 
     @Override

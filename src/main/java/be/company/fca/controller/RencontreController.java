@@ -4,6 +4,7 @@ import be.company.fca.model.*;
 import be.company.fca.repository.DivisionRepository;
 import be.company.fca.repository.EquipeRepository;
 import be.company.fca.repository.PouleRepository;
+import be.company.fca.repository.RencontreRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,12 +21,27 @@ import java.util.List;
 public class RencontreController {
 
     @Autowired
+    private RencontreRepository rencontreRepository;
+    @Autowired
     private EquipeRepository equipeRepository;
     @Autowired
     private DivisionRepository divisionRepository;
     @Autowired
     private PouleRepository pouleRepository;
 
+
+    @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
+    public Iterable<Rencontre> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId) {
+        if (pouleId!=null){
+            Poule poule = new Poule();
+            poule.setId(pouleId);
+            return rencontreRepository.findByPoule(poule);
+        }else{
+            Division division = new Division();
+            division.setId(divisionId);
+            return rencontreRepository.findByDivision(division);
+        }
+    }
 
     @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/createCalendrier")
     public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
