@@ -13,4 +13,10 @@ public interface RencontreService {
      * @return
      */
     public List<Rencontre> saveRencontres(List<Rencontre> rencontreList);
+
+    /**
+     * Permet de supprimer toutes les rencontres d'un championnat
+     * @param championnatId 
+     */
+    public void deleteByChampionnat(Long championnatId);
 }

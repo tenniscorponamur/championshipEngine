@@ -47,7 +47,8 @@ public class RencontreController {
         }
     }
 
-    @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/createCalendrier")
+
+    @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
     public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
 
         List<Rencontre> rencontres = new ArrayList<Rencontre>();
@@ -58,7 +59,6 @@ public class RencontreController {
         for (Division division : divisionList){
             Iterable<Poule> pouleList = pouleRepository.findByDivision(division);
             for (Poule poule : pouleList){
-
                 rencontres.addAll(generateCalendar(poule));
 
             }
@@ -67,7 +67,10 @@ public class RencontreController {
         return rencontreService.saveRencontres(rencontres);
     }
 
-
+    @RequestMapping(method= RequestMethod.DELETE, path="/private/rencontres/calendrier")
+    public void deleteCalendrier(@RequestParam Long championnatId) {
+        rencontreService.deleteByChampionnat(championnatId);
+    }
 
     private List<Rencontre> generateCalendar(Poule poule){
 
@@ -81,8 +84,8 @@ public class RencontreController {
 
         int nbJournees = getNbJournees(equipes);
         int nbRencontresParJournee = equipes.size() / 2;
-        System.err.println("Nb rencontres par journee : " + nbRencontresParJournee);
-        System.err.println("Nombre de matchs à jouer :" + nbJournees*nbRencontresParJournee);
+        //System.err.println("Nb rencontres par journee : " + nbRencontresParJournee);
+        //System.err.println("Nombre de matchs à jouer :" + nbJournees*nbRencontresParJournee);
 
         // Decoupe en journees
 
@@ -96,7 +99,7 @@ public class RencontreController {
                 Rencontre rencontre = new Rencontre();
                 rencontre.setPoule(poule);
                 rencontre.setDivision(poule.getDivision());
-                rencontre.setNumeroJournee(i);
+                rencontre.setNumeroJournee(i+1);
 
                 // Pour un nombre d'equipes impair, permutation circulaire parmi toutes les equipes --> l'une sera bye via la procedure
                 if (nombreEquipesImpair(equipes)){
@@ -113,16 +116,44 @@ public class RencontreController {
                         rencontre.setEquipeVisiteurs(equipesReduites.get( (equipesReduites.size() - 1 - j + i) % equipesReduites.size() ));
                     }
                 }
-                System.err.println(rencontre);
+
+                // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
+                if (rencontre.getEquipeVisites().getTerrainDomicile()!=null){
+                    rencontre.setTerrain(rencontre.getEquipeVisites().getTerrainDomicile());
+                }
+
+                //System.err.println(rencontre);
                 rencontres.add(rencontre);
 
             }
 
         }
 
-        return rencontres;
+        // Si la poule est specifee avec matchs aller-retour, on va dupliquer les rencontres
+        //  en inversant les equipes visites-visiteurs
+        if (poule.isAllerRetour()){
+            List<Rencontre> rencontresRetour = new ArrayList<>();
 
-        // TODO : Aller-retour == dupliquer les rencontres en inversant visites-visiteurs
+            for (Rencontre rencontreAller : rencontres){
+                Rencontre rencontreRetour = new Rencontre();
+                rencontreRetour.setPoule(poule);
+                rencontreRetour.setDivision(poule.getDivision());
+                rencontreRetour.setNumeroJournee(nbJournees + rencontreAller.getNumeroJournee());
+                rencontreRetour.setEquipeVisites(rencontreAller.getEquipeVisiteurs());
+                rencontreRetour.setEquipeVisiteurs(rencontreAller.getEquipeVisites());
+
+                // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
+                if (rencontreRetour.getEquipeVisites().getTerrainDomicile()!=null){
+                    rencontreRetour.setTerrain(rencontreRetour.getEquipeVisites().getTerrainDomicile());
+                }
+
+                rencontresRetour.add(rencontreRetour);
+            }
+
+            rencontres.addAll(rencontresRetour);
+        }
+
+        return rencontres;
 
     }
 
