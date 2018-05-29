@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @Api(description = "API REST pour la gestion des poules")
@@ -41,6 +43,12 @@ public class PouleController {
         division.setId(divisionId);
         poule.setDivision(division);
         return pouleRepository.save(poule);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/poule/allerRetour", method = RequestMethod.PUT)
+    public void updateAllerRetour(@RequestParam Long pouleId, @RequestParam boolean allerRetour){
+        pouleRepository.updateAllerRetour(pouleId,allerRetour);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
