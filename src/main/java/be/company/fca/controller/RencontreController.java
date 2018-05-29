@@ -5,6 +5,7 @@ import be.company.fca.repository.DivisionRepository;
 import be.company.fca.repository.EquipeRepository;
 import be.company.fca.repository.PouleRepository;
 import be.company.fca.repository.RencontreRepository;
+import be.company.fca.service.RencontreService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,9 @@ public class RencontreController {
     private DivisionRepository divisionRepository;
     @Autowired
     private PouleRepository pouleRepository;
+
+    @Autowired
+    private RencontreService rencontreService;
 
 
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
@@ -60,8 +64,7 @@ public class RencontreController {
             }
         }
 
-
-        return rencontres;
+        return rencontreService.saveRencontres(rencontres);
     }
 
 
