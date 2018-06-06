@@ -8,10 +8,8 @@ import be.company.fca.repository.RencontreRepository;
 import be.company.fca.service.RencontreService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +45,11 @@ public class RencontreController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/rencontre", method = RequestMethod.PUT)
+    public Rencontre updateRencontre(@RequestBody Rencontre rencontre){
+        return rencontreRepository.save(rencontre);
+    }
 
     @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
     public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
