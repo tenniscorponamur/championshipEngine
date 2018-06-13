@@ -121,8 +121,8 @@ public class RencontreController {
                 }
 
                 // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
-                if (rencontre.getEquipeVisites().getTerrainDomicile()!=null){
-                    rencontre.setTerrain(rencontre.getEquipeVisites().getTerrainDomicile());
+                if (rencontre.getEquipeVisites().getTerrain()!=null){
+                    rencontre.setTerrain(rencontre.getEquipeVisites().getTerrain());
                 }
 
                 //System.err.println(rencontre);
@@ -146,8 +146,8 @@ public class RencontreController {
                 rencontreRetour.setEquipeVisiteurs(rencontreAller.getEquipeVisites());
 
                 // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
-                if (rencontreRetour.getEquipeVisites().getTerrainDomicile()!=null){
-                    rencontreRetour.setTerrain(rencontreRetour.getEquipeVisites().getTerrainDomicile());
+                if (rencontreRetour.getEquipeVisites().getTerrain()!=null){
+                    rencontreRetour.setTerrain(rencontreRetour.getEquipeVisites().getTerrain());
                 }
 
                 rencontresRetour.add(rencontreRetour);

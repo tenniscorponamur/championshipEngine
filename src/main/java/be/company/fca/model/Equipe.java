@@ -34,7 +34,7 @@ public class Equipe {
 
     @ManyToOne
     @JoinColumn(name = "terrain_fk")
-    private Terrain terrainDomicile;
+    private Terrain terrain;
 
     public Long getId() {
         return id;
@@ -84,12 +84,12 @@ public class Equipe {
         this.poule = poule;
     }
 
-    public Terrain getTerrainDomicile() {
-        return terrainDomicile;
+    public Terrain getTerrain() {
+        return terrain;
     }
 
-    public void setTerrainDomicile(Terrain terrainDomicile) {
-        this.terrainDomicile = terrainDomicile;
+    public void setTerrain(Terrain terrain) {
+        this.terrain = terrain;
     }
 
     @Override
