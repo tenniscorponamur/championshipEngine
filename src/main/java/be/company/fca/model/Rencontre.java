@@ -40,16 +40,11 @@ public class Rencontre {
     @JoinColumn(name = "terrain_fk")
     private Terrain terrain;
 
-    //TODO : liste des matchs - quid stockage resultat rencontre ?? Redondance pour simplifier le calcul des points --> gerer au niveau transactionnel lors
-    // de l'enregistrement du resultat d'un des matchs de la rencontre ??? methode pour connaitre l'equipe gagnante ?? --> structure differente ??
+    @Column( name =  "pointsvisites")
+    private Integer pointsVisites;
 
-    // --> prevoir une redondance des informations pour les championnats clotures
-
-//    private Integer pointsVisites;
-//    private Integer pointsVisiteurs;
-//    private Integer setsVisites;
-//    private Integer setsVisiteurs;
-
+    @Column( name =  "pointsvisiteurs")
+    private Integer pointsVisiteurs;
 
     public Long getId() {
         return id;
@@ -113,6 +108,22 @@ public class Rencontre {
 
     public void setDateHeureRencontre(Date dateHeureRencontre) {
         this.dateHeureRencontre = dateHeureRencontre;
+    }
+
+    public Integer getPointsVisites() {
+        return pointsVisites;
+    }
+
+    public void setPointsVisites(Integer pointsVisites) {
+        this.pointsVisites = pointsVisites;
+    }
+
+    public Integer getPointsVisiteurs() {
+        return pointsVisiteurs;
+    }
+
+    public void setPointsVisiteurs(Integer pointsVisiteurs) {
+        this.pointsVisiteurs = pointsVisiteurs;
     }
 
     @Override
