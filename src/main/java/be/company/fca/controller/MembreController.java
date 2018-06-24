@@ -1,5 +1,6 @@
 package be.company.fca.controller;
 
+import be.company.fca.model.Club;
 import be.company.fca.model.Genre;
 import be.company.fca.model.Membre;
 import be.company.fca.repository.MembreRepository;
@@ -33,13 +34,19 @@ public class MembreController {
     }
 
     @RequestMapping(method= RequestMethod.GET, path="/public/membres")
-    public Iterable<Membre> getMembres() {
+    public Iterable<Membre> getMembres(@RequestParam(required = false) Long clubId) {
 
 //        //TODO : pour une liste de membre, limiter le contenu retourne (membreDto)
 //
 //        //TODO : si retour d'un singleton --> membre complet = ok
 
-        return membreRepository.findAll();
+        if (clubId!=null){
+            Club club = new Club();
+            club.setId(clubId);
+            return membreRepository.findByClub(club);
+        }else{
+            return membreRepository.findAll();
+        }
     }
 
 

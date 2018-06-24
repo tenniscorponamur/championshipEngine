@@ -20,6 +20,13 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
      */
     Membre findByNumero(String numero);
 
+    /**
+     * Permet de recuperer les membres d'un club
+     * @param club Club du membre
+     * @return Membres appartenant au club
+     */
+    Iterable<Membre> findByClub(Club club);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Membre membre " +

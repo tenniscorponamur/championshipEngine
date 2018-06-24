@@ -1,0 +1,1 @@
+alter table MATCH add column type character varying(10) NOT NULL;
