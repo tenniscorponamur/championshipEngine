@@ -19,7 +19,7 @@ public class Match {
     private TypeMatch type;
 
     @ManyToOne
-    @JoinColumn(name = "joueurvisites1_fk", nullable = false)
+    @JoinColumn(name = "joueurvisites1_fk")
     private Membre joueurVisites1;
 
     @ManyToOne
@@ -27,12 +27,18 @@ public class Match {
     private Membre joueurVisites2;
 
     @ManyToOne
-    @JoinColumn(name = "joueurvisiteurs1_fk", nullable = false)
+    @JoinColumn(name = "joueurvisiteurs1_fk")
     private Membre joueurVisiteurs1;
 
     @ManyToOne
     @JoinColumn(name = "joueurvisiteurs2_fk")
     private Membre joueurVisiteurs2;
+
+    @Column( name =  "pointsvisites")
+    private Integer pointsVisites;
+
+    @Column( name =  "pointsvisiteurs")
+    private Integer pointsVisiteurs;
 
     @ManyToOne
     @JoinColumn(name = "rencontre_fk")
@@ -92,6 +98,22 @@ public class Match {
 
     public void setJoueurVisiteurs2(Membre joueurVisiteurs2) {
         this.joueurVisiteurs2 = joueurVisiteurs2;
+    }
+
+    public Integer getPointsVisites() {
+        return pointsVisites;
+    }
+
+    public void setPointsVisites(Integer pointsVisites) {
+        this.pointsVisites = pointsVisites;
+    }
+
+    public Integer getPointsVisiteurs() {
+        return pointsVisiteurs;
+    }
+
+    public void setPointsVisiteurs(Integer pointsVisiteurs) {
+        this.pointsVisiteurs = pointsVisiteurs;
     }
 
     public Rencontre getRencontre() {
