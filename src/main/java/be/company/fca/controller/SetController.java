@@ -22,27 +22,27 @@ public class SetController {
         match.setId(matchId);
         return setRepository.findByMatch(match);
     }
-
-    @RequestMapping(path="/public/set", method= RequestMethod.GET)
-    Set getSet(@RequestParam Long id) {
-        return setRepository.findOne(id);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/set", method = RequestMethod.PUT)
-    public Set updateSet(@RequestBody Set set){
-        return setRepository.save(set);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/set", method = RequestMethod.POST)
-    public Set addSet(@RequestBody Set set){
-        return setRepository.save(set);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/set", method = RequestMethod.DELETE)
-    public void deleteSet(@RequestParam Long id){
-        setRepository.delete(id);
-    }
+//
+//    @RequestMapping(path="/public/set", method= RequestMethod.GET)
+//    Set getSet(@RequestParam Long id) {
+//        return setRepository.findOne(id);
+//    }
+//
+//    @PreAuthorize("hasAuthority('ADMIN_USER')")
+//    @RequestMapping(value = "/private/set", method = RequestMethod.PUT)
+//    public Set updateSet(@RequestBody Set set){
+//        return setRepository.save(set);
+//    }
+//
+//    @PreAuthorize("hasAuthority('ADMIN_USER')")
+//    @RequestMapping(value = "/private/set", method = RequestMethod.POST)
+//    public Set addSet(@RequestBody Set set){
+//        return setRepository.save(set);
+//    }
+//
+//    @PreAuthorize("hasAuthority('ADMIN_USER')")
+//    @RequestMapping(value = "/private/set", method = RequestMethod.DELETE)
+//    public void deleteSet(@RequestParam Long id){
+//        setRepository.delete(id);
+//    }
 }
