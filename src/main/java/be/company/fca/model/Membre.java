@@ -35,6 +35,9 @@ public class Membre {
     @JoinColumn(name = "club_fk")
     private Club club;
 
+    @Column( name = "capitaine", nullable = false)
+    private boolean capitaine=false;
+
     public Long getId() {
         return id;
     }
@@ -97,6 +100,14 @@ public class Membre {
 
     public void setClub(Club club) {
         this.club = club;
+    }
+
+    public boolean isCapitaine() {
+        return capitaine;
+    }
+
+    public void setCapitaine(boolean capitaine) {
+        this.capitaine = capitaine;
     }
 
     @Override

@@ -46,6 +46,9 @@ public class Rencontre {
     @Column( name =  "pointsvisiteurs")
     private Integer pointsVisiteurs;
 
+    @Column( name = "valide", nullable = false)
+    private boolean valide=false;
+
     public Long getId() {
         return id;
     }
@@ -124,6 +127,14 @@ public class Rencontre {
 
     public void setPointsVisiteurs(Integer pointsVisiteurs) {
         this.pointsVisiteurs = pointsVisiteurs;
+    }
+
+    public boolean isValide() {
+        return valide;
+    }
+
+    public void setValide(boolean valide) {
+        this.valide = valide;
     }
 
     @Override

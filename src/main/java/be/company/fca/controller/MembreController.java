@@ -64,7 +64,7 @@ public class MembreController {
     @RequestMapping(value = "/public/membre/clubInfos", method = RequestMethod.PUT)
     public Membre updateClubInfos(@RequestBody Membre membre){
         membreRepository.updateClubInfos(membre.getId(),
-                membre.getClub());
+                membre.getClub(), membre.isCapitaine());
         return membre;
     }
 
