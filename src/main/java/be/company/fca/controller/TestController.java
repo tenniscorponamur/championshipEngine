@@ -47,12 +47,14 @@ public class TestController {
 
         byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
 
+        conn.close();
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/pdf"));
-        String filename = "RapportTest.pdf";
+//        String filename = "RapportTest.pdf";
 //        headers.setContentDispositionFormData(filename, filename);
-        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        headers.add("content-disposition", "inline; filename=" + filename);
+//        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+//        headers.add("content-disposition", "inline; filename=" + filename);
         ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
         return response;
     }
