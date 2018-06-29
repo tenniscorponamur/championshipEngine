@@ -31,7 +31,6 @@ public class RencontreController {
     @Autowired
     private RencontreService rencontreService;
 
-
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
     public Iterable<Rencontre> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId) {
         if (pouleId!=null){
@@ -49,6 +48,32 @@ public class RencontreController {
     @RequestMapping(value = "/private/rencontre", method = RequestMethod.PUT)
     public Rencontre updateRencontre(@RequestBody Rencontre rencontre){
         return rencontreRepository.save(rencontre);
+    }
+
+    @RequestMapping(value = "/public/rencontre/isValidable", method = RequestMethod.GET)
+    public boolean isRencontreValidable(@RequestParam Long rencontreId){
+        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
+            Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
+            return totalPoints == 12;
+        }
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/rencontre/validite", method = RequestMethod.PUT)
+    public boolean updateValiditeRencontre(@RequestParam Long rencontreId, @RequestBody boolean validite){
+        if (validite) {
+            if (isRencontreValidable(rencontreId)){
+                rencontreRepository.updateValiditeRencontre(rencontreId,validite);
+            }else{
+                return false;
+            }
+        }else{
+            rencontreRepository.updateValiditeRencontre(rencontreId,validite);
+        }
+
+        return validite;
     }
 
     @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
