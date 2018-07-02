@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import java.util.*;
+
 public class ClassementEquipe {
 
     private Equipe equipe;
@@ -10,6 +12,7 @@ public class ClassementEquipe {
     private int jeuxGagnes;
     private int jeuxPerdus;
     private boolean gagnantInterseries;
+    private HashSet<Equipe> equipesBattues=new HashSet<>();
 
     public ClassementEquipe() {
     }
@@ -80,5 +83,37 @@ public class ClassementEquipe {
 
     public void setGagnantInterseries(boolean gagnantInterseries) {
         this.gagnantInterseries = gagnantInterseries;
+    }
+
+    public void ajoutMatchJoue(){
+        this.matchsJoues++;
+    }
+
+    public void ajoutPoints(int points){
+        this.points += points;
+    }
+
+    public void ajoutSetsGagnes(int setsGagnes){
+        this.setsGagnes += setsGagnes;
+    }
+
+    public void ajoutSetsPerdus(int setsPerdus){
+        this.setsPerdus += setsPerdus;
+    }
+
+    public void ajoutJeuxGagnes(int jeuxGagnes){
+        this.jeuxGagnes += jeuxGagnes;
+    }
+
+    public void ajoutJeuxPerdus(int jeuxPerdus){
+        this.jeuxPerdus += jeuxPerdus;
+    }
+
+    public HashSet<Equipe> getEquipesBattues() {
+        return equipesBattues;
+    }
+
+    public void setEquipesBattues(HashSet<Equipe> equipesBattues) {
+        this.equipesBattues = equipesBattues;
     }
 }

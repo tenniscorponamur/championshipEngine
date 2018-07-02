@@ -24,4 +24,19 @@ public class Classement {
     public void setClassementEquipes(List<ClassementEquipe> classementEquipes) {
         this.classementEquipes = classementEquipes;
     }
+
+    /**
+     * Permet de retrouver le classement d'une equipe dans la liste
+     * @param equipe
+     * @return
+     */
+    public ClassementEquipe findByEquipe(Equipe equipe){
+        for (ClassementEquipe classementEquipe : classementEquipes){
+            if (classementEquipe.getEquipe().equals(equipe)){
+                return classementEquipe;
+            }
+        }
+        return null;
+    }
+
 }

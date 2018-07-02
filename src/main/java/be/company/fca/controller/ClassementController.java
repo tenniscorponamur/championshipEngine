@@ -43,7 +43,7 @@ public class ClassementController {
         championnat.setId(championnatId);
         List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
 
-        Map<Poule,Classement> classements = new HashMap<Poule,Classement>();
+        Map<Poule,Classement> classementMap = new HashMap<Poule,Classement>();
 
         for (Division division : divisions){
 
@@ -53,7 +53,7 @@ public class ClassementController {
 
                 Classement classement = new Classement();
                 classement.setPoule(poule);
-                classements.put(poule,classement);
+                classementMap.put(poule,classement);
                 List<Equipe> equipesPoule = (List<Equipe>) equipeRepository.findByPoule(poule);
 
                 for (Equipe equipe : equipesPoule){
@@ -67,52 +67,186 @@ public class ClassementController {
             List<Rencontre> rencontresInterseries = new ArrayList<>();
 
             for (Rencontre rencontre : rencontresDivision){
-                Poule poule = rencontre.getPoule();
 
-                if (poule!=null){
-                    Classement classementPoule = classements.get(poule);
+                if (rencontre.isValide()){
 
-                    rencontre.getPointsVisites();
-                    rencontre.getPointsVisiteurs();
+                    Poule poule = rencontre.getPoule();
 
-                    List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+                    if (poule!=null){
+                        Classement classementPoule = classementMap.get(poule);
 
-                    for (Match match : matchs){
-                        List<Set> sets = (List<Set>) setRepository.findByMatch(match);
+                        ClassementEquipe classementEquipeVisites = classementPoule.findByEquipe(rencontre.getEquipeVisites());
+                        ClassementEquipe classementEquipeVisiteurs = classementPoule.findByEquipe(rencontre.getEquipeVisiteurs());
 
+                        int pointsVisites = 0;
+                        int pointsVisiteurs = 0;
+
+                        if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
+                            if (rencontre.getPointsVisites() > rencontre.getPointsVisiteurs()){
+                                pointsVisites = 2;
+                                // On conserve la liste des equipes battues
+                                classementEquipeVisites.getEquipesBattues().add(rencontre.getEquipeVisiteurs());
+
+                            }else if (rencontre.getPointsVisites() < rencontre.getPointsVisiteurs()){
+                                pointsVisiteurs = 2;
+                                // On conserve la liste des equipes battues
+                                classementEquipeVisiteurs.getEquipesBattues().add(rencontre.getEquipeVisites());
+                            }else{
+                                pointsVisites = 1;
+                                pointsVisiteurs = 1;
+                            }
+                        }
+
+                        // Ajout du match joue
+
+                        classementEquipeVisites.ajoutMatchJoue();
+                        classementEquipeVisiteurs.ajoutMatchJoue();
+
+                        // Ajout des points obtenus
+
+                        classementEquipeVisites.ajoutPoints(pointsVisites);
+                        classementEquipeVisiteurs.ajoutPoints(pointsVisiteurs);
+
+                        // Ajout des sets gagnes et perdus
+
+                        classementEquipeVisites.ajoutSetsGagnes(rencontre.getPointsVisites());
+                        classementEquipeVisiteurs.ajoutSetsGagnes(rencontre.getPointsVisiteurs());
+
+                        classementEquipeVisites.ajoutSetsPerdus(rencontre.getPointsVisiteurs());
+                        classementEquipeVisiteurs.ajoutSetsPerdus(rencontre.getPointsVisites());
+
+                        // Recuperation des jeux gagnes et perdus en analysant les resultats des sets
+
+                        List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+
+                        for (Match match : matchs){
+                            List<Set> sets = (List<Set>) setRepository.findByMatch(match);
+                            for (Set set : sets){
+                                classementEquipeVisites.ajoutJeuxGagnes(set.getJeuxVisites());
+                                classementEquipeVisiteurs.ajoutJeuxGagnes(set.getJeuxVisiteurs());
+
+                                classementEquipeVisites.ajoutJeuxPerdus(set.getJeuxVisiteurs());
+                                classementEquipeVisiteurs.ajoutJeuxPerdus(set.getJeuxVisites());
+                            }
+
+                        }
+
+                    }else{
+                        rencontresInterseries.add(rencontre);
+                        // Si 4 poules -> 2 interseries --> 3 rencontres -> ordre dans les rencontres et les gagnants !!
+                        // On va les garder de cote et boucler dessus par la suite
+
+                        //TODO : marquer l'equipe qui gagne la division suite a la rencontre interseries
 
                     }
-
-
-                }else{
-                    rencontresInterseries.add(rencontre);
-                    // Si 4 poules -> 2 interseries --> 3 rencontres -> ordre dans les rencontres et les gagnants !!
-                    // On va les garder de cote et boucler dessus par la suite
-
-                    //TODO : marquer l'equipe qui gagne la division suite a la rencontre interseries
-
                 }
-
-
-                //rencontre.getGagnant/Perdant --> Equipe A/B -> getLignes et ++
 
             }
 
         }
 
-        return classements.values();
-    }
+        // Trier les classements selon divisions/poules par numero
 
+        List<Classement> classements = new ArrayList<>();
+        for (Classement classement : classementMap.values()){
+
+             // Tri des equipes sur base des points obtenus (et les autres criteres par la suite - rencontre directe - sets gagnes - jeux gagnes
+
+            Collections.sort(classement.getClassementEquipes(), new Comparator<ClassementEquipe>() {
+                @Override
+                public int compare(ClassementEquipe classementEquipeA, ClassementEquipe classementEquipeB) {
+
+                    // Premier critere, les points
+
+                    int comparePoints = (-1) * Integer.compare(classementEquipeA.getPoints(),classementEquipeB.getPoints());
+
+                    if (comparePoints!=0){
+                        return comparePoints;
+                    }else{
+
+                        // Second critere, les confrontations directes
+
+                        boolean equipeAwinsAgainstEquipeB = classementEquipeA.getEquipesBattues().contains(classementEquipeB.getEquipe());
+                        boolean equipeBwinsAgainstEquipeA = classementEquipeB.getEquipesBattues().contains(classementEquipeA.getEquipe());
+
+                        if (equipeAwinsAgainstEquipeB && !equipeBwinsAgainstEquipeA){
+                            return -1;
+                        } else if (!equipeAwinsAgainstEquipeB && equipeBwinsAgainstEquipeA){
+                            return 1;
+                        } else {
+
+                            // Troisieme critere : les sets gagnes
+
+                            int compareSetsGagnes = (-1) * Integer.compare(classementEquipeA.getSetsGagnes(),classementEquipeB.getSetsGagnes());
+
+                            if (compareSetsGagnes!=0) {
+                                return compareSetsGagnes;
+                            }else{
+
+                                // Quatrieme critere : les sets perdus
+
+                                int compareSetsPerdus = Integer.compare(classementEquipeA.getSetsPerdus(),classementEquipeB.getSetsPerdus());
+
+                                if (compareSetsPerdus!=0) {
+                                    return compareSetsPerdus;
+                                }else{
+
+                                    // Cinquieme critere : les jeux perdus
+
+                                    return Integer.compare(classementEquipeA.getJeuxPerdus(),classementEquipeB.getJeuxPerdus());
+
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            classements.add(classement);
+        }
+
+        Collections.sort(classements, new Comparator<Classement>() {
+            @Override
+            public int compare(Classement classementA, Classement classementB) {
+                int compareDivision = classementA.getPoule().getDivision().getNumero().compareTo(classementB.getPoule().getDivision().getNumero());
+                if (compareDivision!=0){
+                    return compareDivision;
+                }else{
+                    int comparePoule = classementA.getPoule().getNumero().compareTo(classementB.getPoule().getNumero());
+                    return comparePoule;
+                }
+            }
+        });
+
+        return classements;
+    }
 
     //TODO : classement de la division basee sur la rencontre inter-series --> juste placer une etoile a cote du vainqueur de la division + popup pour expliquer ce que ca signifie
 
-    //TODO : classement base sur les rencontres validees
+    //TODO : showRencontres dans ecran ne doit afficher que les rencontres validees
 
-    //TODO: showRencontres --> uniquement rencontres validees
 
-    //TODO : ordonner par division et poule en partant du 1
+    /**
+     * Extrait du reglement :
+     * --------------------
+     *
+     * Article 8 : Classement des équipes.
 
-    // Liste des equipes tries selon les points et les criteres de classement suivants : rencontre directe, sets gagnes , jeux gagnes
+     8.1. Le classement final s'établit par ordre décroissant des points obtenus. En cas d'égalité dans les points, l'ordre de classement est déterminé comme suit :
+     Si une équipe lauréate a gagné une rencontre par forfait, cette dernière est retirée du championnat parmi toutes les équipes entrant en compétition pour le départage
+     a) si 2 équipes à égalité : le résultat de la rencontre entre les 2 équipes.
+     b) Si plus de 2 équipes à égalité :seul les résultats entre ces équipes sont pris en considération pour déterminer le classement définitif en observant les critères suivants
+     1) le plus grand nombre de points
+     2) le plus grand nombre de victoires (en simples et en doubles)
+     3) le plus petit nombre de sets perdus.( en simple et en doubles)
+     4) le plus petit nombre de jeux perdus (en simple et en doubles)
+     Si après ces critères, 2 équipes se trouvent toujours à égalité, le départage se fait suivant la règle du point 8.1.a
+     En cas d’égalité totale après tous ces critères, le tirage au sort donnera le vainqueur final.
 
+     8.2. Les équipes premières des différentes séries d'une division se rencontrent pour se départager. La commission sportive fixe la date, l'heure et l'endroit des rencontres inter séries et en détermine les règles particulières.
+
+     8.3. Est déclarée championne de sa division l'équipe qui s'est classée première de sa division ou qui remporte la rencontre inter séries selon l'article 8.2.
+
+     */
 
 }
