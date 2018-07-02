@@ -32,8 +32,12 @@ public class RencontreController {
     private RencontreService rencontreService;
 
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
-    public Iterable<Rencontre> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId) {
-        if (pouleId!=null){
+    public Iterable<Rencontre> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId, @RequestParam(required = false) Long equipeId) {
+        if (equipeId!=null){
+            Equipe equipe = new Equipe();
+            equipe.setId(equipeId);
+            return rencontreRepository.findRencontresByEquipe(equipe);
+        }else if (pouleId!=null){
             Poule poule = new Poule();
             poule.setId(pouleId);
             return rencontreRepository.findByPoule(poule);
