@@ -4,7 +4,9 @@ import be.company.fca.model.Championnat;
 import be.company.fca.model.Division;
 import be.company.fca.model.Rencontre;
 import be.company.fca.repository.DivisionRepository;
+import be.company.fca.repository.MatchRepository;
 import be.company.fca.repository.RencontreRepository;
+import be.company.fca.repository.SetRepository;
 import be.company.fca.service.RencontreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,6 +25,12 @@ public class RencontreServiceImpl implements RencontreService{
     @Autowired
     private RencontreRepository rencontreRepository;
 
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private SetRepository setRepository;
+
     @Override
     @Transactional(readOnly = false)
     public List<Rencontre> saveRencontres(List<Rencontre> rencontreList) {
@@ -40,13 +48,8 @@ public class RencontreServiceImpl implements RencontreService{
     @Override
     @Transactional(readOnly = false)
     public void deleteByChampionnat(Long championnatId) {
-
-        Championnat championnat = new Championnat();
-        championnat.setId(championnatId);
-
-        Iterable<Division> divisionList = divisionRepository.findByChampionnat(championnat);
-        for (Division division : divisionList){
-            rencontreRepository.deleteByDivision(division);
-        }
+        setRepository.deleteByChampionnatId(championnatId);
+        matchRepository.deleteByChampionnatId(championnatId);
+        rencontreRepository.deleteByChampionnatId(championnatId);
     }
 }
