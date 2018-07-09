@@ -38,6 +38,10 @@ public class Membre {
     @Column( name = "capitaine", nullable = false)
     private boolean capitaine=false;
 
+    // Derniers classements
+//    private ClassementAFT classementAFTactuel;
+//    private ClassementCorpo classementCorpoActuel;
+
     public Long getId() {
         return id;
     }
