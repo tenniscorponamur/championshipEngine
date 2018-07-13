@@ -38,9 +38,15 @@ public class Membre {
     @Column( name = "capitaine", nullable = false)
     private boolean capitaine=false;
 
-    // Derniers classements
-//    private ClassementAFT classementAFTactuel;
-//    private ClassementCorpo classementCorpoActuel;
+    // Classements actuels
+
+    @ManyToOne
+    @JoinColumn(name = "classementaft_fk")
+    private ClassementAFT classementAFTactuel;
+
+    @ManyToOne
+    @JoinColumn(name = "classementcorpo_fk")
+    private ClassementCorpo classementCorpoActuel;
 
     public Long getId() {
         return id;
@@ -112,6 +118,22 @@ public class Membre {
 
     public void setCapitaine(boolean capitaine) {
         this.capitaine = capitaine;
+    }
+
+    public ClassementAFT getClassementAFTactuel() {
+        return classementAFTactuel;
+    }
+
+    public void setClassementAFTactuel(ClassementAFT classementAFTactuel) {
+        this.classementAFTactuel = classementAFTactuel;
+    }
+
+    public ClassementCorpo getClassementCorpoActuel() {
+        return classementCorpoActuel;
+    }
+
+    public void setClassementCorpoActuel(ClassementCorpo classementCorpoActuel) {
+        this.classementCorpoActuel = classementCorpoActuel;
     }
 
     @Override

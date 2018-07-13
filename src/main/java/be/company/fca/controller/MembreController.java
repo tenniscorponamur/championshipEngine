@@ -49,10 +49,9 @@ public class MembreController {
         }
     }
 
-
-    @RequestMapping(value = "/public/membre/infosGenerales", method = RequestMethod.PUT)
-    public Membre updateMembreInfosGenerales(@RequestBody Membre membre){
-        membreRepository.updateInfosGenerales(membre.getId(),
+    @RequestMapping(value = "/public/membre/{membreId}/infosGenerales", method = RequestMethod.PUT)
+    public Membre updateMembreInfosGenerales(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        membreRepository.updateInfosGenerales(membreId,
                 membre.getGenre(),
                 membre.getPrenom(),
                 membre.getNom(),
@@ -61,9 +60,9 @@ public class MembreController {
     }
 
 
-    @RequestMapping(value = "/public/membre/clubInfos", method = RequestMethod.PUT)
-    public Membre updateClubInfos(@RequestBody Membre membre){
-        membreRepository.updateClubInfos(membre.getId(),
+    @RequestMapping(value = "/public/membre/{membreId}/clubInfos", method = RequestMethod.PUT)
+    public Membre updateClubInfos(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        membreRepository.updateClubInfos(membreId,
                 membre.getClub(), membre.isCapitaine());
         return membre;
     }

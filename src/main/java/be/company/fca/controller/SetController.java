@@ -16,6 +16,9 @@ public class SetController {
     @Autowired
     private SetRepository setRepository;
 
+    // TODO : les urls devraient être basées sur le match
+    // --> /public/rencontre/{id}/match/{id}/sets
+
     @RequestMapping(method= RequestMethod.GET, path="/public/sets")
     public Iterable<Set> getSetsByMatch(@RequestParam Long matchId) {
         Match match = new Match();

@@ -54,8 +54,8 @@ public class RencontreController {
         return rencontreRepository.save(rencontre);
     }
 
-    @RequestMapping(value = "/public/rencontre/isValidable", method = RequestMethod.GET)
-    public boolean isRencontreValidable(@RequestParam Long rencontreId){
+    @RequestMapping(value = "/public/rencontre/{rencontreId}/isValidable", method = RequestMethod.GET)
+    public boolean isRencontreValidable(@PathVariable("rencontreId") Long rencontreId){
         Rencontre rencontre = rencontreRepository.findOne(rencontreId);
         if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
             Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
@@ -65,8 +65,8 @@ public class RencontreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/rencontre/validite", method = RequestMethod.PUT)
-    public boolean updateValiditeRencontre(@RequestParam Long rencontreId, @RequestBody boolean validite){
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/validite", method = RequestMethod.PUT)
+    public boolean updateValiditeRencontre(@PathVariable("rencontreId") Long rencontreId, @RequestBody boolean validite){
         if (validite) {
             if (isRencontreValidable(rencontreId)){
                 rencontreRepository.updateValiditeRencontre(rencontreId,validite);

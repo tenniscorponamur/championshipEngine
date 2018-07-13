@@ -24,8 +24,11 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
-    @RequestMapping(method= RequestMethod.GET, path="/public/matchs")
-    public Iterable<Match> getMatchsByRencontre(@RequestParam Long rencontreId) {
+    // TODO : les urls devraient être basées sur la rencontre
+    // --> /public/rencontre/{id}/match
+
+    @RequestMapping(method= RequestMethod.GET, path="/public/rencontre/{rencontreId}/matchs")
+    public Iterable<Match> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
 
         Rencontre rencontre = new Rencontre();
         rencontre.setId(rencontreId);
