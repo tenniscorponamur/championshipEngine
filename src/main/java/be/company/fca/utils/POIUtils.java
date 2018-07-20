@@ -316,12 +316,9 @@ public class POIUtils {
                 cell.setCellStyle(decimalCellStyle);
             }
 
-        } else if (value instanceof BigDecimal){
-            if (value != null){
-                cell.setCellValue(((BigDecimal) value).doubleValue());
-            } else {
-                cell.setCellValue((Double) null);
-            }
+        } else if (value != null && value instanceof BigDecimal){
+
+            cell.setCellValue(((BigDecimal) value).doubleValue());
             if (decimalCellStyle!=null){
                 cell.setCellStyle(decimalCellStyle);
             }
