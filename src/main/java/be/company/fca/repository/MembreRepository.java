@@ -1,8 +1,6 @@
 package be.company.fca.repository;
 
-import be.company.fca.model.Club;
-import be.company.fca.model.Genre;
-import be.company.fca.model.Membre;
+import be.company.fca.model.*;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -50,5 +48,21 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
                          @Param("club") Club club,
                          @Param("capitaine") boolean capitaine);
 
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Membre membre " +
+            " set membre.classementCorpoActuel =:classementCorpo " +
+            " where membre.id =:membreId")
+    void updateClassementCorpo( @Param("membreId") Long membreId,
+                                @Param("classementCorpo") ClassementCorpo classementCorpo);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Membre membre " +
+            " set membre.classementAFTactuel =:classementAFT " +
+            " where membre.id =:membreId")
+    void updateClassementAFT( @Param("membreId") Long membreId,
+                                @Param("classementAFT") ClassementAFT classementAFT);
 
 }
