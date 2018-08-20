@@ -50,7 +50,7 @@ public class ClassementAFTServiceImpl implements ClassementAFTService {
         for (ClassementAFT classementAFT : classementAFTList){
             classementAFT.setId(null);
             classementAFT.setMembreFk(membreId);
-            classementAFTRepository.save(classementAFTActuel);
+            classementAFTRepository.save(classementAFT);
         }
 
         return classementAFTActuel;
