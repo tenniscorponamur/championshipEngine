@@ -60,7 +60,7 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Membre membre " +
-            " set membre.classementAFTactuel =:classementAFT " +
+            " set membre.classementAFTActuel =:classementAFT " +
             " where membre.id =:membreId")
     void updateClassementAFT( @Param("membreId") Long membreId,
                                 @Param("classementAFT") ClassementAFT classementAFT);

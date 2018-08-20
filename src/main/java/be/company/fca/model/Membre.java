@@ -42,7 +42,7 @@ public class Membre {
 
     @ManyToOne
     @JoinColumn(name = "classementaft_fk")
-    private ClassementAFT classementAFTactuel;
+    private ClassementAFT classementAFTActuel;
 
     @ManyToOne
     @JoinColumn(name = "classementcorpo_fk")
@@ -120,12 +120,12 @@ public class Membre {
         this.capitaine = capitaine;
     }
 
-    public ClassementAFT getClassementAFTactuel() {
-        return classementAFTactuel;
+    public ClassementAFT getClassementAFTActuel() {
+        return classementAFTActuel;
     }
 
-    public void setClassementAFTactuel(ClassementAFT classementAFTactuel) {
-        this.classementAFTactuel = classementAFTactuel;
+    public void setClassementAFTActuel(ClassementAFT classementAFTActuel) {
+        this.classementAFTActuel = classementAFTActuel;
     }
 
     public ClassementCorpo getClassementCorpoActuel() {
