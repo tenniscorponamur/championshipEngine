@@ -28,15 +28,30 @@ public class Membre {
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
-    @Column( name = "actif", nullable = false)
-    private boolean actif=true;
-
     @ManyToOne
     @JoinColumn(name = "club_fk")
     private Club club;
 
     @Column( name = "capitaine", nullable = false)
     private boolean capitaine=false;
+
+    // Infos tennistiques
+
+    @Column( name = "actif", nullable = false)
+    private boolean actif=true;
+
+    @Column( name =  "numero_aft")
+    private String numeroAft;
+
+    @Temporal(TemporalType.DATE)
+    @Column( name = "date_affiliation_aft" )
+    private Date dateAffiliationAft;
+
+    @Column( name =  "numero_club_aft")
+    private String numeroClubAft;
+
+    @Column( name = "only_corpo", nullable = false)
+    private boolean onlyCorpo=false;
 
     // Classements actuels
 
@@ -134,6 +149,38 @@ public class Membre {
 
     public void setClassementCorpoActuel(ClassementCorpo classementCorpoActuel) {
         this.classementCorpoActuel = classementCorpoActuel;
+    }
+
+    public String getNumeroAft() {
+        return numeroAft;
+    }
+
+    public void setNumeroAft(String numeroAft) {
+        this.numeroAft = numeroAft;
+    }
+
+    public Date getDateAffiliationAft() {
+        return dateAffiliationAft;
+    }
+
+    public void setDateAffiliationAft(Date dateAffiliationAft) {
+        this.dateAffiliationAft = dateAffiliationAft;
+    }
+
+    public String getNumeroClubAft() {
+        return numeroClubAft;
+    }
+
+    public void setNumeroClubAft(String numeroClubAft) {
+        this.numeroClubAft = numeroClubAft;
+    }
+
+    public boolean isOnlyCorpo() {
+        return onlyCorpo;
+    }
+
+    public void setOnlyCorpo(boolean onlyCorpo) {
+        this.onlyCorpo = onlyCorpo;
     }
 
     @Override

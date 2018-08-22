@@ -67,6 +67,17 @@ public class MembreController {
         return membre;
     }
 
+    @RequestMapping(value = "/public/membre/{membreId}/infosTennis", method = RequestMethod.PUT)
+    public Membre updateInfosTennis(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        membreRepository.updateInfosTennis(membreId,
+                membre.getNumeroAft(),
+                membre.getNumeroClubAft(),
+                membre.getDateAffiliationAft(),
+                membre.isOnlyCorpo()
+                );
+        return membre;
+    }
+
 
 
     @RequestMapping(value = "/public/membre", method = RequestMethod.POST)
