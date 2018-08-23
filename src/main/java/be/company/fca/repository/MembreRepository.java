@@ -56,7 +56,7 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
             " membre.dateAffiliationAft = :dateAffiliationAft, " +
             " membre.onlyCorpo = :onlyCorpo " +
             " where membre.id =:membreId")
-    void updateInfosTennis(@Param("membreId") Long membreId,
+    void updateInfosAft(@Param("membreId") Long membreId,
                          @Param("numeroAft") String numeroAft,
                          @Param("numeroClubAft") String numeroClubAft,
                          @Param("dateAffiliationAft") Date dateAffiliationAft,
