@@ -24,8 +24,7 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
-    // TODO : les urls devraient être basées sur la rencontre
-    // --> /public/rencontre/{id}/match
+    // TODO : DTO pour les membres afin de ne pas recuperer les coordonnees et contacts
 
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontre/{rencontreId}/matchs")
     public Iterable<Match> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
@@ -40,11 +39,6 @@ public class MatchController {
 
         return matchs;
 
-    }
-
-    @RequestMapping(path="/public/match", method= RequestMethod.GET)
-    Match getMatch(@RequestParam Long id) {
-        return matchRepository.findOne(id);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

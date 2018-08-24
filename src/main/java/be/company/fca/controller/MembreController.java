@@ -10,6 +10,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +34,12 @@ public class MembreController {
         return membreRepository.findByNumero(numero);
     }
 
+    // TODO : DTO pour les membres afin de ne pas recuperer l'adresse si on n'est pas authentifie
+
     @RequestMapping(method= RequestMethod.GET, path="/public/membres")
     public Iterable<Membre> getMembres(@RequestParam(required = false) Long clubId) {
 
 //        //TODO : pour une liste de membre, limiter le contenu retourne (membreDto)
-//
-//        //TODO : si retour d'un singleton --> membre complet = ok
 
         if (clubId!=null){
             Club club = new Club();
@@ -49,7 +50,8 @@ public class MembreController {
         }
     }
 
-    @RequestMapping(value = "/public/membre/{membreId}/infosGenerales", method = RequestMethod.PUT)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/infosGenerales", method = RequestMethod.PUT)
     public Membre updateMembreInfosGenerales(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateInfosGenerales(membreId,
                 membre.getGenre(),
@@ -59,15 +61,16 @@ public class MembreController {
         return membre;
     }
 
-
-    @RequestMapping(value = "/public/membre/{membreId}/clubInfos", method = RequestMethod.PUT)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/clubInfos", method = RequestMethod.PUT)
     public Membre updateClubInfos(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateClubInfos(membreId,
                 membre.getClub(), membre.isCapitaine());
         return membre;
     }
 
-    @RequestMapping(value = "/public/membre/{membreId}/infosAft", method = RequestMethod.PUT)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/infosAft", method = RequestMethod.PUT)
     public Membre updateInfosAft(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateInfosAft(membreId,
                 membre.getNumeroAft(),
@@ -78,9 +81,8 @@ public class MembreController {
         return membre;
     }
 
-
-
-    @RequestMapping(value = "/public/membre", method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
         newMembre.setGenre(membre.getGenre());

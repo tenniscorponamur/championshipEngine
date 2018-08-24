@@ -25,6 +25,8 @@ public class EquipeController {
     @Autowired
     private EquipeService equipeService;
 
+    // TODO : DTO pour les capitaines d'equipe
+
     @RequestMapping(method= RequestMethod.GET, path="/public/equipes")
     public Iterable<Equipe> getEquipesByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId) {
         if (pouleId!=null){

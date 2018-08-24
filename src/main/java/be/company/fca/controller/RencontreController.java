@@ -31,6 +31,10 @@ public class RencontreController {
     @Autowired
     private RencontreService rencontreService;
 
+
+    // TODO : DTO pour les capitaines d'equipe
+
+
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
     public Iterable<Rencontre> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId, @RequestParam(required = false) Long equipeId) {
         if (equipeId!=null){
