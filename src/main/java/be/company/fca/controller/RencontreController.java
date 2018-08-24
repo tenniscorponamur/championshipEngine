@@ -80,6 +80,7 @@ public class RencontreController {
         return validite;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
     public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
 
@@ -99,6 +100,7 @@ public class RencontreController {
         return rencontreService.saveRencontres(rencontres);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(method= RequestMethod.DELETE, path="/private/rencontres/calendrier")
     public void deleteCalendrier(@RequestParam Long championnatId) {
         rencontreService.deleteByChampionnat(championnatId);
