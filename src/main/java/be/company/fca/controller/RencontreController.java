@@ -1,5 +1,6 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.RencontreDto;
 import be.company.fca.model.*;
 import be.company.fca.repository.DivisionRepository;
 import be.company.fca.repository.EquipeRepository;
@@ -31,25 +32,32 @@ public class RencontreController {
     @Autowired
     private RencontreService rencontreService;
 
-
-    // TODO : DTO pour les capitaines d'equipe
-
+    // DTO pour les capitaines d'equipe afin de ne pas recuperer les donnees privees
 
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
-    public Iterable<Rencontre> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId, @RequestParam(required = false) Long equipeId) {
+    public List<RencontreDto> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId, @RequestParam(required = false) Long equipeId) {
+        List<RencontreDto> rencontresDto = new ArrayList<>();
+        List<Rencontre> rencontres = new ArrayList<Rencontre>();
+
         if (equipeId!=null){
             Equipe equipe = new Equipe();
             equipe.setId(equipeId);
-            return rencontreRepository.findRencontresByEquipe(equipe);
+            rencontres = (List<Rencontre>) rencontreRepository.findRencontresByEquipe(equipe);
         }else if (pouleId!=null){
             Poule poule = new Poule();
             poule.setId(pouleId);
-            return rencontreRepository.findByPoule(poule);
+            rencontres = (List<Rencontre>) rencontreRepository.findByPoule(poule);
         }else{
             Division division = new Division();
             division.setId(divisionId);
-            return rencontreRepository.findByDivision(division);
+            rencontres = (List<Rencontre>) rencontreRepository.findByDivision(division);
         }
+
+        for (Rencontre rencontre : rencontres){
+            rencontresDto.add(new RencontreDto(rencontre));
+        }
+
+        return rencontresDto;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

@@ -1,5 +1,6 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.EquipeDto;
 import be.company.fca.model.Club;
 import be.company.fca.model.Division;
 import be.company.fca.model.Equipe;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,19 +27,28 @@ public class EquipeController {
     @Autowired
     private EquipeService equipeService;
 
-    // TODO : DTO pour les capitaines d'equipe
+    // DTO pour les capitaines d'equipe afin de ne pas recuperer les donnees privees
 
     @RequestMapping(method= RequestMethod.GET, path="/public/equipes")
-    public Iterable<Equipe> getEquipesByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId) {
+    public List<EquipeDto> getEquipesByDivisionOrPoule(@RequestParam Long divisionId, @RequestParam(required = false) Long pouleId) {
+        List<EquipeDto> equipesDto = new ArrayList<>();
+        List<Equipe> equipes = new ArrayList<Equipe>();
+
         if (pouleId!=null){
             Poule poule = new Poule();
             poule.setId(pouleId);
-            return equipeRepository.findByPoule(poule);
+            equipes = (List<Equipe>) equipeRepository.findByPoule(poule);
         }else{
             Division division = new Division();
             division.setId(divisionId);
-            return equipeRepository.findByDivision(division);
+            equipes = (List<Equipe>) equipeRepository.findByDivision(division);
         }
+
+        for (Equipe equipe : equipes){
+            equipesDto.add(new EquipeDto(equipe));
+        }
+
+        return equipesDto;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

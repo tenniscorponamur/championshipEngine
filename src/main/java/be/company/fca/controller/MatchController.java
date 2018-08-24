@@ -1,5 +1,6 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.MatchDto;
 import be.company.fca.model.*;
 import be.company.fca.repository.MatchRepository;
 import be.company.fca.repository.RencontreRepository;
@@ -24,20 +25,31 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
-    // TODO : DTO pour les membres afin de ne pas recuperer les coordonnees et contacts
+
+    // TODO : DTO pour les membres afin de ne pas recuperer les donnees privees
+
+    // TODO : attention a la rencontre --> rencontreDto
+
 
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontre/{rencontreId}/matchs")
-    public Iterable<Match> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
+    public List<MatchDto> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
+
+        List<MatchDto> matchsDto = new ArrayList<>();
+        List<Match> matchs = new ArrayList<Match>();
 
         Rencontre rencontre = new Rencontre();
         rencontre.setId(rencontreId);
-        List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+        matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
 
         if (matchs.isEmpty()){
             matchs = matchService.createMatchs(rencontre);
         }
 
-        return matchs;
+        for (Match match : matchs){
+            matchsDto.add(new MatchDto(match));
+        }
+
+        return matchsDto;
 
     }
 
