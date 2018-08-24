@@ -1,25 +1,27 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.MembreDto;
 import be.company.fca.model.Club;
 import be.company.fca.model.Genre;
 import be.company.fca.model.Membre;
 import be.company.fca.repository.MembreRepository;
 import be.company.fca.utils.POIUtils;
+import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.Api;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.security.Principal;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,25 +31,27 @@ public class MembreController {
     @Autowired
     private MembreRepository membreRepository;
 
-    @RequestMapping(method= RequestMethod.GET, path="/public/membre")
-    public Membre getMembreByNumero(@RequestParam String numero) {
-        return membreRepository.findByNumero(numero);
-    }
-
-    // TODO : DTO pour les membres afin de ne pas recuperer l'adresse si on n'est pas authentifie
+    // DTO pour les membres afin de ne pas recuperer l'adresse si on n'est pas authentifie
 
     @RequestMapping(method= RequestMethod.GET, path="/public/membres")
-    public Iterable<Membre> getMembres(@RequestParam(required = false) Long clubId) {
+    public List<MembreDto> getMembres(Authentication authentication, @RequestParam(required = false) Long clubId) {
 
-//        //TODO : pour une liste de membre, limiter le contenu retourne (membreDto)
+        List<MembreDto> membresDto = new ArrayList<MembreDto>();
+        List<Membre> membres = new ArrayList<Membre>();
 
         if (clubId!=null){
             Club club = new Club();
             club.setId(clubId);
-            return membreRepository.findByClub(club);
+            membres = (List<Membre>) membreRepository.findByClub(club);
         }else{
-            return membreRepository.findAll();
+            membres = (List<Membre>) membreRepository.findAll();
         }
+
+        for (Membre membre : membres){
+            membresDto.add(new MembreDto(membre,UserUtils.isPrivateInformationsAuthorized(authentication)));
+        }
+
+        return membresDto;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

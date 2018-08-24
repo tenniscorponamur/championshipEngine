@@ -1,8 +1,10 @@
 package be.company.fca.service;
 
 import be.company.fca.dto.UserDto;
+import be.company.fca.model.Role;
 import be.company.fca.model.User;
 import be.company.fca.repository.UserRepository;
+import be.company.fca.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,7 +32,9 @@ public class EngineUserDetailsService implements UserDetailsService {
         }
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ADMIN_USER"));
+        for (String role : UserUtils.getDefaultRoles()){
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
         user.setAuthorities(authorities);
 
         return user;

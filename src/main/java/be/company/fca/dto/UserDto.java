@@ -2,21 +2,33 @@ package be.company.fca.dto;
 
 import be.company.fca.model.User;
 
+import java.util.List;
+
 public class UserDto {
 
     private Long id;
     private String username;
     private String prenom;
     private String nom;
+    private List<String> roles;
 
     public UserDto() {
     }
 
-    public UserDto(User user) {
+    public UserDto(User user, List<String> roles) {
         this.id=user.getId();
         this.username=user.getUsername();
         this.prenom=user.getPrenom();
         this.nom=user.getNom();
+        this.roles=roles;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
     public Long getId() {

@@ -2,15 +2,19 @@ package be.company.fca.controller;
 
 import be.company.fca.dto.ChangePasswordDto;
 import be.company.fca.dto.UserDto;
+import be.company.fca.model.Role;
 import be.company.fca.model.User;
 import be.company.fca.repository.UserRepository;
 import be.company.fca.utils.PasswordUtils;
+import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -25,7 +29,8 @@ public class UserController {
             notes = "Ceci est une méthode privée pour récupérer l'utilisateur reconnu par le token d'accès")
     @RequestMapping(method=RequestMethod.GET, path="/private/user/current")
     public UserDto getCurrentUser(Principal principal) {
-        return new UserDto(userRepository.findByUsername(principal.getName().toLowerCase()));
+        User user = userRepository.findByUsername(principal.getName().toLowerCase());
+        return new UserDto(user, UserUtils.getDefaultRoles());
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -48,7 +53,7 @@ public class UserController {
         user.setPrenom(userDto.getPrenom());
         user.setNom(userDto.getNom());
         userRepository.save(user);
-        return new UserDto(user);
+        return new UserDto(user,UserUtils.getDefaultRoles());
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -60,7 +65,7 @@ public class UserController {
         user.setNom(userDto.getNom());
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
         userRepository.save(user);
-        return new UserDto(user);
+        return new UserDto(user,UserUtils.getDefaultRoles());
     }
 
 
@@ -83,8 +88,6 @@ public class UserController {
 
         return true;
     }
-
-
 
 
 //    @RequestMapping(value = "/public/defaultUser", method = RequestMethod.GET)
