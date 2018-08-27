@@ -63,6 +63,41 @@ public class Membre {
     @JoinColumn(name = "classementcorpo_fk")
     private ClassementCorpo classementCorpoActuel;
 
+    @Temporal(TemporalType.DATE)
+    @Column( name = "date_affiliation_corpo" )
+    private Date dateAffiliationCorpo;
+
+    @Temporal(TemporalType.DATE)
+    @Column( name = "date_desaffiliation_corpo" )
+    private Date dateDesaffiliationCorpo;
+
+    @Column( name = "responsable_club", nullable = false)
+    private boolean responsableClub=false;
+
+    @Column( name =  "code_postal")
+    private String codePostal;
+
+    @Column( name =  "localite")
+    private String localite;
+
+    @Column( name =  "rue")
+    private String rue;
+
+    @Column( name =  "rue_numero")
+    private String rueNumero;
+
+    @Column( name =  "rue_boite")
+    private String rueBoite;
+
+    @Column( name =  "telephone")
+    private String telephone;
+
+    @Column( name =  "gsm")
+    private String gsm;
+
+    @Column( name =  "mail")
+    private String mail;
+
     public Long getId() {
         return id;
     }
@@ -181,6 +216,94 @@ public class Membre {
 
     public void setOnlyCorpo(boolean onlyCorpo) {
         this.onlyCorpo = onlyCorpo;
+    }
+
+    public Date getDateAffiliationCorpo() {
+        return dateAffiliationCorpo;
+    }
+
+    public void setDateAffiliationCorpo(Date dateAffiliationCorpo) {
+        this.dateAffiliationCorpo = dateAffiliationCorpo;
+    }
+
+    public Date getDateDesaffiliationCorpo() {
+        return dateDesaffiliationCorpo;
+    }
+
+    public void setDateDesaffiliationCorpo(Date dateDesaffiliationCorpo) {
+        this.dateDesaffiliationCorpo = dateDesaffiliationCorpo;
+    }
+
+    public boolean isResponsableClub() {
+        return responsableClub;
+    }
+
+    public void setResponsableClub(boolean responsableClub) {
+        this.responsableClub = responsableClub;
+    }
+
+    public String getCodePostal() {
+        return codePostal;
+    }
+
+    public void setCodePostal(String codePostal) {
+        this.codePostal = codePostal;
+    }
+
+    public String getLocalite() {
+        return localite;
+    }
+
+    public void setLocalite(String localite) {
+        this.localite = localite;
+    }
+
+    public String getRue() {
+        return rue;
+    }
+
+    public void setRue(String rue) {
+        this.rue = rue;
+    }
+
+    public String getRueNumero() {
+        return rueNumero;
+    }
+
+    public void setRueNumero(String rueNumero) {
+        this.rueNumero = rueNumero;
+    }
+
+    public String getRueBoite() {
+        return rueBoite;
+    }
+
+    public void setRueBoite(String rueBoite) {
+        this.rueBoite = rueBoite;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public String getGsm() {
+        return gsm;
+    }
+
+    public void setGsm(String gsm) {
+        this.gsm = gsm;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     @Override

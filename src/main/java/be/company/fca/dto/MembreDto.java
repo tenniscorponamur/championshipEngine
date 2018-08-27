@@ -21,6 +21,17 @@ public class MembreDto {
     private boolean onlyCorpo=false;
     private ClassementAFT classementAFTActuel;
     private ClassementCorpo classementCorpoActuel;
+    private Date dateAffiliationCorpo;
+    private Date dateDesaffiliationCorpo;
+    private boolean responsableClub=false;
+    private String codePostal;
+    private String localite;
+    private String rue;
+    private String rueNumero;
+    private String rueBoite;
+    private String telephone;
+    private String gsm;
+    private String mail;
 
     // Donnees privees (accessibles uniquement si authentification)
 
@@ -47,9 +58,20 @@ public class MembreDto {
         this.onlyCorpo = membre.isOnlyCorpo();
         this.classementAFTActuel = membre.getClassementAFTActuel();
         this.classementCorpoActuel = membre.getClassementCorpoActuel();
+        this.dateAffiliationCorpo = membre.getDateAffiliationCorpo();
+        this.dateDesaffiliationCorpo = membre.getDateDesaffiliationCorpo();
+        this.responsableClub = membre.isResponsableClub();
 
         if (withPrivateInformations){
             this.dateNaissance = membre.getDateNaissance();
+            this.codePostal = membre.getCodePostal();
+            this.localite = membre.getLocalite();
+            this.rue = membre.getRue();
+            this.rueNumero = membre.getRueNumero();
+            this.rueBoite = membre.getRueBoite();
+            this.telephone = membre.getTelephone();
+            this.gsm = membre.getGsm();
+            this.mail = membre.getMail();
         }
     }
 
@@ -163,5 +185,93 @@ public class MembreDto {
 
     public void setDateNaissance(Date dateNaissance) {
         this.dateNaissance = dateNaissance;
+    }
+
+    public Date getDateAffiliationCorpo() {
+        return dateAffiliationCorpo;
+    }
+
+    public void setDateAffiliationCorpo(Date dateAffiliationCorpo) {
+        this.dateAffiliationCorpo = dateAffiliationCorpo;
+    }
+
+    public Date getDateDesaffiliationCorpo() {
+        return dateDesaffiliationCorpo;
+    }
+
+    public void setDateDesaffiliationCorpo(Date dateDesaffiliationCorpo) {
+        this.dateDesaffiliationCorpo = dateDesaffiliationCorpo;
+    }
+
+    public boolean isResponsableClub() {
+        return responsableClub;
+    }
+
+    public void setResponsableClub(boolean responsableClub) {
+        this.responsableClub = responsableClub;
+    }
+
+    public String getCodePostal() {
+        return codePostal;
+    }
+
+    public void setCodePostal(String codePostal) {
+        this.codePostal = codePostal;
+    }
+
+    public String getLocalite() {
+        return localite;
+    }
+
+    public void setLocalite(String localite) {
+        this.localite = localite;
+    }
+
+    public String getRue() {
+        return rue;
+    }
+
+    public void setRue(String rue) {
+        this.rue = rue;
+    }
+
+    public String getRueNumero() {
+        return rueNumero;
+    }
+
+    public void setRueNumero(String rueNumero) {
+        this.rueNumero = rueNumero;
+    }
+
+    public String getRueBoite() {
+        return rueBoite;
+    }
+
+    public void setRueBoite(String rueBoite) {
+        this.rueBoite = rueBoite;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public String getGsm() {
+        return gsm;
+    }
+
+    public void setGsm(String gsm) {
+        this.gsm = gsm;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 }

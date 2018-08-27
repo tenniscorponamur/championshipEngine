@@ -69,7 +69,12 @@ public class MembreController {
     @RequestMapping(value = "/private/membre/{membreId}/clubInfos", method = RequestMethod.PUT)
     public Membre updateClubInfos(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateClubInfos(membreId,
-                membre.getClub(), membre.isCapitaine());
+                membre.getClub(),
+                membre.isCapitaine(),
+                membre.isResponsableClub(),
+                membre.getDateAffiliationCorpo(),
+                membre.getDateDesaffiliationCorpo()
+                );
         return membre;
     }
 
