@@ -79,6 +79,30 @@ public class MembreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/coordonnees", method = RequestMethod.PUT)
+    public Membre updateCoordonnees(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        membreRepository.updateCoordonnees(membreId,
+                membre.getCodePostal(),
+                membre.getLocalite(),
+                membre.getRue(),
+                membre.getRueNumero(),
+                membre.getRueBoite()
+        );
+        return membre;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/contacts", method = RequestMethod.PUT)
+    public Membre updateContacts(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        membreRepository.updateContacts(membreId,
+                membre.getTelephone(),
+                membre.getGsm(),
+                membre.getMail()
+        );
+        return membre;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/infosAft", method = RequestMethod.PUT)
     public Membre updateInfosAft(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateInfosAft(membreId,

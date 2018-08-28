@@ -24,6 +24,10 @@ public class MembreDto {
     private Date dateAffiliationCorpo;
     private Date dateDesaffiliationCorpo;
     private boolean responsableClub=false;
+
+    // Donnees privees (accessibles uniquement si authentification)
+
+    private Date dateNaissance;
     private String codePostal;
     private String localite;
     private String rue;
@@ -32,11 +36,6 @@ public class MembreDto {
     private String telephone;
     private String gsm;
     private String mail;
-
-    // Donnees privees (accessibles uniquement si authentification)
-
-    private Date dateNaissance;
-    //TODO : coordonnees et contacts
 
     /**
      * Constructeur permettant de filtrer les donnees du membre a transmettre aux appelants

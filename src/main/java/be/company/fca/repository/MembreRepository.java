@@ -59,6 +59,34 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Membre membre " +
+            " set membre.codePostal =:codePostal, " +
+            " membre.localite = :localite, " +
+            " membre.rue = :rue, " +
+            " membre.rueNumero = :rueNumero, " +
+            " membre.rueBoite = :rueBoite " +
+            " where membre.id =:membreId")
+    void updateCoordonnees(@Param("membreId") Long membreId,
+                        @Param("codePostal") String codePostal,
+                        @Param("localite") String localite,
+                        @Param("rue") String rue,
+                        @Param("rueNumero") String rueNumero,
+                        @Param("rueBoite") String rueBoite);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Membre membre " +
+            " set membre.telephone =:telephone, " +
+            " membre.gsm = :gsm, " +
+            " membre.mail = :mail " +
+            " where membre.id =:membreId")
+    void updateContacts(@Param("membreId") Long membreId,
+                           @Param("telephone") String telephone,
+                           @Param("gsm") String gsm,
+                           @Param("mail") String mail);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Membre membre " +
             " set membre.numeroAft =:numeroAft, " +
             " membre.numeroClubAft = :numeroClubAft, " +
             " membre.dateAffiliationAft = :dateAffiliationAft, " +
