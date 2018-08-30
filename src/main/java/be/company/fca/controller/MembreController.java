@@ -70,6 +70,7 @@ public class MembreController {
     public Membre updateClubInfos(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateClubInfos(membreId,
                 membre.getClub(),
+                membre.isActif(),
                 membre.isCapitaine(),
                 membre.isResponsableClub(),
                 membre.getDateAffiliationCorpo(),

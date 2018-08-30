@@ -43,6 +43,7 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
     @Modifying(clearAutomatically = true)
     @Query("update Membre membre " +
             " set membre.club =:club, " +
+            " membre.actif = :actif, " +
             " membre.capitaine = :capitaine, " +
             " membre.responsableClub = :responsableClub, " +
             " membre.dateAffiliationCorpo = :dateAffiliationCorpo, " +
@@ -50,6 +51,7 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
             " where membre.id =:membreId")
     void updateClubInfos(@Param("membreId") Long membreId,
                          @Param("club") Club club,
+                         @Param("actif") boolean actif,
                          @Param("capitaine") boolean capitaine,
                          @Param("responsableClub") boolean responsableClub,
                          @Param("dateAffiliationCorpo") Date dateAffiliationCorpo,
