@@ -12,7 +12,7 @@ public class Championnat {
     private Long id;
 
     @Column( name =  "annee")
-    private Integer annee;
+    private String annee;
 
     @Column ( name = "type" )
     @Enumerated(EnumType.STRING)
@@ -30,11 +30,11 @@ public class Championnat {
         this.id = id;
     }
 
-    public Integer getAnnee() {
+    public String getAnnee() {
         return annee;
     }
 
-    public void setAnnee(Integer annee) {
+    public void setAnnee(String annee) {
         this.annee = annee;
     }
 
