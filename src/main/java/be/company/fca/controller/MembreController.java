@@ -48,7 +48,9 @@ public class MembreController {
         }
 
         for (Membre membre : membres){
-            membresDto.add(new MembreDto(membre,UserUtils.isPrivateInformationsAuthorized(authentication)));
+            if (UserUtils.isPrivateInformationsAuthorized(authentication) || membre.isActif()){
+                membresDto.add(new MembreDto(membre,UserUtils.isPrivateInformationsAuthorized(authentication)));
+            }
         }
 
         return membresDto;

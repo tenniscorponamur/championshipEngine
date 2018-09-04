@@ -21,12 +21,12 @@ public class MembreDto {
     private boolean onlyCorpo=false;
     private ClassementAFT classementAFTActuel;
     private ClassementCorpo classementCorpoActuel;
-    private Date dateAffiliationCorpo;
-    private Date dateDesaffiliationCorpo;
     private boolean responsableClub=false;
 
     // Donnees privees (accessibles uniquement si authentification)
 
+    private Date dateAffiliationCorpo;
+    private Date dateDesaffiliationCorpo;
     private Date dateNaissance;
     private String codePostal;
     private String localite;
@@ -57,11 +57,11 @@ public class MembreDto {
         this.onlyCorpo = membre.isOnlyCorpo();
         this.classementAFTActuel = membre.getClassementAFTActuel();
         this.classementCorpoActuel = membre.getClassementCorpoActuel();
-        this.dateAffiliationCorpo = membre.getDateAffiliationCorpo();
-        this.dateDesaffiliationCorpo = membre.getDateDesaffiliationCorpo();
         this.responsableClub = membre.isResponsableClub();
 
         if (withPrivateInformations){
+            this.dateAffiliationCorpo = membre.getDateAffiliationCorpo();
+            this.dateDesaffiliationCorpo = membre.getDateDesaffiliationCorpo();
             this.dateNaissance = membre.getDateNaissance();
             this.codePostal = membre.getCodePostal();
             this.localite = membre.getLocalite();
