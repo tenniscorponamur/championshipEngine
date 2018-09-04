@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -93,6 +94,82 @@ public class RencontreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method= RequestMethod.GET, path="/private/rencontres/calendrier/isValidable")
+    public boolean isCalendrierValidable(@RequestParam Long championnatId){
+        // On peut valider le calendrier si des rencontres existent pour ce championnat
+        Championnat championnat = new Championnat();
+        championnat.setId(championnatId);
+        List<Rencontre> rencontres = (List<Rencontre>) rencontreRepository.findRencontresByChampionnat(championnat);
+        return !rencontres.isEmpty();
+    }
+
+    public boolean isCalendrierInvalidable(@RequestParam Long championnatId){
+        // On peut invalider la calendrier si celui-ci est validé et qu'aucun resultat n'a ete encode
+        return false;
+    }
+
+    public boolean isCalendrierDeletable(@RequestParam Long championnatId){
+        // Le calendrier peut être supprimé si le calendrier n'est pas marqué comme validé
+        // et que des rencontres existent (bien que non-indispensable)
+        return false;
+    }
+
+    public boolean isCalendrierCloturable(@RequestParam Long championnatId){
+        // Le calendrier peut etre cloture si toutes les rencontres ont ete disputees
+        return false;
+    }
+
+    public List<Rencontre> createInterseries(@RequestParam Long championnatId){
+        // Les rencontres interseries peuvent etre crees si toutes les rencontres des poules concernees sont encodees
+        //TODO : pouvoir creer les rencontres interseries par division afin de ne pas bloquer si le reste du championnat n'est pas fini
+        return new ArrayList<Rencontre>();
+    }
+
+    // TODO :
+    /*
+        Le refresh est faisable tant que le calendrier n'est pas valide
+        Si le calendrier est valide, on peut encoder des resultats
+        Le championnat peut etre marque comme cloture si toutes les rencontres ont ete encodees (interseries comprises)
+        On peut devalider le calendrier tant qu'aucun resultat n'a ete encode (principe de base mais un contournement sera toujours possible)
+
+        Si une rencontre a deja ete disputee et qu'il faut regenerer certaines rencontres (ajout d'une equipe par exemple), le refresh sera toujours potentiellement faisable
+
+     */
+
+    // TODO : Typiquement, on ne pourra pas supprimer une division ou une equipe tant que le calendrier existera
+
+    // TODO : pour permettre la suppression d'une équipe, il faut envisager de supprimer toutes les rencontres de cette équipe dans le calendrier sinon blocage --> suppression de ces rencontres + refresh si le calendrier existe
+    // TODO : pour permettre la suppression d'une division/poule, il faut envisager de supprimer toutes les rencontres de cette division/poule dans le calendrier sinon blocage --> suppression de ces rencontres + refresh si le calendrier existe
+
+    //TODO : si une équipe change de poule, il faut regénérer le calendrier car il n'est plus correct --> par contre, il n'y aura aucun blocage dans l'état actuel --> initier le refresh si le calendrier existe
+
+    //TODO : ajout d'une equipe/division/poule : initier refresh si le calendrier existe
+
+
+    public Iterable<Rencontre> refreshCalendrier(@RequestParam Long championnatId){
+
+
+        //TODO : tester si le calendrier a ete genere, si c'est le cas, on va faire un refresh et non une simple creation
+
+
+        List<Rencontre> anciennesRencontres = new ArrayList<>();
+        List<Rencontre> nouvellesRencontres = new ArrayList<>();
+
+        Championnat championnat = new Championnat();
+        championnat.setId(championnatId);
+        Iterable<Division> divisionList = divisionRepository.findByChampionnat(championnat);
+        for (Division division : divisionList){
+            Iterable<Poule> pouleList = pouleRepository.findByDivision(division);
+            for (Poule poule : pouleList){
+                anciennesRencontres.addAll((Collection<? extends Rencontre>) rencontreRepository.findByPoule(poule));
+                nouvellesRencontres.addAll(generateCalendar(poule));
+            }
+        }
+
+        return rencontreService.refreshRencontres(anciennesRencontres,nouvellesRencontres);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
     public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
 
@@ -118,6 +195,11 @@ public class RencontreController {
         rencontreService.deleteByChampionnat(championnatId);
     }
 
+    /**
+     * Permet de generer le calendrier d'une poule
+     * @param poule Poule
+     * @return Liste des rencontres d'une poule
+     */
     private List<Rencontre> generateCalendar(Poule poule){
 
         List<Rencontre> rencontres = new ArrayList<>();

@@ -1,9 +1,6 @@
 package be.company.fca.repository;
 
-import be.company.fca.model.Division;
-import be.company.fca.model.Equipe;
-import be.company.fca.model.Rencontre;
-import be.company.fca.model.Poule;
+import be.company.fca.model.*;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -25,6 +22,15 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
      * @return Rencontres d'une poule
      */
     Iterable<Rencontre> findByPoule(Poule poule);
+
+    /**
+     * Permet de recuperer les rencontres d'un championnat
+     * @param championnat Championnat
+     * @return Rencontres d'un championnat
+     */
+    @Query("select distinct rencontre from Rencontre rencontre " +
+            " where rencontre.division.championnat = :championnat")
+    Iterable<Rencontre> findRencontresByChampionnat(@Param("championnat") Championnat championnat);
 
     /**
      * Permet de recuperer les rencontres validées d'une equipe

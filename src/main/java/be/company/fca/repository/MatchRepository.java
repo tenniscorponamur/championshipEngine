@@ -17,6 +17,10 @@ public interface MatchRepository extends CrudRepository<Match,Long> {
      */
     Iterable<Match> findByRencontre(Rencontre rencontre);
 
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    Iterable<Match> deleteByRencontre(Rencontre rencontre);
+
     /**
      * Permet de supprimer tous les matchs d'un championnat
      * @param championnatId Identifiant du championnat
