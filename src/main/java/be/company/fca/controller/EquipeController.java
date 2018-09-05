@@ -5,6 +5,8 @@ import be.company.fca.model.Club;
 import be.company.fca.model.Division;
 import be.company.fca.model.Equipe;
 import be.company.fca.model.Poule;
+import be.company.fca.repository.ChampionnatRepository;
+import be.company.fca.repository.DivisionRepository;
 import be.company.fca.repository.EquipeRepository;
 import be.company.fca.service.DivisionService;
 import be.company.fca.service.EquipeService;
@@ -23,6 +25,12 @@ public class EquipeController {
 
     @Autowired
     private EquipeRepository equipeRepository;
+
+    @Autowired
+    private DivisionRepository divisionRepository;
+
+    @Autowired
+    private ChampionnatRepository championnatRepository;
 
     @Autowired
     private EquipeService equipeService;
@@ -63,16 +71,37 @@ public class EquipeController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.POST)
     public Equipe addEquipe(@RequestParam Long divisionId, @RequestBody Equipe equipe){
-        Division division = new Division();
-        division.setId(divisionId);
+        Division division = divisionRepository.findOne(divisionId);
         equipe.setDivision(division);
-        return equipeRepository.save(equipe);
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
+            throw new RuntimeException("Operation not supported");
+        }
+
+        Equipe equipeSaved = equipeRepository.save(equipe);
+        // On signale que le calendrier doit etre rafraichi si l'equipe a ete sauvee
+        championnatRepository.updateCalendrierARafraichir(division.getChampionnat().getId(),true);
+
+
+
+        return equipeSaved;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.DELETE)
     public void deleteEquipe(@RequestParam Long id){
+
+        Equipe equipe = equipeRepository.findOne(id);
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
+            throw new RuntimeException("Operation not supported");
+        }
+
         equipeRepository.delete(id);
+        // On signale que le calendrier doit etre rafraichi si l'equipe a ete supprimee
+        championnatRepository.updateCalendrierARafraichir(equipe.getDivision().getChampionnat().getId(),true);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -84,8 +113,20 @@ public class EquipeController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe/poule", method = RequestMethod.PUT)
     public Equipe updatePouleEquipe(@RequestParam Long equipeId, @RequestBody Poule poule){
+
+        Equipe equipe = equipeRepository.findOne(equipeId);
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
+            throw new RuntimeException("Operation not supported");
+        }
+
         equipeRepository.updatePoule(equipeId,poule);
-        return equipeRepository.findOne(equipeId);
+
+        // On signale que le calendrier doit etre rafraichi si l'equipe a change de poule
+        championnatRepository.updateCalendrierARafraichir(equipe.getDivision().getChampionnat().getId(),true);
+
+        return equipe;
     }
 
     //1107, 1113, 1116, 1112: division

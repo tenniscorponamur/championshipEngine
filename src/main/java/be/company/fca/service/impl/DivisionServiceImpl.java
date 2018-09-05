@@ -21,10 +21,7 @@ public class DivisionServiceImpl implements DivisionService {
 
     @Override
     @Transactional(readOnly = false)
-    public List<Division> saveDivisionsInChampionship(Long championnatId, List<Division> divisionList) {
-
-        Championnat championnat = new Championnat();
-        championnat.setId(championnatId);
+    public List<Division> saveDivisionsInChampionship(Championnat championnat, List<Division> divisionList) {
 
         for (Division division : divisionList){
             division.setChampionnat(championnat);

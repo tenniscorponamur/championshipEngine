@@ -49,26 +49,54 @@ public class DivisionController {
     @RequestMapping(value = "/private/division", method = RequestMethod.POST)
     public Division addDivision(@RequestParam Long championnatId, @RequestBody Division division){
 
-        //TODO : tester si le numero n'est pas deja present --> devrait etre une contrainte en DB mais probleme pour la renumerotation...
-
-        //TODO : methode de modificaiton d'un championnat interdite a partir d'un certain stade du championnat (avoir un etat)
-
-        Championnat championnat = new Championnat();
-        championnat.setId(championnatId);
+        Championnat championnat = championnatRepository.findOne(championnatId);
         division.setChampionnat(championnat);
-        return divisionRepository.save(division);
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (championnat.isCalendrierValide() || championnat.isCloture()){
+            throw new RuntimeException("Operation not supported");
+        }
+
+        Division divisionSaved =  divisionRepository.save(division);
+
+        // On signale que le calendrier doit etre rafraichi si la division a ete sauvee
+        championnatRepository.updateCalendrierARafraichir(championnatId,true);
+
+        return divisionSaved;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/division", method = RequestMethod.DELETE)
     public void deleteDivision(@RequestParam Long id){
+        Division division = divisionRepository.findOne(id);
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
+            throw new RuntimeException("Operation not supported");
+        }
+
         divisionRepository.delete(id);
+        // On signale que le calendrier doit etre rafraichi si la division a ete supprimee
+        championnatRepository.updateCalendrierARafraichir(division.getChampionnat().getId(),true);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/divisions", method = RequestMethod.PUT)
     public List<Division> saveDivisionsInChampionship(@RequestParam Long championnatId, @RequestBody List<Division> divisionList){
-        return divisionService.saveDivisionsInChampionship(championnatId,divisionList);
+
+        Championnat championnat = championnatRepository.findOne(championnatId);
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (championnat.isCalendrierValide() || championnat.isCloture()){
+            throw new RuntimeException("Operation not supported");
+        }
+
+        List<Division> divisions =  divisionService.saveDivisionsInChampionship(championnat,divisionList);
+
+        // On signale que le calendrier doit etre rafraichi si les divisions ont ete sauvees
+        championnatRepository.updateCalendrierARafraichir(championnatId,true);
+
+        return divisions;
     }
 //
 //    @RequestMapping(method= RequestMethod.GET, path="/public/division/createDivision")

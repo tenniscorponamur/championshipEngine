@@ -122,6 +122,9 @@ public class RencontreController {
     public Iterable<Rencontre> refreshCalendrier(@RequestParam Long championnatId){
 
 
+        //TODO : calendrier rafraichi --> false
+
+
         //TODO : tester si le calendrier a ete genere, si c'est le cas, on va faire un refresh et non une simple creation
 
 
