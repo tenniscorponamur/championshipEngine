@@ -2,10 +2,7 @@ package be.company.fca.controller;
 
 import be.company.fca.dto.RencontreDto;
 import be.company.fca.model.*;
-import be.company.fca.repository.DivisionRepository;
-import be.company.fca.repository.EquipeRepository;
-import be.company.fca.repository.PouleRepository;
-import be.company.fca.repository.RencontreRepository;
+import be.company.fca.repository.*;
 import be.company.fca.service.RencontreService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,8 @@ public class RencontreController {
     private DivisionRepository divisionRepository;
     @Autowired
     private PouleRepository pouleRepository;
+    @Autowired
+    private ChampionnatRepository championnatRepository;
 
     @Autowired
     private RencontreService rencontreService;
@@ -91,32 +90,6 @@ public class RencontreController {
         }
 
         return validite;
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(method= RequestMethod.GET, path="/private/rencontres/calendrier/isValidable")
-    public boolean isCalendrierValidable(@RequestParam Long championnatId){
-        // On peut valider le calendrier si des rencontres existent pour ce championnat
-        Championnat championnat = new Championnat();
-        championnat.setId(championnatId);
-        List<Rencontre> rencontres = (List<Rencontre>) rencontreRepository.findRencontresByChampionnat(championnat);
-        return !rencontres.isEmpty();
-    }
-
-    public boolean isCalendrierInvalidable(@RequestParam Long championnatId){
-        // On peut invalider la calendrier si celui-ci est validé et qu'aucun resultat n'a ete encode
-        return false;
-    }
-
-    public boolean isCalendrierDeletable(@RequestParam Long championnatId){
-        // Le calendrier peut être supprimé si le calendrier n'est pas marqué comme validé
-        // et que des rencontres existent (bien que non-indispensable)
-        return false;
-    }
-
-    public boolean isCalendrierCloturable(@RequestParam Long championnatId){
-        // Le calendrier peut etre cloture si toutes les rencontres ont ete disputees
-        return false;
     }
 
     public List<Rencontre> createInterseries(@RequestParam Long championnatId){
@@ -192,7 +165,10 @@ public class RencontreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(method= RequestMethod.DELETE, path="/private/rencontres/calendrier")
     public void deleteCalendrier(@RequestParam Long championnatId) {
-        rencontreService.deleteByChampionnat(championnatId);
+        Championnat championnat = championnatRepository.findOne(championnatId);
+        if (!championnat.isCalendrierValide()){
+            rencontreService.deleteByChampionnat(championnatId);
+        }
     }
 
     /**

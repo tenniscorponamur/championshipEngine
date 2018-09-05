@@ -19,6 +19,15 @@ public interface SetRepository extends CrudRepository<Set,Long> {
     Iterable<Set> findByMatch(Match match);
 
     /**
+     * Permet de recuperer toutes les sets d'un championnat
+     * @param championnatId Identifiant du championnat
+     * @return liste des sets d'un championnat
+     */
+    @Query(value = "select count(*) from set " +
+            " where match_fk in (select match.id from match inner join rencontre on match.rencontre_fk = rencontre.id inner join division on rencontre.division_fk = division.id  where division.championnat_fk = :championnatId)", nativeQuery = true)
+    Long countByChampionnatId(@Param("championnatId") Long championnatId);
+
+    /**
      * Permet de supprimer les sets d'un match
      * @param match Match
      * @return Sets d'un match

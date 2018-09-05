@@ -22,6 +22,15 @@ public class Championnat {
     @Enumerated(EnumType.STRING)
     private CategorieChampionnat categorie;
 
+    @Column( name = "calendrier_a_rafraichir", nullable = false)
+    private boolean calendrierARafraichir=false;
+
+    @Column( name = "calendrier_valide", nullable = false)
+    private boolean calendrierValide=false;
+
+    @Column( name = "cloture", nullable = false)
+    private boolean cloture=false;
+
     public Long getId() {
         return id;
     }
@@ -52,6 +61,30 @@ public class Championnat {
 
     public void setCategorie(CategorieChampionnat categorie) {
         this.categorie = categorie;
+    }
+
+    public boolean isCalendrierARafraichir() {
+        return calendrierARafraichir;
+    }
+
+    public void setCalendrierARafraichir(boolean calendrierARafraichir) {
+        this.calendrierARafraichir = calendrierARafraichir;
+    }
+
+    public boolean isCalendrierValide() {
+        return calendrierValide;
+    }
+
+    public void setCalendrierValide(boolean calendrierValide) {
+        this.calendrierValide = calendrierValide;
+    }
+
+    public boolean isCloture() {
+        return cloture;
+    }
+
+    public void setCloture(boolean cloture) {
+        this.cloture = cloture;
     }
 
     @Override
