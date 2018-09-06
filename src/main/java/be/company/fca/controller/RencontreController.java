@@ -98,41 +98,20 @@ public class RencontreController {
         return new ArrayList<Rencontre>();
     }
 
-    // TODO :
-    /*
-        Le refresh est faisable tant que le calendrier n'est pas valide
-        Si le calendrier est valide, on peut encoder des resultats
-        Le championnat peut etre marque comme cloture si toutes les rencontres ont ete encodees (interseries comprises)
-        On peut devalider le calendrier tant qu'aucun resultat n'a ete encode (principe de base mais un contournement sera toujours possible)
-
-        Si une rencontre a deja ete disputee et qu'il faut regenerer certaines rencontres (ajout d'une equipe par exemple), le refresh sera toujours potentiellement faisable
-
-     */
-
-    // TODO : Typiquement, on ne pourra pas supprimer une division ou une equipe tant que le calendrier existera
-
     // TODO : pour permettre la suppression d'une équipe, il faut envisager de supprimer toutes les rencontres de cette équipe dans le calendrier sinon blocage --> suppression de ces rencontres + refresh si le calendrier existe
+
     // TODO : pour permettre la suppression d'une division/poule, il faut envisager de supprimer toutes les rencontres de cette division/poule dans le calendrier sinon blocage --> suppression de ces rencontres + refresh si le calendrier existe
-
-    //TODO : si une équipe change de poule, il faut regénérer le calendrier car il n'est plus correct --> par contre, il n'y aura aucun blocage dans l'état actuel --> initier le refresh si le calendrier existe
-
-    //TODO : ajout d'une equipe/division/poule : initier refresh si le calendrier existe
-
 
     public Iterable<Rencontre> refreshCalendrier(@RequestParam Long championnatId){
 
-
-        //TODO : calendrier rafraichi --> false
-
-
-        //TODO : tester si le calendrier a ete genere, si c'est le cas, on va faire un refresh et non une simple creation
-
+        // On peut faire un refresh tant que le calendrier n'a pas ete valide
+        Championnat championnat = championnatRepository.findOne(championnatId);
+        if (championnat.isCalendrierValide()){
+            throw new RuntimeException("Operation not supported - Calendrier validé");
+        }
 
         List<Rencontre> anciennesRencontres = new ArrayList<>();
         List<Rencontre> nouvellesRencontres = new ArrayList<>();
-
-        Championnat championnat = new Championnat();
-        championnat.setId(championnatId);
         Iterable<Division> divisionList = divisionRepository.findByChampionnat(championnat);
         for (Division division : divisionList){
             Iterable<Poule> pouleList = pouleRepository.findByDivision(division);
@@ -142,7 +121,12 @@ public class RencontreController {
             }
         }
 
-        return rencontreService.refreshRencontres(anciennesRencontres,nouvellesRencontres);
+        List<Rencontre> rencontresSaved = rencontreService.refreshRencontres(anciennesRencontres,nouvellesRencontres);
+
+        // Calendrier rafraichi --> false
+        championnatRepository.updateCalendrierARafraichir(championnatId,false);
+
+        return rencontresSaved;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

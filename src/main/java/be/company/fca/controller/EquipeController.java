@@ -76,7 +76,7 @@ public class EquipeController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         Equipe equipeSaved = equipeRepository.save(equipe);
@@ -96,7 +96,7 @@ public class EquipeController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         equipeRepository.delete(id);
@@ -118,7 +118,7 @@ public class EquipeController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         equipeRepository.updatePoule(equipeId,poule);

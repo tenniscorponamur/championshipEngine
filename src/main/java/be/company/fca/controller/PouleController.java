@@ -52,7 +52,7 @@ public class PouleController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         Poule pouleSaved = pouleRepository.save(poule);
@@ -71,7 +71,7 @@ public class PouleController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (poule.getDivision().getChampionnat().isCalendrierValide() || poule.getDivision().getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         pouleRepository.updateAllerRetour(pouleId,allerRetour);
@@ -89,7 +89,7 @@ public class PouleController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (poule.getDivision().getChampionnat().isCalendrierValide() || poule.getDivision().getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         pouleRepository.delete(id);

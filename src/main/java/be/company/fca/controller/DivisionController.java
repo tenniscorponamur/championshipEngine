@@ -54,7 +54,7 @@ public class DivisionController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (championnat.isCalendrierValide() || championnat.isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         Division divisionSaved =  divisionRepository.save(division);
@@ -72,7 +72,7 @@ public class DivisionController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         divisionRepository.delete(id);
@@ -88,7 +88,7 @@ public class DivisionController {
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (championnat.isCalendrierValide() || championnat.isCloture()){
-            throw new RuntimeException("Operation not supported");
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
         List<Division> divisions =  divisionService.saveDivisionsInChampionship(championnat,divisionList);
