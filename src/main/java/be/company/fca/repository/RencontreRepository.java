@@ -42,6 +42,16 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     Iterable<Rencontre> findRencontresByEquipe(@Param("equipe") Equipe equipe);
 
     /**
+     * Permet de supprimer une renconttre
+     * @param rencontreId Identifiant de la rencontre
+     */
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query(value = "delete from rencontre " +
+            " where id = :rencontreId", nativeQuery = true)
+    void deleteById(@Param("rencontreId") Long rencontreId);
+
+    /**
      * Permet de supprimer toutes les rencontres d'un championnat
      * @param championnatId Identifiant du championnat
      */

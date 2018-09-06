@@ -98,10 +98,28 @@ public class RencontreController {
         return new ArrayList<Rencontre>();
     }
 
-    // TODO : pour permettre la suppression d'une équipe, il faut envisager de supprimer toutes les rencontres de cette équipe dans le calendrier sinon blocage --> suppression de ces rencontres + refresh si le calendrier existe
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
+    public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
 
-    // TODO : pour permettre la suppression d'une division/poule, il faut envisager de supprimer toutes les rencontres de cette division/poule dans le calendrier sinon blocage --> suppression de ces rencontres + refresh si le calendrier existe
+        List<Rencontre> rencontres = new ArrayList<Rencontre>();
 
+        Championnat championnat = new Championnat();
+        championnat.setId(championnatId);
+        Iterable<Division> divisionList = divisionRepository.findByChampionnat(championnat);
+        for (Division division : divisionList){
+            Iterable<Poule> pouleList = pouleRepository.findByDivision(division);
+            for (Poule poule : pouleList){
+                rencontres.addAll(generateCalendar(poule));
+
+            }
+        }
+
+        return rencontreService.saveRencontres(rencontres);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method= RequestMethod.PUT, path="/private/rencontres/calendrier")
     public Iterable<Rencontre> refreshCalendrier(@RequestParam Long championnatId){
 
         // On peut faire un refresh tant que le calendrier n'a pas ete valide
@@ -127,26 +145,6 @@ public class RencontreController {
         championnatRepository.updateCalendrierARafraichir(championnatId,false);
 
         return rencontresSaved;
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(method= RequestMethod.POST, path="/private/rencontres/calendrier")
-    public Iterable<Rencontre> createCalendrier(@RequestParam Long championnatId) {
-
-        List<Rencontre> rencontres = new ArrayList<Rencontre>();
-
-        Championnat championnat = new Championnat();
-        championnat.setId(championnatId);
-        Iterable<Division> divisionList = divisionRepository.findByChampionnat(championnat);
-        for (Division division : divisionList){
-            Iterable<Poule> pouleList = pouleRepository.findByDivision(division);
-            for (Poule poule : pouleList){
-                rencontres.addAll(generateCalendar(poule));
-
-            }
-        }
-
-        return rencontreService.saveRencontres(rencontres);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

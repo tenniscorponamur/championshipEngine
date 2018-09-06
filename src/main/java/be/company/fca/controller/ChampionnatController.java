@@ -55,8 +55,6 @@ public class ChampionnatController {
         championnatRepository.delete(id);
     }
 
-    //TODO : a rafraichir --> boolean garni quand on ajoute/upprime une equipe, change de poule, ajout division, ajout poule, ...
-
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat/calendrierARafraichir", method = RequestMethod.PUT)
     public boolean setCalendrierARafraichir(@RequestParam Long championnatId,@RequestBody boolean aRafraichir){

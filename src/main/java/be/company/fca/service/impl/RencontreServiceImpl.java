@@ -59,7 +59,7 @@ public class RencontreServiceImpl implements RencontreService{
         for (Rencontre oldRencontre : oldRencontreList){
             setRepository.deleteByRencontreId(oldRencontre.getId());
             matchRepository.deleteByRencontre(oldRencontre);
-            rencontreRepository.delete(oldRencontre.getId());
+            rencontreRepository.deleteById(oldRencontre.getId());
         }
 
         return newRencontreList;
@@ -70,18 +70,22 @@ public class RencontreServiceImpl implements RencontreService{
      * @param newRencontre
      * @param oldRencontreList
      */
+    @Transactional(readOnly = false)
     private void initAndSaveFromOlds(Rencontre newRencontre, List<Rencontre> oldRencontreList){
         Rencontre oldRencontre = getMatchingOldRencontre(newRencontre, oldRencontreList);
-        if (oldRencontre!=null){
-
+        // Initialisation de la nouvelle rencontre si une ancienne etait presente
+        if (oldRencontre!=null) {
             newRencontre.setDateHeureRencontre(oldRencontre.getDateHeureRencontre());
             newRencontre.setTerrain(oldRencontre.getTerrain());
             newRencontre.setPointsVisites(oldRencontre.getPointsVisites());
             newRencontre.setPointsVisiteurs(oldRencontre.getPointsVisiteurs());
             newRencontre.setValide(oldRencontre.isValide());
+        }
 
-            newRencontre = rencontreRepository.save(newRencontre);
+        newRencontre = rencontreRepository.save(newRencontre);
 
+        // Si jamais des matchs ont ete crees pour l'ancienne rencontre, on va les recuperer dans la nouvelle
+        if (oldRencontre!=null) {
             List<Match> matchs = (List<Match>) matchRepository.findByRencontre(oldRencontre);
             for (Match match : matchs){
                 match.setRencontre(newRencontre);
