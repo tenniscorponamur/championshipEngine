@@ -3,6 +3,7 @@ package be.company.fca.controller;
 import be.company.fca.dto.RencontreDto;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
+import be.company.fca.service.ClassementService;
 import be.company.fca.service.RencontreService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class RencontreController {
     @Autowired
     private ChampionnatRepository championnatRepository;
 
+    @Autowired
+    private ClassementService classementService;
     @Autowired
     private RencontreService rencontreService;
 
@@ -90,6 +93,69 @@ public class RencontreController {
         }
 
         return validite;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method= RequestMethod.GET, path="/private/rencontres/interseries")
+    public List<Rencontre> getInterseries(@RequestParam Long championnatId){
+
+        // Dans un premier temps, on ne va creer des interseries qu'avec des divisions comprenant deux poules
+        // TODO : gerer les matchs interseries pour des divisions a plus de deux poules
+
+        /*
+
+            Parcours des divisions
+            Pour chaque division, regarder
+                s'il y a plusieurs poules
+                si l'ensemble des rencontres ont ete validees
+            Si c'est le cas, on va prendre les 1er de chaque poule pour proposer la rencontre
+
+         */
+
+        Championnat championnat = championnatRepository.findOne(championnatId);
+        if (!championnat.isCalendrierValide() || championnat.isCloture()){
+            throw new RuntimeException("Operation not supported - Championnat cloture");
+        }
+        List<Rencontre> rencontresInterseries = new ArrayList<>();
+        List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+        for (Division division : divisions) {
+
+            List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+            // S'il y a deux poules dans la division,
+            if (!poules.isEmpty()&&poules.size()==2){
+
+                // On verifie que l'ensemble des rencontres de la division ont bien ete validees
+
+                Long nbRencontresNonValidees = rencontreRepository.countNonValideesByDivision(division.getId());
+                System.err.println("Nb rencontres non-validees : " + nbRencontresNonValidees);
+
+                if (nbRencontresNonValidees==0){
+                    // On recupere les classements pour cette division
+                    // Par poule, on prend la premiere equipe
+                    Classement classementPoule1 = classementService.getClassementPoule(poules.get(0));
+                    Classement classementPoule2 = classementService.getClassementPoule(poules.get(1));
+
+                    if (!classementPoule1.getClassementEquipes().isEmpty() && !classementPoule2.getClassementEquipes().isEmpty()){
+                        Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();
+                        Equipe equipe2 = classementPoule2.getClassementEquipes().get(0).getEquipe();
+
+                        //TODO : verifier si cette rencontre n'existe pas deja !!
+
+                        Rencontre rencontre = new Rencontre();
+                        rencontre.setDivision(division);
+                        rencontre.setEquipeVisites(equipe1);
+                        rencontre.setEquipeVisiteurs(equipe2);
+                        rencontresInterseries.add(rencontre);
+
+                    }
+
+                }
+
+            }
+        }
+
+        return rencontresInterseries;
+
     }
 
     public List<Rencontre> createInterseries(@RequestParam Long championnatId){

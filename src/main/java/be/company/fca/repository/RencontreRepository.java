@@ -24,6 +24,15 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     Iterable<Rencontre> findByPoule(Poule poule);
 
     /**
+     * Permet de recuperer le nombre de rencontres non-validees d'une division
+     * @param divisionId Identifiant de la division
+     * @return Rencontres d'un championnat
+     */
+    @Query(value = "select count(*) from rencontre " +
+            " where rencontre.valide = '0' and rencontre.division_fk = :divisionId", nativeQuery = true)
+    Long countNonValideesByDivision(@Param("divisionId") Long divisionId);
+
+    /**
      * Permet de recuperer les rencontres d'un championnat
      * @param championnat Championnat
      * @return Rencontres d'un championnat
