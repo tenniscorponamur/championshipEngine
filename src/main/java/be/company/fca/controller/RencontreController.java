@@ -121,13 +121,14 @@ public class RencontreController {
         for (Division division : divisions) {
 
             List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+
             // S'il y a deux poules dans la division,
+
             if (!poules.isEmpty()&&poules.size()==2){
 
                 // On verifie que l'ensemble des rencontres de la division ont bien ete validees
 
                 Long nbRencontresNonValidees = rencontreRepository.countNonValideesByDivision(division.getId());
-                System.err.println("Nb rencontres non-validees : " + nbRencontresNonValidees);
 
                 if (nbRencontresNonValidees==0){
                     // On recupere les classements pour cette division
@@ -139,13 +140,14 @@ public class RencontreController {
                         Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();
                         Equipe equipe2 = classementPoule2.getClassementEquipes().get(0).getEquipe();
 
-                        //TODO : verifier si cette rencontre n'existe pas deja !!
-
                         Rencontre rencontre = new Rencontre();
                         rencontre.setDivision(division);
                         rencontre.setEquipeVisites(equipe1);
                         rencontre.setEquipeVisiteurs(equipe2);
-                        rencontresInterseries.add(rencontre);
+
+                        if (!isInterserieExists(rencontre)){
+                            rencontresInterseries.add(rencontre);
+                        }
 
                     }
 
@@ -158,10 +160,15 @@ public class RencontreController {
 
     }
 
-    public List<Rencontre> createInterseries(@RequestParam Long championnatId){
-        // Les rencontres interseries peuvent etre crees si toutes les rencontres des poules concernees sont encodees
-        //TODO : pouvoir creer les rencontres interseries par division afin de ne pas bloquer si le reste du championnat n'est pas fini
-        return new ArrayList<Rencontre>();
+    /**
+     * Permet de verifier si la rencontre interserie existe deja dans le systeme
+     * @param rencontre Rencontre
+     * @return
+     */
+    private boolean isInterserieExists(Rencontre rencontre){
+        Long nbSameRencontre = rencontreRepository.countByDivisionAndEquipes(rencontre.getDivision().getId(),rencontre.getEquipeVisites().getId(),rencontre.getEquipeVisiteurs().getId());
+
+        return nbSameRencontre>0;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -181,7 +188,12 @@ public class RencontreController {
             }
         }
 
-        return rencontreService.saveRencontres(rencontres);
+        List<Rencontre> rencontresSaved = rencontreService.saveRencontres(rencontres);
+
+        // Calendrier rafraichi --> false
+        championnatRepository.updateCalendrierARafraichir(championnatId,false);
+
+        return rencontresSaved;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
