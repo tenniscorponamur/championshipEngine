@@ -64,6 +64,12 @@ public class RencontreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/rencontre", method = RequestMethod.POST)
+    public Rencontre createRencontre(@RequestBody Rencontre rencontre){
+        return rencontreRepository.save(rencontre);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre", method = RequestMethod.PUT)
     public Rencontre updateRencontre(@RequestBody Rencontre rencontre){
         return rencontreRepository.save(rencontre);
