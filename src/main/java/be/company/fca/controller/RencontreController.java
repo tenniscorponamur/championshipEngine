@@ -100,7 +100,19 @@ public class RencontreController {
     public List<Rencontre> getInterseries(@RequestParam Long championnatId){
 
         // Dans un premier temps, on ne va creer des interseries qu'avec des divisions comprenant deux poules
-        // TODO : gerer les matchs interseries pour des divisions a plus de deux poules
+
+        /*
+
+         TODO : gerer les matchs interseries pour des divisions a plus de deux poules :
+
+         Lister les equipes premieres de classement de poule
+         Analyser les confrontations interseries et ne conserver que les gagnants
+         les perdants doivent etre conserves afin de ne pas les reprendre pour la suite de la
+         competition
+         Ce principe fonctionnera avec un nombre pair de poules
+         Pour un nombre impair : à analyser
+
+          */
 
         /*
 
@@ -167,7 +179,6 @@ public class RencontreController {
      */
     private boolean isInterserieExists(Rencontre rencontre){
         Long nbSameRencontre = rencontreRepository.countByDivisionAndEquipes(rencontre.getDivision().getId(),rencontre.getEquipeVisites().getId(),rencontre.getEquipeVisiteurs().getId());
-
         return nbSameRencontre>0;
     }
 

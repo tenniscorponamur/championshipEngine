@@ -80,8 +80,11 @@ public class ClassementServiceImpl implements ClassementService {
         List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
 
         Map<Poule,Classement> classementMap = new HashMap<Poule,Classement>();
+        Map<Division,List<Rencontre>> interseriesMap = new HashMap<>();
 
         for (Division division : divisions){
+
+            List<Rencontre> rencontresInterseries = new ArrayList<>();
 
             List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
 
@@ -91,8 +94,6 @@ public class ClassementServiceImpl implements ClassementService {
             }
 
             List<Rencontre> rencontresDivision = (List<Rencontre>) rencontreRepository.findByDivision(division);
-
-//            List<Rencontre> rencontresInterseries = new ArrayList<>();
 
             for (Rencontre rencontre : rencontresDivision){
 
@@ -106,39 +107,26 @@ public class ClassementServiceImpl implements ClassementService {
                     }else{
 
                         // Il s'agit d'une rencontre interserie
-                        //rencontresInterseries.add(rencontre);
-
-                        // Classement de la division basee sur la rencontre inter-series --> juste placer une etoile a cote du vainqueur de la division + popup pour expliquer ce que ca signifie
-
-                        // On considere qu'il n'y a qu'une rencontre interserie par division possible (deux poules maximum)
-                        // TODO : gerer le cas de plusieurs interseries si la division comporte plus de deux poules
-
-                        Equipe equipeVictorieuseDivision = getGagnantRencontreInterserie(rencontre);
-                        if (equipeVictorieuseDivision!=null){
-                            // Marquer l'equipe qui gagne la division suite a la rencontre interseries
-                            for (Poule poule : poules){
-                                Classement classementPoule = classementMap.get(poule);
-                                ClassementEquipe classementEquipe = classementPoule.findByEquipe(equipeVictorieuseDivision);
-                                if (classementEquipe!=null){
-                                    classementEquipe.setGagnantInterseries(true);
-                                }
-                            }
-                        }
-
+                        rencontresInterseries.add(rencontre);
                     }
                 }
 
             }
 
+            interseriesMap.put(division,rencontresInterseries);
+
         }
 
-        // Trier les classements selon divisions/poules par numero
+        // Tri des equipes au sein des classements
 
         List<Classement> classements = new ArrayList<>();
         for (Classement classement : classementMap.values()){
             triEquipes(classement);
+            setGagnantInterseries(classement,interseriesMap.get(classement.getPoule().getDivision()));
             classements.add(classement);
         }
+
+        // Trier les classements selon divisions/poules par numero
 
         Collections.sort(classements, new Comparator<Classement>() {
             @Override
@@ -298,6 +286,41 @@ public class ClassementServiceImpl implements ClassementService {
                 }
             }
         });
+    }
+
+    /**
+     * Permet de preciser le gagnant des rencontres interseries dans un classement
+     * Si plusieurs rencontres interseries dans la division ont lieu, elles seront toutes analyses pour ne
+     * conserver que le gagnant final
+     * @param classement
+     * @param rencontreInterseries
+     */
+    private void setGagnantInterseries(Classement classement, List<Rencontre> rencontreInterseries){
+        Equipe equipeVictorieuseDivision = getEquipeVictorieuse(rencontreInterseries);
+        if (equipeVictorieuseDivision!=null){
+            // Si l'equipe est classe dans cette poule, elle sera marquee comme gagnant la division suite a la rencontre interseries
+            ClassementEquipe classementEquipe = classement.findByEquipe(equipeVictorieuseDivision);
+            if (classementEquipe!=null){
+                classementEquipe.setGagnantInterseries(true);
+            }
+        }
+    }
+
+    /**
+     * Permet de recuperer l'equipe victorieuse d'une liste de rencontre interserie
+     * TODO : gerer le cas de rencontres multiples (actuellement seule une rencontre unique est consideree)
+     * @param rencontreInterserieList
+     * @return
+     */
+    private Equipe getEquipeVictorieuse(List<Rencontre> rencontreInterserieList){
+        Equipe equipe = null;
+
+        // On considere qu'il n'y a qu'une rencontre interserie par division possible (deux poules maximum)
+
+        for (Rencontre interserie : rencontreInterserieList){
+            equipe = getGagnantRencontreInterserie(interserie);
+        }
+        return equipe;
     }
 
     /**
