@@ -127,7 +127,7 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat/isCloturable", method = RequestMethod.GET)
     public boolean isCloturable(@RequestParam Long championnatId){
-        // TODO : Le calendrier peut etre cloture si toutes les rencontres ont ete disputees (interseries comprises)
+        // TODO : Le calendrier peut etre cloture si toutes les rencontres ont ete disputees et validees (interseries comprises)
         return false;
     }
 
