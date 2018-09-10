@@ -97,9 +97,9 @@ public class ChampionnatController {
     public boolean isCalendrierValidable(@RequestParam Long championnatId){
         Championnat championnat = championnatRepository.findOne(championnatId);
         if (!championnat.isCalendrierARafraichir() && !championnat.isCalendrierValide()){
-            // On peut valider le calendrier si des rencontres existent pour ce championnat et qu'il a ete valide
-            List<Rencontre> rencontres = (List<Rencontre>) rencontreRepository.findRencontresByChampionnat(championnat);
-            return !rencontres.isEmpty();
+            // On peut valider le calendrier si des rencontres existent pour ce championnat
+            Long countRencontres = rencontreRepository.countByChampionnat(championnatId);
+            return countRencontres > 0;
         }
         return false;
     }
@@ -127,7 +127,12 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat/isCloturable", method = RequestMethod.GET)
     public boolean isCloturable(@RequestParam Long championnatId){
-        // TODO : Le calendrier peut etre cloture si toutes les rencontres ont ete disputees et validees (interseries comprises)
+        Championnat championnat = championnatRepository.findOne(championnatId);
+        // Le calendrier peut etre cloture si toutes les rencontres ont ete disputees et validees (interseries comprises) et que le calendrier est valide
+        if (championnat.isCalendrierValide() && !championnat.isCloture()){
+            Long countRencontresInvalidees = rencontreRepository.countNonValideesByChampionnat(championnatId);
+            return countRencontresInvalidees == 0;
+        }
         return false;
     }
 

@@ -26,11 +26,28 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     /**
      * Permet de recuperer le nombre de rencontres non-validees d'une division
      * @param divisionId Identifiant de la division
-     * @return Rencontres d'un championnat
+     * @return Nombre de rencontres non-validees d'une division
      */
     @Query(value = "select count(*) from rencontre " +
             " where rencontre.valide = '0' and rencontre.division_fk = :divisionId", nativeQuery = true)
     Long countNonValideesByDivision(@Param("divisionId") Long divisionId);
+
+    /**
+     * Permet de recuperer le nombre de rencontres d'un chamionnat
+     * @param championnatId Identifiant du championnat
+     * @return Nombre de rencontres d'un championnat
+     */
+    @Query(value = "select count(*) from rencontre inner join division on rencontre.division_fk = division.id  where division.championnat_fk = :championnatId ", nativeQuery = true)
+    Long countByChampionnat(@Param("championnatId") Long championnatId);
+
+    /**
+     * Permet de recuperer le nombre de rencontres non-validees d'un chamionnat
+     * @param championnatId Identifiant du championnat
+     * @return Nombre de rencontres non-validees d'un championnat
+     */
+    @Query(value = "select count(*) from rencontre inner join division on rencontre.division_fk = division.id  where division.championnat_fk = :championnatId " +
+            " and rencontre.valide = '0' ", nativeQuery = true)
+    Long countNonValideesByChampionnat(@Param("championnatId") Long championnatId);
 
     /**
      * Permet de recuperer les rencontres d'un championnat
