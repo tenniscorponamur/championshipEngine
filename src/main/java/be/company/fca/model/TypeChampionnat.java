@@ -4,7 +4,8 @@ public enum TypeChampionnat {
 
     HIVER ("Hiver"),
     ETE ("Eté"),
-    CRITERIUM ("Critérium");
+    CRITERIUM ("Critérium"),
+    COUPE_HIVER ("Coupe d'hiver");
 
     private String libelle = "";
 
