@@ -20,25 +20,35 @@ import java.util.List;
 public class MatchController {
 
     @Autowired
+    private RencontreRepository rencontreRepository;
+
+    @Autowired
     private MatchRepository matchRepository;
 
     @Autowired
     private MatchService matchService;
 
 
-    // TODO : DTO pour les membres afin de ne pas recuperer les donnees privees
+    // DTO pour les membres afin de ne pas recuperer les donnees privees
+    // Attention a la rencontre --> rencontreDto
 
-    // TODO : attention a la rencontre --> rencontreDto
-
-
+    /**
+     * Permet de recuperer les matchs pour une rencontre
+     * Si les matchs n'existent pas, ils sont créés à la volée
+     *
+     * Cette création dépend du type de championnat et de la catégorie
+     *
+     * @param rencontreId
+     * @return
+     */
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontre/{rencontreId}/matchs")
     public List<MatchDto> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
 
         List<MatchDto> matchsDto = new ArrayList<>();
         List<Match> matchs = new ArrayList<Match>();
 
-        Rencontre rencontre = new Rencontre();
-        rencontre.setId(rencontreId);
+        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+
         matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
 
         if (matchs.isEmpty()){

@@ -78,10 +78,46 @@ public class RencontreController {
     @RequestMapping(value = "/public/rencontre/{rencontreId}/isValidable", method = RequestMethod.GET)
     public boolean isRencontreValidable(@PathVariable("rencontreId") Long rencontreId){
         Rencontre rencontre = rencontreRepository.findOne(rencontreId);
-        if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
-            Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
-            return totalPoints == 12;
+
+        if (rencontre.getDivision().getChampionnat()!=null){
+
+            // La validite change en fonction du type et de la categorie de championnat
+
+            // Criterium : Simple -> au moins 2 points atteints par l'une des deux equipes
+            // Coupe d'hiver : au moins 8 points atteints au total des deux equipes
+
+
+            Championnat championnat = rencontre.getDivision().getChampionnat();
+            if (TypeChampionnat.HIVER.equals(championnat.getType())
+                    || TypeChampionnat.ETE.equals(championnat.getType())) {
+
+                if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
+
+                    // 6 rencontres de 2 points chacune
+
+                    Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
+                    return totalPoints == 12;
+                }
+
+            } else if (TypeChampionnat.COUPE_HIVER.equals(championnat.getType())) {
+
+                // 4 rencontres de 2 points
+
+                if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
+                    Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
+                    return totalPoints == 8;
+                }
+
+            } else if (TypeChampionnat.CRITERIUM.equals(championnat.getType())){
+
+                if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
+                    Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
+                    return totalPoints == 2;
+                }
+
+            }
         }
+
         return false;
     }
 
@@ -134,43 +170,48 @@ public class RencontreController {
         if (!championnat.isCalendrierValide() || championnat.isCloture()){
             throw new RuntimeException("Operation not supported - Championnat cloture");
         }
+
         List<Rencontre> rencontresInterseries = new ArrayList<>();
-        List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
-        for (Division division : divisions) {
 
-            List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+        if (TypeChampionnat.ETE.equals(championnat.getType()) || TypeChampionnat.HIVER.equals(championnat.getType())) {
 
-            // S'il y a deux poules dans la division,
+            List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+            for (Division division : divisions) {
 
-            if (!poules.isEmpty()&&poules.size()==2){
+                List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
 
-                // On verifie que l'ensemble des rencontres de la division ont bien ete validees
+                // S'il y a deux poules dans la division,
 
-                Long nbRencontresNonValidees = rencontreRepository.countNonValideesByDivision(division.getId());
+                if (!poules.isEmpty() && poules.size() == 2) {
 
-                if (nbRencontresNonValidees==0){
-                    // On recupere les classements pour cette division
-                    // Par poule, on prend la premiere equipe
-                    Classement classementPoule1 = classementService.getClassementPoule(poules.get(0));
-                    Classement classementPoule2 = classementService.getClassementPoule(poules.get(1));
+                    // On verifie que l'ensemble des rencontres de la division ont bien ete validees
 
-                    if (!classementPoule1.getClassementEquipes().isEmpty() && !classementPoule2.getClassementEquipes().isEmpty()){
-                        Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();
-                        Equipe equipe2 = classementPoule2.getClassementEquipes().get(0).getEquipe();
+                    Long nbRencontresNonValidees = rencontreRepository.countNonValideesByDivision(division.getId());
 
-                        Rencontre rencontre = new Rencontre();
-                        rencontre.setDivision(division);
-                        rencontre.setEquipeVisites(equipe1);
-                        rencontre.setEquipeVisiteurs(equipe2);
+                    if (nbRencontresNonValidees == 0) {
+                        // On recupere les classements pour cette division
+                        // Par poule, on prend la premiere equipe
+                        Classement classementPoule1 = classementService.getClassementPoule(poules.get(0));
+                        Classement classementPoule2 = classementService.getClassementPoule(poules.get(1));
 
-                        if (!isInterserieExists(rencontre)){
-                            rencontresInterseries.add(rencontre);
+                        if (!classementPoule1.getClassementEquipes().isEmpty() && !classementPoule2.getClassementEquipes().isEmpty()) {
+                            Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();
+                            Equipe equipe2 = classementPoule2.getClassementEquipes().get(0).getEquipe();
+
+                            Rencontre rencontre = new Rencontre();
+                            rencontre.setDivision(division);
+                            rencontre.setEquipeVisites(equipe1);
+                            rencontre.setEquipeVisiteurs(equipe2);
+
+                            if (!isInterserieExists(rencontre)) {
+                                rencontresInterseries.add(rencontre);
+                            }
+
                         }
 
                     }
 
                 }
-
             }
         }
 

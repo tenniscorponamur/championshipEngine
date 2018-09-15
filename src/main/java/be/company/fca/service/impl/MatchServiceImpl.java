@@ -1,9 +1,6 @@
 package be.company.fca.service.impl;
 
-import be.company.fca.model.Match;
-import be.company.fca.model.Rencontre;
-import be.company.fca.model.Set;
-import be.company.fca.model.TypeMatch;
+import be.company.fca.model.*;
 import be.company.fca.repository.MatchRepository;
 import be.company.fca.repository.SetRepository;
 import be.company.fca.service.MatchService;
@@ -86,30 +83,90 @@ public class MatchServiceImpl implements MatchService {
 
         List<Match> matchs = new ArrayList<Match>();
 
-        // 4 matchs simples
+       // La liste des matchs depend du type et de la categorie de championnat
 
-        for (int i=0;i<4;i++){
-            Match match = new Match();
-            match.setRencontre(rencontre);
-            match.setType(TypeMatch.SIMPLE);
-            match.setOrdre(i+1);
+        // Un seul match pour criterium (simple ou double selon le cas)
+        // 4 doubles pour coupe d'hiver
+        // 4 simples et 2 doubles pour les championnats classiques Hiver et Ete
 
-            match = matchRepository.save(match);
+        if (rencontre.getDivision().getChampionnat()!=null){
+            Championnat championnat = rencontre.getDivision().getChampionnat();
+            if (TypeChampionnat.HIVER.equals(championnat.getType())
+                || TypeChampionnat.ETE.equals(championnat.getType())) {
 
-            matchs.add(match);
-        }
 
-        // 2 matchs doubles
+                // 4 matchs simples
 
-        for (int i=0;i<2;i++){
-            Match match = new Match();
-            match.setRencontre(rencontre);
-            match.setType(TypeMatch.DOUBLE);
-            match.setOrdre(i+1);
+                for (int i=0;i<4;i++){
+                    Match match = new Match();
+                    match.setRencontre(rencontre);
+                    match.setType(TypeMatch.SIMPLE);
+                    match.setOrdre(i+1);
 
-            match = matchRepository.save(match);
+                    match = matchRepository.save(match);
 
-            matchs.add(match);
+                    matchs.add(match);
+                }
+
+                // 2 matchs doubles
+
+                for (int i=0;i<2;i++){
+                    Match match = new Match();
+                    match.setRencontre(rencontre);
+                    match.setType(TypeMatch.DOUBLE);
+                    match.setOrdre(i+1);
+
+                    match = matchRepository.save(match);
+
+                    matchs.add(match);
+                }
+
+
+            } else if (TypeChampionnat.COUPE_HIVER.equals(championnat.getType())){
+
+                // 4 matchs doubles
+
+                for (int i=0;i<4;i++){
+                    Match match = new Match();
+                    match.setRencontre(rencontre);
+                    match.setType(TypeMatch.DOUBLE);
+                    match.setOrdre(i+1);
+
+                    match = matchRepository.save(match);
+
+                    matchs.add(match);
+                }
+
+            } else if (TypeChampionnat.CRITERIUM.equals(championnat.getType())){
+
+                if (CategorieChampionnat.SIMPLE_MESSIEURS.equals(championnat.getCategorie())
+                    || CategorieChampionnat.SIMPLE_DAMES.equals(championnat.getCategorie())) {
+
+                    Match match = new Match();
+                    match.setRencontre(rencontre);
+                    match.setType(TypeMatch.SIMPLE);
+                    match.setOrdre(1);
+
+                    match = matchRepository.save(match);
+
+                    matchs.add(match);
+
+                } else {
+
+                    Match match = new Match();
+                    match.setRencontre(rencontre);
+                    match.setType(TypeMatch.DOUBLE);
+                    match.setOrdre(1);
+
+                    match = matchRepository.save(match);
+
+                    matchs.add(match);
+
+                }
+
+            }
+
+
         }
 
         return matchs;
