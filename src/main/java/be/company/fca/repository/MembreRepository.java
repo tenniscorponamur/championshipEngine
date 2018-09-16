@@ -12,11 +12,11 @@ import java.util.Date;
 public interface MembreRepository extends PagingAndSortingRepository<Membre,Long> {
 
     /**
-     * Permet de recuperer un membre sur base de son numero
-     * @param numero Numero de membre
+     * Permet de recuperer un membre sur base de son numero aft
+     * @param numeroAft Numero aft de membre
      * @return Membre correspondant au numero
      */
-    Membre findByNumero(String numero);
+    Membre findByNumeroAft(String numeroAft);
 
     /**
      * Permet de recuperer les membres d'un club
