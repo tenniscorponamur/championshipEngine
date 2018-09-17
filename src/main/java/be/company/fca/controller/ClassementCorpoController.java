@@ -2,8 +2,10 @@ package be.company.fca.controller;
 
 import be.company.fca.model.*;
 import be.company.fca.repository.ClassementCorpoRepository;
+import be.company.fca.repository.MatchRepository;
 import be.company.fca.repository.MembreRepository;
 import be.company.fca.service.ClassementCorpoService;
+import be.company.fca.utils.DateUtils;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,9 @@ public class ClassementCorpoController {
 
     @Autowired
     private MembreRepository membreRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
 
     @Autowired
     private ClassementCorpoRepository classementCorpoRepository;
@@ -65,7 +70,6 @@ public class ClassementCorpoController {
     @RequestMapping(value = "/public/membre/simulationClassement", method = RequestMethod.GET)
     public ClassementCorpo simulationClassement(Membre membre, Date startDate, Date endDate){
 
-
         //TODO : recup parametres pour test
 
         membre = membreRepository.findByNumeroAft("6065450");
@@ -75,13 +79,12 @@ public class ClassementCorpoController {
         startDate = gc.getTime();
         endDate = new Date();
 
-
         // On enregistre le classement de depart
         Integer startPoints = getPointsCorpoByMembreAndDate(membre,startDate);
 
-        // TODO :Recuperer l'ensemble des matchs joues par le membre entre les deux dates
+        // Recuperer l'ensemble des matchs joues par le membre entre les deux dates
 
-        List<Match> matchs = new ArrayList<>();
+        List<Match> matchs = (List<Match>) matchRepository.findByMembreBetweenDates(membre.getId(), DateUtils.shrinkToDay(startDate),DateUtils.shrinkToDay(endDate));
 
         // On ne calcule un nouveau classement qu'a partir de 3 matchs joues
 
