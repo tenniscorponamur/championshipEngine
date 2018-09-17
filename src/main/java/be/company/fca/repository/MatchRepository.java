@@ -8,6 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 public interface MatchRepository extends CrudRepository<Match,Long> {
 
     /**
@@ -20,6 +22,13 @@ public interface MatchRepository extends CrudRepository<Match,Long> {
     @Transactional
     @Modifying(clearAutomatically = true)
     Iterable<Match> deleteByRencontre(Rencontre rencontre);
+
+    @Query(value = "select * from match inner join rencontre on match.rencontre_fk = rencontre.id " +
+            "    where rencontre.valide = '1' " +
+            "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') > to_char(cast(:startDate AS date),'YYYY-MM-DD') " +
+            "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') <= to_char(cast(:endDate AS date),'YYYY-MM-DD') " +
+            "    and (joueurvisites1_fk = :membreId or joueurvisites2_fk = :membreId or joueurvisiteurs1_fk = :membreId or joueurvisiteurs2_fk = :membreId)", nativeQuery = true)
+    Iterable<Match> findValidesByMembreBetweenDates(@Param("membreId") Long membreId,@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     /**
      * Permet de supprimer tous les matchs d'un championnat
