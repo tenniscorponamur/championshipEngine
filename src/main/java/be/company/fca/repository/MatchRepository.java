@@ -1,7 +1,6 @@
 package be.company.fca.repository;
 
 import be.company.fca.model.Match;
-import be.company.fca.model.Membre;
 import be.company.fca.model.Rencontre;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,10 +24,11 @@ public interface MatchRepository extends CrudRepository<Match,Long> {
     Iterable<Match> deleteByRencontre(Rencontre rencontre);
 
     @Query(value = "select * from match inner join rencontre on match.rencontre_fk = rencontre.id " +
-            "    where to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') > to_char(cast(:startDate AS date),'YYYY-MM-DD') " +
+            "    where rencontre.valide = '1' " +
+            "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') > to_char(cast(:startDate AS date),'YYYY-MM-DD') " +
             "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') <= to_char(cast(:endDate AS date),'YYYY-MM-DD') " +
             "    and (joueurvisites1_fk = :membreId or joueurvisites2_fk = :membreId or joueurvisiteurs1_fk = :membreId or joueurvisiteurs2_fk = :membreId)", nativeQuery = true)
-    Iterable<Match> findByMembreBetweenDates(@Param("membreId") Long membreId,@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    Iterable<Match> findValidesByMembreBetweenDates(@Param("membreId") Long membreId,@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     /**
      * Permet de supprimer tous les matchs d'un championnat
