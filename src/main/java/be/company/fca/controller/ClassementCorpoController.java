@@ -94,8 +94,7 @@ public class ClassementCorpoController {
 
         // Recuperer l'ensemble des matchs joues par le membre entre les deux dates
 
-        List<Match> matchs = (List<Match>) matchRepository.findValidesByMembreBetweenDates(membre.getId(),startDate,endDate);
-        List<Match> matchs = (List<Match>) matchRepository.findByMembreBetweenDates(membre.getId(), DateUtils.shrinkToDay(startDate),DateUtils.shrinkToDay(endDate));
+        List<Match> matchs = (List<Match>) matchRepository.findValidesByMembreBetweenDates(membre.getId(),DateUtils.shrinkToDay(startDate),DateUtils.shrinkToDay(endDate));
 
         // On ne calcule un nouveau classement qu'a partir de 3 matchs joues
 
