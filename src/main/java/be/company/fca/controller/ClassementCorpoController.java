@@ -69,25 +69,21 @@ public class ClassementCorpoController {
     }
 
     /**
-     * Recupere le classement Corpo
-     * @param membre
+     * Permet de calculer un classement corpo a une date donnee
+     * en partant d'une autre date
+     * Ce classement sera determine en fonction des matchs joues entre les deux dates (3 minimum)
+     * @param membreId
      * @param startDate
      * @param endDate
      * @return
      */
-    @RequestMapping(value = "/public/membre/simulationClassement", method = RequestMethod.GET)
-    public ClassementCorpo simulationClassement(Membre membre, Date startDate, Date endDate){
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/classementCorpo/simulation", method = RequestMethod.GET)
+    public ClassementCorpo simulationClassement(@PathVariable("membreId") Long membreId, @RequestParam Date startDate, @RequestParam Date endDate){
 
+        //TODO : gerer le cas des classements Corpo "homme" pour les dames --> classement assimile
 
-        //TODO : recup parametres pour test
-
-        membre = membreRepository.findByNumeroAft("6065450");
-
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.add(Calendar.YEAR,-2);
-        startDate = gc.getTime();
-        endDate = new Date();
-
+        Membre membre = membreRepository.findOne(membreId);
 
         // On enregistre le classement de depart
         Integer startPoints = getPointsCorpoByMembreAndDate(membre,startDate);
