@@ -100,7 +100,7 @@ public class ClassementCorpoController {
 
         Integer totalGagnesPerdus = 0;
 
-        if (matchs.size()>=1){
+        if (matchs.size()>=3){
 
             for (Match match : matchs){
 
