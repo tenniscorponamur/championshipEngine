@@ -8,6 +8,7 @@ import be.company.fca.service.ClassementCorpoService;
 import be.company.fca.utils.DateUtils;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,7 +80,7 @@ public class ClassementCorpoController {
      */
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/classementCorpo/simulation", method = RequestMethod.GET)
-    public ClassementCorpo simulationClassement(@PathVariable("membreId") Long membreId, @RequestParam Date startDate, @RequestParam Date endDate){
+    public ClassementCorpo simulationClassement(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate){
 
         Membre membre = membreRepository.findOne(membreId);
 
