@@ -74,7 +74,9 @@ public class TerrainController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/terrain", method = RequestMethod.DELETE)
     public void deleteTerrain(@RequestParam Long terrainId){
-
+        if (isDeletable(terrainId)){
+            terrainRepository.delete(terrainId);
+        }
     }
 
 }

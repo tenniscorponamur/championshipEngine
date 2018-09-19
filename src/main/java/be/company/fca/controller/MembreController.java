@@ -125,6 +125,34 @@ public class MembreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/anonymisation", method = RequestMethod.PUT)
+    public Membre anonymisation(@PathVariable("membreId") Long membreId){
+
+        // Anonymisation -> nom/prenom = ***
+        // suppression de l'adresse, telephone, mail, ...
+
+        Membre membre = membreRepository.findOne(membreId);
+        membre.setNom("***");
+        membre.setPrenom("***");
+        membre.setDateNaissance(null);
+        membre.setNumeroAft(null);
+        membre.setDateAffiliationAft(null);
+        membre.setDateAffiliationCorpo(null);
+        membre.setDateDesaffiliationCorpo(null);
+        membre.setCodePostal(null);
+        membre.setLocalite(null);
+        membre.setRue(null);
+        membre.setRueNumero(null);
+        membre.setRueBoite(null);
+        membre.setTelephone(null);
+        membre.setGsm(null);
+        membre.setMail(null);
+        membre.setActif(false);
+        membreRepository.save(membre);
+        return membre;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
@@ -157,7 +185,9 @@ public class MembreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre", method = RequestMethod.DELETE)
     public void deleteMembre(@RequestParam Long membreId){
-
+        if (isDeletable(membreId)){
+            membreRepository.delete(membreId);
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

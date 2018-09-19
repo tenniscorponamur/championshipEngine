@@ -69,6 +69,8 @@ public class ClubController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/club", method = RequestMethod.DELETE)
     public void deleteClub(@RequestParam Long clubId){
-
+        if (isDeletable(clubId)){
+            clubRepository.delete(clubId);
+        }
     }
 }

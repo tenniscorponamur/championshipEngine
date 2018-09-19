@@ -48,11 +48,12 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat", method = RequestMethod.DELETE)
     public void deleteChampionnat(@RequestParam Long id){
-        Championnat championnat = new Championnat();
-        championnat.setId(id);
-        //TODO : idealement transactionnel...
-        divisionRepository.deleteByChampionnat(championnat);
-        championnatRepository.delete(id);
+        if (isCalendrierDeletable(id)){
+            Championnat championnat = new Championnat();
+            championnat.setId(id);
+            divisionRepository.deleteByChampionnat(championnat);
+            championnatRepository.delete(id);
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

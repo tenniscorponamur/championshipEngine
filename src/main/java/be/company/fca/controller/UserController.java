@@ -10,6 +10,8 @@ import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -68,9 +70,19 @@ public class UserController {
         return new UserDto(user,UserUtils.getDefaultRoles());
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/changePassword", method = RequestMethod.PUT)
-    public boolean updatePassword(@PathVariable Long id, @RequestBody ChangePasswordDto changePasswordDto ){
+    public boolean updatePassword(Authentication authentication, @PathVariable Long id, @RequestBody ChangePasswordDto changePasswordDto ){
+
+        authentication.getName();
+
+        new BCryptPasswordEncoder().encode(changePasswordDto.getOldPassword());
+
+        if (true){
+
+        }
+
+        new BCryptPasswordEncoder().encode(changePasswordDto.getNewPassword());
 
         //TODO : return false si l'ancien mot de passe ne correspond pas a celui qui est connu
 
