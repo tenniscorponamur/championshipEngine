@@ -2,6 +2,8 @@ package be.company.fca.controller;
 
 import be.company.fca.model.Club;
 import be.company.fca.repository.ClubRepository;
+import be.company.fca.repository.EquipeRepository;
+import be.company.fca.repository.MembreRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +20,12 @@ public class ClubController {
 
     @Autowired
     private ClubRepository clubRepository;
+
+    @Autowired
+    private MembreRepository membreRepository;
+
+    @Autowired
+    private EquipeRepository equipeRepository;
 
     @RequestMapping(path="/public/clubs", method= RequestMethod.GET)
     Iterable<Club> getAllClubs() {
@@ -44,10 +52,17 @@ public class ClubController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/club/{clubId}/deletable", method= RequestMethod.GET)
     public boolean isDeletable(@PathVariable("clubId") Long clubId){
+        Club club = new Club();
+        club.setId(clubId);
 
-        // TODO : faire des counts pour savoir si le club n'a pas de reference
+        // Faire des counts pour savoir si le club n'a pas de reference
         // --> pas d'equipe, pas de membre
-        //
+
+        long count = equipeRepository.countByClub(club);
+        if (count==0){
+            count = membreRepository.countByClub(club);
+            return count==0;
+        }
         return false;
     }
 

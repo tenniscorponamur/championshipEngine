@@ -19,6 +19,13 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
     Membre findByNumeroAft(String numeroAft);
 
     /**
+     * Permet de compter le nombre de membres par club
+     * @param club
+     * @return Nombre de membres par club
+     */
+    long countByClub(Club club);
+
+    /**
      * Permet de recuperer les membres d'un club
      * @param club Club du membre
      * @return Membres appartenant au club

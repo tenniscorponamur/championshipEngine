@@ -4,6 +4,8 @@ import be.company.fca.dto.MembreDto;
 import be.company.fca.model.Club;
 import be.company.fca.model.Genre;
 import be.company.fca.model.Membre;
+import be.company.fca.repository.EquipeRepository;
+import be.company.fca.repository.MatchRepository;
 import be.company.fca.repository.MembreRepository;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.UserUtils;
@@ -29,6 +31,12 @@ public class MembreController {
 
     @Autowired
     private MembreRepository membreRepository;
+
+    @Autowired
+    private EquipeRepository equipeRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
 
     // DTO pour les membres afin de ne pas recuperer l'adresse si on n'est pas authentifie
 
@@ -132,9 +140,17 @@ public class MembreController {
     @RequestMapping(path="/private/membre/{membreId}/deletable", method= RequestMethod.GET)
     public boolean isDeletable(@PathVariable("membreId") Long membreId){
 
-        // TODO : faire des counts pour savoir si le membre n'a pas de reference
+        Membre membre = new Membre();
+        membre.setId(membreId);
+
+        // Faire des counts pour savoir si le membre n'a pas de reference
         // --> pas en tant que capitaine d'equipe, pas de match
-        //
+
+        long count = equipeRepository.countByCapitaine(membre);
+        if (count==0){
+            count = matchRepository.countByMembreId(membreId);
+            return count==0;
+        }
         return false;
     }
 

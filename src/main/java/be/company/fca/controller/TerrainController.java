@@ -3,6 +3,8 @@ package be.company.fca.controller;
 import be.company.fca.model.Club;
 import be.company.fca.model.Terrain;
 import be.company.fca.repository.ClubRepository;
+import be.company.fca.repository.EquipeRepository;
+import be.company.fca.repository.RencontreRepository;
 import be.company.fca.repository.TerrainRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,15 @@ public class TerrainController {
 
     @Autowired
     private TerrainRepository terrainRepository;
+
+    @Autowired
+    private ClubRepository clubRepository;
+
+    @Autowired
+    private EquipeRepository equipeRepository;
+
+    @Autowired
+    private RencontreRepository rencontreRepository;
 
     @RequestMapping(path="/public/terrains", method= RequestMethod.GET)
     Iterable<Terrain> getAllTerrains() {
@@ -43,10 +54,20 @@ public class TerrainController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/terrain/{terrainId}/deletable", method= RequestMethod.GET)
     public boolean isDeletable(@PathVariable("terrainId") Long terrainId){
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
 
-        // TODO : faire des counts pour savoir si le terrain n'a pas de reference
+        // Faire des counts pour savoir si le terrain n'a pas de reference
         // --> pas de club, pas d'equipe, pas de rencontre
-        //
+
+        long count = clubRepository.countByTerrain(terrain);
+        if (count==0){
+            count = equipeRepository.countByTerrain(terrain);
+            if (count==0){
+                count = rencontreRepository.countByTerrain(terrain);
+                return count==0;
+            }
+        }
         return false;
     }
 

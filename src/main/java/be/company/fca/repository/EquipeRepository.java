@@ -23,6 +23,26 @@ public interface EquipeRepository extends CrudRepository<Equipe,Long>{
      */
     Iterable<Equipe> findByPoule(Poule poule);
 
+    /**
+     * Permet de compter le nombre d'equipes par club
+     * @param club
+     * @return Nombre d'equipes par club
+     */
+    long countByClub(Club club);
+
+    /**
+     * Permet de compter le nombre d'equipes par terrain
+     * @param terrain
+     * @return Nombre d'equipes par terrain
+     */
+    long countByTerrain(Terrain terrain);
+
+    /**
+     * Permet de compter le nombre d'equipes par membre (capitaine)
+     * @param membre
+     * @return Nombre d'equipes par membre (capitaine)
+     */
+    long countByCapitaine(Membre membre);
 
     @Transactional
     @Modifying(clearAutomatically = true)

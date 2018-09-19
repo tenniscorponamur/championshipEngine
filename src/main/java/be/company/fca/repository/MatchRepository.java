@@ -1,6 +1,7 @@
 package be.company.fca.repository;
 
 import be.company.fca.model.Match;
+import be.company.fca.model.Membre;
 import be.company.fca.model.Rencontre;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,10 @@ public interface MatchRepository extends CrudRepository<Match,Long> {
      * @return Matchs d'une rencontre
      */
     Iterable<Match> findByRencontre(Rencontre rencontre);
+
+    @Query(value = "select count(*) from match " +
+            "    where (joueurvisites1_fk = :membreId or joueurvisites2_fk = :membreId or joueurvisiteurs1_fk = :membreId or joueurvisiteurs2_fk = :membreId)", nativeQuery = true)
+    Long countByMembreId(@Param("membreId") Long membreId);
 
     @Transactional
     @Modifying(clearAutomatically = true)

@@ -24,6 +24,13 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     Iterable<Rencontre> findByPoule(Poule poule);
 
     /**
+     * Permet de compter le nombre de rencontres par terrain
+     * @param terrain
+     * @return Nombre de rencontres par terrain
+     */
+    long countByTerrain(Terrain terrain);
+
+    /**
      * Permet de recuperer le nombre de rencontres non-validees d'une division
      * @param divisionId Identifiant de la division
      * @return Nombre de rencontres non-validees d'une division
