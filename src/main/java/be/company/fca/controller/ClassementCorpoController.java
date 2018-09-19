@@ -81,12 +81,10 @@ public class ClassementCorpoController {
     @RequestMapping(value = "/private/membre/{membreId}/classementCorpo/simulation", method = RequestMethod.GET)
     public ClassementCorpo simulationClassement(@PathVariable("membreId") Long membreId, @RequestParam Date startDate, @RequestParam Date endDate){
 
-        //TODO : gerer le cas des classements Corpo "homme" pour les dames --> classement assimile
-
         Membre membre = membreRepository.findOne(membreId);
 
         // On enregistre le classement de depart
-        Integer startPoints = getPointsCorpoByMembreAndDate(membre,startDate);
+        Integer startPoints = getPointsCorpoByMembreAndDate(membre,startDate,false);
 
         // Recuperer l'ensemble des matchs joues par le membre entre les deux dates
 
@@ -166,7 +164,12 @@ public class ClassementCorpoController {
      * @param date
      * @return
      */
-    private Integer getPointsCorpoByMembreAndDate(Membre membre, Date date){
+    private Integer getPointsCorpoByMembreAndDate(Membre membre, Date date, boolean championnatHomme){
+
+        // En championnat hiver/ete, pour les rencontres hommes, on va recuperer le classement correspondant
+        // pour une femme qui jouerait dans cette categorie
+
+        // Pour les autres types de championnat, aucune adaptation n'est realisee pour le moment
 
         // Si le membre n'a pas de classement, on va considerer qu'il est non-classe (5 points)
 
@@ -176,7 +179,6 @@ public class ClassementCorpoController {
 
             // On recupere les classements corpo du membre
             List<ClassementCorpo> classementsCorpos = (List<ClassementCorpo>) classementCorpoRepository.findByMembreFk(membre.getId());
-
 
             if (!classementsCorpos.isEmpty()){
 
@@ -202,6 +204,12 @@ public class ClassementCorpoController {
             }
         }
 
+        if (championnatHomme){
+            if (Genre.FEMME.equals(membre.getGenre())){
+                points = EchelleCorpo.getCorrespondancePointsHommeFemme().get(points);
+            }
+        }
+
         return points;
     }
 
@@ -218,21 +226,26 @@ public class ClassementCorpoController {
      */
     private Integer getDifferencePoints(Match match, Membre membre){
 
+        // On considere que c'est un championnat messieurs pour les championnats hiver/ete
+        // afin de prendre en compte la correspondance quand une dame joue avec les messieurs
+        // Pour l'instant, le criterium et coupe d'hiver ne font pas l'objet de cette prise en compte
+        boolean isChampionnatHomme = CategorieChampionnat.MESSIEURS.equals(match.getRencontre().getDivision().getChampionnat().getCategorie());
+
         // Determiner s'il s'agit d'un simple ou d'un double
 
         if (TypeMatch.SIMPLE.equals(match.getType())){
-            Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre());
+            Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
             Membre adversaire = null;
             if (membre.equals(match.getJoueurVisites1())){
                 adversaire = match.getJoueurVisiteurs1();
             }else{
                 adversaire = match.getJoueurVisites1();
             }
-            Integer pointsAdversaire = getPointsCorpoByMembreAndDate(adversaire,match.getRencontre().getDateHeureRencontre());
+            Integer pointsAdversaire = getPointsCorpoByMembreAndDate(adversaire,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
             return pointsAdversaire - pointsMembre;
         }else{
 
-            Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre());
+            Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
 
             Membre partenaire = null;
             Membre adversaire1 = null;
@@ -256,9 +269,9 @@ public class ClassementCorpoController {
                 adversaire2 = match.getJoueurVisites2();
             }
 
-            Integer pointsPartenaire = getPointsCorpoByMembreAndDate(partenaire,match.getRencontre().getDateHeureRencontre());
-            Integer pointsAdversaire1 = getPointsCorpoByMembreAndDate(adversaire1,match.getRencontre().getDateHeureRencontre());
-            Integer pointsAdversaire2 = getPointsCorpoByMembreAndDate(adversaire2,match.getRencontre().getDateHeureRencontre());
+            Integer pointsPartenaire = getPointsCorpoByMembreAndDate(partenaire,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            Integer pointsAdversaire1 = getPointsCorpoByMembreAndDate(adversaire1,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            Integer pointsAdversaire2 = getPointsCorpoByMembreAndDate(adversaire2,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
 
             return getPointsAssimilesSimples(pointsAdversaire1 + pointsAdversaire2) - getPointsAssimilesSimples(pointsMembre + pointsPartenaire);
 
