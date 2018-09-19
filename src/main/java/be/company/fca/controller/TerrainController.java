@@ -40,4 +40,20 @@ public class TerrainController {
         return terrainRepository.save(terrain);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/terrain/{terrainId}/deletable", method= RequestMethod.GET)
+    public boolean isDeletable(@PathVariable("terrainId") Long terrainId){
+
+        // TODO : faire des counts pour savoir si le terrain n'a pas de reference
+        // --> pas de club, pas d'equipe, pas de rencontre
+        //
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain", method = RequestMethod.DELETE)
+    public void deleteTerrain(@RequestParam Long terrainId){
+
+    }
+
 }

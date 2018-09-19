@@ -11,15 +11,14 @@ import io.swagger.annotations.Api;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.security.Principal;
 import java.util.*;
 
@@ -127,6 +126,30 @@ public class MembreController {
         newMembre.setDateNaissance(membre.getDateNaissance());
         membreRepository.save(newMembre);
         return newMembre;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/membre/{membreId}/deletable", method= RequestMethod.GET)
+    public boolean isDeletable(@PathVariable("membreId") Long membreId){
+
+        // TODO : faire des counts pour savoir si le membre n'a pas de reference
+        // --> pas en tant que capitaine d'equipe, pas de match
+        //
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre", method = RequestMethod.DELETE)
+    public void deleteMembre(@RequestParam Long membreId){
+
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membres/import", method = RequestMethod.POST)
+    public void importData(@RequestBody byte[] content) throws Exception {
+        FileOutputStream fileOutputStream = new FileOutputStream("D:/testFichier.xlsx");
+        fileOutputStream.write(Base64.getDecoder().decode(content));
+        fileOutputStream.close();
     }
 
 

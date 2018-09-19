@@ -41,4 +41,19 @@ public class ClubController {
         return clubRepository.save(club);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/club/{clubId}/deletable", method= RequestMethod.GET)
+    public boolean isDeletable(@PathVariable("clubId") Long clubId){
+
+        // TODO : faire des counts pour savoir si le club n'a pas de reference
+        // --> pas d'equipe, pas de membre
+        //
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/club", method = RequestMethod.DELETE)
+    public void deleteClub(@RequestParam Long clubId){
+
+    }
 }
