@@ -24,6 +24,9 @@ public class Club {
     @JoinColumn(name = "terrain_fk")
     private Terrain terrain;
 
+    @Column( name = "actif", nullable = false)
+    private boolean actif=true;
+
     public long getId() {
         return id;
     }
@@ -62,6 +65,14 @@ public class Club {
 
     public void setTerrain(Terrain terrain) {
         this.terrain = terrain;
+    }
+
+    public boolean isActif() {
+        return actif;
+    }
+
+    public void setActif(boolean actif) {
+        this.actif = actif;
     }
 
     @Override

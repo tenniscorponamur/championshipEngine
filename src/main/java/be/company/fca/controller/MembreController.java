@@ -1,9 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.dto.MembreDto;
-import be.company.fca.model.Club;
-import be.company.fca.model.Genre;
-import be.company.fca.model.Membre;
+import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.UserUtils;
@@ -29,6 +27,9 @@ public class MembreController {
 
     @Autowired
     private MembreRepository membreRepository;
+
+    @Autowired
+    private ClubRepository clubRepository;
 
     @Autowired
     private EquipeRepository equipeRepository;
@@ -199,31 +200,159 @@ public class MembreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membres/import", method = RequestMethod.POST)
     public void importData(@RequestBody byte[] content) throws Exception {
-        FileOutputStream fileOutputStream = new FileOutputStream("D:/testFichier.xlsx");
-        fileOutputStream.write(Base64.getDecoder().decode(content));
-        fileOutputStream.close();
+//        FileOutputStream fileOutputStream = new FileOutputStream("D:/testFichier.xlsx");
+//        fileOutputStream.write(Base64.getDecoder().decode(content));
+//        fileOutputStream.close();
+
+        if (content!=null){
+
+            Workbook wb = POIUtils.createWorkbook(new ByteArrayInputStream(Base64.getDecoder().decode(content)));
+            Sheet sheet = POIUtils.getSheet(wb,0,false);
+
+            for (int i=1;i<sheet.getPhysicalNumberOfRows();i++){
+                String numeroAft = POIUtils.readAsString(sheet,i,0);
+                String nom = POIUtils.readAsString(sheet,i,1);
+                String prenom = POIUtils.readAsString(sheet,i,2);
+                Object dateNaissanceObj = POIUtils.readDate(sheet,i,3);
+                String genre = POIUtils.readAsString(sheet,i,4);
+                String rue = POIUtils.readAsString(sheet,i,6);
+                String codePostal = POIUtils.readAsString(sheet,i,7);
+                String localite = POIUtils.readAsString(sheet,i,8);
+                String telephone = POIUtils.readAsString(sheet,i,9);
+                String gsm = POIUtils.readAsString(sheet,i,12);
+                String mail = POIUtils.readAsString(sheet,i,14);
+                String responsableClub = POIUtils.readAsString(sheet,i,16);
+                String codeClassementAft = POIUtils.readAsString(sheet,i,18);
+                String pointsAft = POIUtils.readAsString(sheet,i,19);
+                String pointsCorpo = POIUtils.readAsString(sheet,i,20);
+                String numeroClubCorpo = POIUtils.readAsString(sheet,i,22);
+                String numeroClubAft = POIUtils.readAsString(sheet,i,23);
+
+                if (!StringUtils.isEmpty(numeroAft)){
+
+                    try{
+
+                        // Considerés comme obligatoires : Nom, prenom, numeroAft (ce dernier pour gerer les doublons)
+
+                        // Si le membre existe deja (en se basant sur le numero Aft) --> update
+                        Membre membre = membreRepository.findByNumeroAft(numeroAft);
+                        if (membre==null){
+                            membre = new Membre();
+                        }
+
+                        membre.setNumeroAft(numeroAft);
+                        membre.setPrenom(prenom);
+                        membre.setNom(nom);
+                        if (dateNaissanceObj!=null && dateNaissanceObj instanceof Date){
+                            Date dateNaissance = (Date) dateNaissanceObj;
+                            Calendar gc = new GregorianCalendar();
+                            gc.setTime(dateNaissance);
+                            // Gestion bug de l'export Excel
+                            if (gc.get(Calendar.YEAR) > 2020){
+                                gc.add(Calendar.YEAR,-100);
+                            }
+                            membre.setDateNaissance(gc.getTime());
+                        }
+                        if ("F".equals(genre)){
+                            membre.setGenre(Genre.FEMME);
+                        }else{
+                            membre.setGenre(Genre.HOMME);
+                        }
+
+                        membre.setRue(rue);
+                        membre.setCodePostal(codePostal);
+                        membre.setLocalite(localite);
+                        membre.setTelephone(telephone);
+                        membre.setGsm(gsm);
+                        membre.setMail(mail);
+                        membre.setResponsableClub("1".equals(responsableClub));
+                        membre.setNumeroClubAft(numeroClubAft);
+
+                        if ("9999".equals(numeroClubCorpo)){
+                            membre.setActif(false);
+                        }else{
+                            // Recuperer le club du membre
+                            Club club = clubRepository.findByNumero(numeroClubCorpo);
+                            membre.setClub(club);
+                        }
+
+                        // Garnir le classement AFT et Corpo actuel du membre : attention pour la mise a jour --> risque de creer des doublons --> a zapper si le membre existe
+
+                        if (membre.getId()==null){
+                            membre = membreRepository.save(membre);
+                            if (!StringUtils.isEmpty(pointsCorpo)){
+                                ClassementCorpo classementCorpo = new ClassementCorpo();
+                                classementCorpo.setMembreFk(membre.getId());
+                                classementCorpo.setDateClassement(new Date());
+                                classementCorpo.setPoints(Integer.valueOf(pointsCorpo));
+                                classementCorpoRepository.save(classementCorpo);
+                                membreRepository.updateClassementCorpo(membre.getId(),classementCorpo);
+                            }
+                            if (!StringUtils.isEmpty(pointsAft)){
+                                ClassementAFT classementAFT = new ClassementAFT();
+                                classementAFT.setMembreFk(membre.getId());
+                                classementAFT.setDateClassement(new Date());
+                                classementAFT.setCodeClassement(codeClassementAft);
+                                classementAFT.setPoints(Integer.valueOf(pointsAft));
+                                classementAFTRepository.save(classementAFT);
+                                membreRepository.updateClassementAFT(membre.getId(),classementAFT);
+                            }
+
+                        }else{
+                            membre = membreRepository.save(membre);
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }
+
     }
 
+    // FrontEnd
+    // Faire les appels deletable/delete/actif a partir de l'UI
+    // Ajouter un bouton Anonymisation
+    // Ajouter un bouton pour charger un fichier dans le système (popup de demande de fichier --> plus joli)
 
-//    @RequestMapping(method= RequestMethod.GET, path="/public/membre/createDb")
-//    public Iterable<Membre> createMembreDb() throws IOException, InvalidFormatException {
+
+//    public static void main(String[] args) throws Exception {
 //
-//        Workbook wb = POIUtils.createWorkbook(new FileInputStream("/Users/fabricecalay/Downloads/membres.xls"));
+//        Workbook wb = POIUtils.createWorkbook(new FileInputStream("D:/membres.xls"));
 //        Sheet sheet = POIUtils.getSheet(wb,0,false);
 //
+//        // TODO : si le membre existe deja (en se basant sur le numero Aft) --> update
+//
+//        List<Membre> membres = new ArrayList<>();
+//
 //        for (int i=1;i<sheet.getPhysicalNumberOfRows();i++){
-//            String numero = POIUtils.readAsString(sheet,i,0);
+//            String numeroAft = POIUtils.readAsString(sheet,i,0);
 //            String nom = POIUtils.readAsString(sheet,i,1);
 //            String prenom = POIUtils.readAsString(sheet,i,2);
 //            Object dateNaissanceObj = POIUtils.readDate(sheet,i,3);
 //            String genre = POIUtils.readAsString(sheet,i,4);
+//            String rue = POIUtils.readAsString(sheet,i,6);
+//            String codePostal = POIUtils.readAsString(sheet,i,7);
+//            String localite = POIUtils.readAsString(sheet,i,8);
+//            String telephone = POIUtils.readAsString(sheet,i,9);
+//            String gsm = POIUtils.readAsString(sheet,i,12);
+//            String mail = POIUtils.readAsString(sheet,i,14);
+//            String responsableClub = POIUtils.readAsString(sheet,i,16);
+//            String classementAft = POIUtils.readAsString(sheet,i,18);
+//            String pointsAft = POIUtils.readAsString(sheet,i,19);
+//            String pointsCorpo = POIUtils.readAsString(sheet,i,20);
+//            String numeroClubCorpo = POIUtils.readAsString(sheet,i,22);
+//            String numeroClubAft = POIUtils.readAsString(sheet,i,23);
 //
-//            if (!StringUtils.isEmpty(numero)){
+//            if (!StringUtils.isEmpty(numeroAft)){
 //
-//                //TODO : il y a des doublons dans la base initiale --> traiter lors de l'insertion
+//                //TODO : il y a des doublons dans la base initiale --> traiter lors de l'insertion via un test d'update
+//
+//                // Considerés comme obligatoires : Nom, prenom, numeroAft (ce dernier pour gerer les doublons)
 //
 //                Membre membre = new Membre();
-//                membre.setNumero(numero);
+//                membre.setNumeroAft(numeroAft);
 //                membre.setPrenom(prenom);
 //                membre.setNom(nom);
 //                if (dateNaissanceObj!=null && dateNaissanceObj instanceof Date){
@@ -241,18 +370,33 @@ public class MembreController {
 //                }else{
 //                    membre.setGenre(Genre.HOMME);
 //                }
-//                try{
-//                    membreRepository.save(membre);
-//                }catch (Exception e){
-//                    System.err.println("Doublon : " + numero);
-//                    e.printStackTrace();
+//
+//                membre.setRue(rue);
+//                membre.setCodePostal(codePostal);
+//                membre.setLocalite(localite);
+//                membre.setTelephone(telephone);
+//                membre.setGsm(gsm);
+//                membre.setMail(mail);
+//                membre.setResponsableClub("1".equals(responsableClub));
+//                membre.setNumeroClubAft(numeroClubAft);
+//
+//                if ("9999".equals(numeroClubCorpo)){
+//                    membre.setActif(false);
+//                }else{
+//                   // TODO : recuperer le club du membre
 //                }
+//
+//                //TODO : garnir le classement AFT et Corpo actuel du membre : attention pour la mise a jour --> risque de creer des doublons --> a zapper si le membre existe
+//
+//                membres.add(membre);
 //
 //            }
 //        }
 //
+//        System.err.println("Nombre de membres : " + membres.size());
 //
-//        return membreRepository.findAll();
 //    }
+
+
 
 }

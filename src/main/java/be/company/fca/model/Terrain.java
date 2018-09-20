@@ -20,6 +20,9 @@ public class Terrain {
     @Column( name =  "adresse")
     private String adresse;
 
+    @Column( name = "actif", nullable = false)
+    private boolean actif=true;
+
     public Long getId() {
         return id;
     }
@@ -50,6 +53,14 @@ public class Terrain {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public boolean isActif() {
+        return actif;
+    }
+
+    public void setActif(boolean actif) {
+        this.actif = actif;
     }
 
     @Override

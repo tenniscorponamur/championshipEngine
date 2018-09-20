@@ -27,6 +27,14 @@ public class ClassementAFTServiceImpl implements ClassementAFTService {
 
     @Override
     @Transactional(readOnly = false)
+    public void saveClassementAFTActuel(Long membreId, ClassementAFT classementAFT){
+        classementAFT.setMembreFk(membreId);
+        classementAFTRepository.save(classementAFT);
+        membreRepository.updateClassementAFT(membreId,classementAFT);
+    }
+
+    @Override
+    @Transactional(readOnly = false)
     public ClassementAFT saveClassementsAFT(Long membreId, List<ClassementAFT> classementAFTList) {
 
         // delete all classement for membre
