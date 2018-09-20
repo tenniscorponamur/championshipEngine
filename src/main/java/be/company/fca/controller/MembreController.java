@@ -4,9 +4,7 @@ import be.company.fca.dto.MembreDto;
 import be.company.fca.model.Club;
 import be.company.fca.model.Genre;
 import be.company.fca.model.Membre;
-import be.company.fca.repository.EquipeRepository;
-import be.company.fca.repository.MatchRepository;
-import be.company.fca.repository.MembreRepository;
+import be.company.fca.repository.*;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.Api;
@@ -37,6 +35,12 @@ public class MembreController {
 
     @Autowired
     private MatchRepository matchRepository;
+
+    @Autowired
+    private ClassementCorpoRepository classementCorpoRepository;
+
+    @Autowired
+    private ClassementAFTRepository classementAFTRepository;
 
     // DTO pour les membres afin de ne pas recuperer l'adresse si on n'est pas authentifie
 
@@ -186,6 +190,8 @@ public class MembreController {
     @RequestMapping(value = "/private/membre", method = RequestMethod.DELETE)
     public void deleteMembre(@RequestParam Long membreId){
         if (isDeletable(membreId)){
+            classementCorpoRepository.deleteByMembreFk(membreId);
+            classementAFTRepository.deleteByMembreFk(membreId);
             membreRepository.delete(membreId);
         }
     }
