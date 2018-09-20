@@ -72,20 +72,14 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/changePassword", method = RequestMethod.PUT)
-    public boolean updatePassword(Authentication authentication, @PathVariable Long id, @RequestBody ChangePasswordDto changePasswordDto ){
-
-        authentication.getName();
-
-        new BCryptPasswordEncoder().encode(changePasswordDto.getOldPassword());
-
-        if (true){
-
+    public boolean updatePassword(Authentication authentication, @RequestBody ChangePasswordDto changePasswordDto ){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        User user = userRepository.findByUsername(authentication.getName());
+        if (encoder.matches(changePasswordDto.getOldPassword(),user.getPassword())){
+            user.setPassword(encoder.encode(changePasswordDto.getNewPassword()));
+            userRepository.save(user);
+            return true;
         }
-
-        new BCryptPasswordEncoder().encode(changePasswordDto.getNewPassword());
-
-        //TODO : return false si l'ancien mot de passe ne correspond pas a celui qui est connu
-
         return false;
     }
 
