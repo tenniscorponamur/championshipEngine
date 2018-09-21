@@ -186,7 +186,7 @@ public class RencontreController {
 
                     // On verifie que l'ensemble des rencontres de la division ont bien ete validees
 
-                    Long nbRencontresNonValidees = rencontreRepository.countNonValideesByDivision(division.getId());
+                    Long nbRencontresNonValidees = rencontreRepository.countRencontresDePouleNonValideesByDivision(division.getId());
 
                     if (nbRencontresNonValidees == 0) {
                         // On recupere les classements pour cette division
@@ -195,6 +195,9 @@ public class RencontreController {
                         Classement classementPoule2 = classementService.getClassementPoule(poules.get(1));
 
                         if (!classementPoule1.getClassementEquipes().isEmpty() && !classementPoule2.getClassementEquipes().isEmpty()) {
+
+                            //TODO : boucler si plusieurs rencontres a des niveaux differents + boolean pour preciser cette caracteristique dans la division
+
                             Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();
                             Equipe equipe2 = classementPoule2.getClassementEquipes().get(0).getEquipe();
 

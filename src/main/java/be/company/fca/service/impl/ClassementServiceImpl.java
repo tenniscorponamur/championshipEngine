@@ -296,12 +296,15 @@ public class ClassementServiceImpl implements ClassementService {
      * @param rencontreInterseries
      */
     private void setGagnantInterseries(Classement classement, List<Rencontre> rencontreInterseries){
-        Equipe equipeVictorieuseDivision = getEquipeVictorieuse(rencontreInterseries);
-        if (equipeVictorieuseDivision!=null){
-            // Si l'equipe est classe dans cette poule, elle sera marquee comme gagnant la division suite a la rencontre interseries
-            ClassementEquipe classementEquipe = classement.findByEquipe(equipeVictorieuseDivision);
-            if (classementEquipe!=null){
-                classementEquipe.setGagnantInterseries(true);
+
+        List<Equipe> equipesVictorieusesDivision = getEquipeVictorieuse(rencontreInterseries);
+        for (Equipe equipeVictorieuseDivision : equipesVictorieusesDivision){
+            if (equipeVictorieuseDivision!=null){
+                // Si l'equipe est classe dans cette poule, elle sera marquee comme gagnant la division suite a la rencontre interseries
+                ClassementEquipe classementEquipe = classement.findByEquipe(equipeVictorieuseDivision);
+                if (classementEquipe!=null){
+                    classementEquipe.setGagnantInterseries(true);
+                }
             }
         }
     }
@@ -312,15 +315,16 @@ public class ClassementServiceImpl implements ClassementService {
      * @param rencontreInterserieList
      * @return
      */
-    private Equipe getEquipeVictorieuse(List<Rencontre> rencontreInterserieList){
-        Equipe equipe = null;
+    private List<Equipe> getEquipeVictorieuse(List<Rencontre> rencontreInterserieList){
+        List<Equipe> equipes = new ArrayList<>();
 
-        // On considere qu'il n'y a qu'une rencontre interserie par division possible (deux poules maximum)
+        // On considere qu'il n'y a qu'une rencontre interserie par division possible (deux poules maximum) par niveau au classement
 
         for (Rencontre interserie : rencontreInterserieList){
-            equipe = getGagnantRencontreInterserie(interserie);
+            equipes.add(getGagnantRencontreInterserie(interserie));
         }
-        return equipe;
+
+        return equipes;
     }
 
     /**

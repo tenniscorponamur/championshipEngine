@@ -24,9 +24,18 @@ public class EchelleCorpo {
     public static Map<Integer,Integer> getCorrespondancePointsHommeFemme(){
         Map<Integer, Integer> map=new HashMap<>();
         for (EchelleCorpo echelleCorpo : EchelleCorpo.getAllEchellesCorpo()){
-            map.put(echelleCorpo.getPoints(),Math.max(5,echelleCorpo.getPoints()-10));
+            map.put(echelleCorpo.getPoints(),Math.max(5,getManPointsFromWomanPoints(echelleCorpo.points)));
         }
         return map;
+    }
+
+    /**
+     * Permet de recuperer la valeur correspondant en points homme pour les points d'une dame
+     * @return
+     */
+    private static Integer getManPointsFromWomanPoints(Integer womanPoints){
+        // classement dames divisé par 2 puis ajout de 10 pts. On arrondit par le bas (dans mon cas 35 pts soit 17.5 + 10 = 27.5 => 25pts)
+        return (((womanPoints/2)+10)/5)*5;
     }
 
     public EchelleCorpo(int points) {

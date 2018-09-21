@@ -31,13 +31,16 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     long countByTerrain(Terrain terrain);
 
     /**
-     * Permet de recuperer le nombre de rencontres non-validees d'une division
+     * Permet de recuperer le nombre de rencontres de poule non-validees d'une division
      * @param divisionId Identifiant de la division
-     * @return Nombre de rencontres non-validees d'une division
+     * @return Nombre de rencontres de poule non-validees d'une division
+     *
      */
     @Query(value = "select count(*) from rencontre " +
-            " where rencontre.valide = '0' and rencontre.division_fk = :divisionId", nativeQuery = true)
-    Long countNonValideesByDivision(@Param("divisionId") Long divisionId);
+            " where rencontre.valide = '0' " +
+            " and rencontre.poule_fk is not null" +
+            " and rencontre.division_fk = :divisionId", nativeQuery = true)
+    Long countRencontresDePouleNonValideesByDivision(@Param("divisionId") Long divisionId);
 
     /**
      * Permet de recuperer le nombre de rencontres d'un chamionnat
