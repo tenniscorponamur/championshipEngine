@@ -4,15 +4,24 @@ import be.company.fca.dto.MembreDto;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.utils.POIUtils;
+import be.company.fca.utils.TemplateUtils;
 import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.Api;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.IOUtils;
+import org.hibernate.sql.Template;
 import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -198,6 +207,16 @@ public class MembreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/membres/import/template", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getTemplateImportMembres() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+        byte[] excelFile = IOUtils.toByteArray(TemplateUtils.getTemplateImportMembres());
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(excelFile, headers, HttpStatus.OK);
+        return response;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membres/import", method = RequestMethod.POST)
     public void importData(@RequestBody byte[] content) throws Exception {
 //        FileOutputStream fileOutputStream = new FileOutputStream("D:/testFichier.xlsx");
@@ -215,18 +234,18 @@ public class MembreController {
                 String prenom = POIUtils.readAsString(sheet,i,2);
                 Object dateNaissanceObj = POIUtils.readDate(sheet,i,3);
                 String genre = POIUtils.readAsString(sheet,i,4);
-                String rue = POIUtils.readAsString(sheet,i,6);
-                String codePostal = POIUtils.readAsString(sheet,i,7);
-                String localite = POIUtils.readAsString(sheet,i,8);
-                String telephone = POIUtils.readAsString(sheet,i,9);
-                String gsm = POIUtils.readAsString(sheet,i,12);
-                String mail = POIUtils.readAsString(sheet,i,14);
-                String responsableClub = POIUtils.readAsString(sheet,i,16);
-                String codeClassementAft = POIUtils.readAsString(sheet,i,18);
-                String pointsAft = POIUtils.readAsString(sheet,i,19);
-                String pointsCorpo = POIUtils.readAsString(sheet,i,20);
-                String numeroClubCorpo = POIUtils.readAsString(sheet,i,22);
-                String numeroClubAft = POIUtils.readAsString(sheet,i,23);
+                String rue = POIUtils.readAsString(sheet,i,5);
+                String codePostal = POIUtils.readAsString(sheet,i,6);
+                String localite = POIUtils.readAsString(sheet,i,7);
+                String telephone = POIUtils.readAsString(sheet,i,8);
+                String gsm = POIUtils.readAsString(sheet,i,9);
+                String mail = POIUtils.readAsString(sheet,i,10);
+                String responsableClub = POIUtils.readAsString(sheet,i,11);
+                String codeClassementAft = POIUtils.readAsString(sheet,i,12);
+                String pointsAft = POIUtils.readAsString(sheet,i,13);
+                String pointsCorpo = POIUtils.readAsString(sheet,i,14);
+                String numeroClubCorpo = POIUtils.readAsString(sheet,i,15);
+                String numeroClubAft = POIUtils.readAsString(sheet,i,16);
 
                 if (!StringUtils.isEmpty(numeroAft)){
 
