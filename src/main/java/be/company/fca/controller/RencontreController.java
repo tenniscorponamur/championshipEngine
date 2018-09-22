@@ -196,22 +196,31 @@ public class RencontreController {
 
                         if (!classementPoule1.getClassementEquipes().isEmpty() && !classementPoule2.getClassementEquipes().isEmpty()) {
 
+                            // Si on a une division a interserie multiple, on va boucler sur les equipes du classement
+
+                            Integer maxInterserie = 1;
+
+                            // Boucler si plusieurs rencontres a des niveaux differents + boolean pour preciser cette caracteristique dans la division
+
                             if (division.isMultiIS()){
+                                maxInterserie = Math.min(classementPoule1.getClassementEquipes().size(), classementPoule2.getClassementEquipes().size());                                               }
+
+                            for (int i=0;i<maxInterserie;i++){
+
+                                Equipe equipe1 = classementPoule1.getClassementEquipes().get(i).getEquipe();
+                                Equipe equipe2 = classementPoule2.getClassementEquipes().get(i).getEquipe();
+
+                                Rencontre rencontre = new Rencontre();
+                                rencontre.setDivision(division);
+                                rencontre.setEquipeVisites(equipe1);
+                                rencontre.setEquipeVisiteurs(equipe2);
+
+                                if (!isInterserieExists(rencontre)) {
+                                    rencontresInterseries.add(rencontre);
+                                }
 
                             }
-                            //TODO : boucler si plusieurs rencontres a des niveaux differents + boolean pour preciser cette caracteristique dans la division
 
-                            Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();
-                            Equipe equipe2 = classementPoule2.getClassementEquipes().get(0).getEquipe();
-
-                            Rencontre rencontre = new Rencontre();
-                            rencontre.setDivision(division);
-                            rencontre.setEquipeVisites(equipe1);
-                            rencontre.setEquipeVisiteurs(equipe2);
-
-                            if (!isInterserieExists(rencontre)) {
-                                rencontresInterseries.add(rencontre);
-                            }
 
                         }
 
