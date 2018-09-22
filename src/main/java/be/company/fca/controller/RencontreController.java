@@ -196,6 +196,9 @@ public class RencontreController {
 
                         if (!classementPoule1.getClassementEquipes().isEmpty() && !classementPoule2.getClassementEquipes().isEmpty()) {
 
+                            if (division.isMultiIS()){
+
+                            }
                             //TODO : boucler si plusieurs rencontres a des niveaux differents + boolean pour preciser cette caracteristique dans la division
 
                             Equipe equipe1 = classementPoule1.getClassementEquipes().get(0).getEquipe();

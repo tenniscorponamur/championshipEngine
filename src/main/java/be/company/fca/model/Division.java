@@ -24,6 +24,9 @@ public class Division {
     @JoinColumn(name = "championnat_fk", nullable = false)
     private Championnat championnat;
 
+    @Column( name = "multi_is", nullable = false)
+    private boolean multiIS=false;
+
     public Long getId() {
         return id;
     }
@@ -62,6 +65,14 @@ public class Division {
 
     public void setChampionnat(Championnat championnat) {
         this.championnat = championnat;
+    }
+
+    public boolean isMultiIS() {
+        return multiIS;
+    }
+
+    public void setMultiIS(boolean multiIS) {
+        this.multiIS = multiIS;
     }
 
     @Override
