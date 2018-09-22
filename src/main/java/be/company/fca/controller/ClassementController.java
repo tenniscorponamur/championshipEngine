@@ -1,8 +1,6 @@
 package be.company.fca.controller;
 
 import be.company.fca.model.*;
-import be.company.fca.model.Set;
-import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +13,20 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(description = "API REST pour la gestion des classements")
+@Api(description = "API REST pour les classements")
 public class ClassementController {
 
     @Autowired
     private ClassementService classementService;
 
     @RequestMapping(method= RequestMethod.GET, path="/public/classements")
-    public Collection<Classement> getClassementByChampionnat(@RequestParam Long championnatId) {
-        return classementService.getClassementByChampionnat(championnatId);
+    public List<Classement> getClassementsByChampionnat(@RequestParam Long championnatId) {
+        return classementService.getClassementsByChampionnat(championnatId);
+    }
+
+    @RequestMapping(method= RequestMethod.GET, path="/public/classementsClub")
+    public List<ClassementClub> getClassementsClubByChampionnat(@RequestParam Long championnatId) {
+        return classementService.getClassementsClubByChampionnat(championnatId);
     }
 
 }

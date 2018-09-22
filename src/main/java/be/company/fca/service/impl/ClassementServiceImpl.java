@@ -15,6 +15,9 @@ import java.util.*;
 public class ClassementServiceImpl implements ClassementService {
 
     @Autowired
+    private ChampionnatRepository championnatRepository;
+
+    @Autowired
     private EquipeRepository equipeRepository;
 
     @Autowired
@@ -73,7 +76,7 @@ public class ClassementServiceImpl implements ClassementService {
     }
 
     @Override
-    public List<Classement> getClassementByChampionnat(Long championnatId) {
+    public List<Classement> getClassementsByChampionnat(Long championnatId) {
 
         Championnat championnat = new Championnat();
         championnat.setId(championnatId);
@@ -142,6 +145,60 @@ public class ClassementServiceImpl implements ClassementService {
         });
 
         return classements;
+    }
+
+    @Override
+    public List<ClassementClub> getClassementsClubByChampionnat(Long championnatId) {
+        List<ClassementClub> classementClubs = new ArrayList<>();
+
+        // Ce classement n'est construit que pour le criterium
+        // Parcourir les equipes et les classements des poules --> attribuer des points aux clubs concernes
+
+        Championnat championnat = championnatRepository.findOne(championnatId);
+        if (TypeChampionnat.CRITERIUM.equals(championnat.getType())){
+
+            Map<Club, Integer> pointsClub = new HashMap<>();
+
+            List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+            for (Division division : divisions){
+                List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+                for (Poule poule : poules){
+                    Classement classement = getClassementPoule(poule);
+                    List<ClassementEquipe> classementEquipes = classement.getClassementEquipes();
+                    for (int i=0;i<classementEquipes.size();i++){
+                        ClassementEquipe classementEquipe = classementEquipes.get(i);
+                        Club club = classementEquipe.getEquipe().getClub();
+
+                        //TODO : etablir la regle d'attribution des points (je n'ai pas compris jusqu'a present
+                        // Conflit entre le mail expliquant le systeme et ce qui est present sur le site
+                        Integer pointsAttribues = Math.max(2 - i,0);
+
+                        Integer points = pointsClub.get(club);
+                        if (points==null){
+                            points = 0;
+                        }
+                        points+=pointsAttribues;
+                        pointsClub.put(club, points);
+                    }
+                }
+            }
+
+            for (Club club : pointsClub.keySet()){
+                ClassementClub classementClub = new ClassementClub();
+                classementClub.setClub(club);
+                classementClub.setPoints(pointsClub.get(club));
+                classementClubs.add(classementClub);
+            }
+
+            Collections.sort(classementClubs, new Comparator<ClassementClub>() {
+                @Override
+                public int compare(ClassementClub o1, ClassementClub o2) {
+                    return (-1) * Integer.compare(o1.getPoints(),o2.getPoints());
+                }
+            });
+        }
+
+        return classementClubs;
     }
 
 
