@@ -1,15 +1,18 @@
 package be.company.fca.controller;
 
 import be.company.fca.model.Club;
+import be.company.fca.model.HoraireTerrain;
 import be.company.fca.model.Terrain;
-import be.company.fca.repository.ClubRepository;
-import be.company.fca.repository.EquipeRepository;
-import be.company.fca.repository.RencontreRepository;
-import be.company.fca.repository.TerrainRepository;
+import be.company.fca.model.TypeChampionnat;
+import be.company.fca.repository.*;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -19,6 +22,9 @@ public class TerrainController {
 
     @Autowired
     private TerrainRepository terrainRepository;
+
+    @Autowired
+    private HoraireTerrainRepository horaireTerrainRepository;
 
     @Autowired
     private ClubRepository clubRepository;
@@ -37,6 +43,13 @@ public class TerrainController {
     @RequestMapping(path="/public/terrain", method= RequestMethod.GET)
     Terrain getTerrain(@RequestParam Long id) {
         return terrainRepository.findOne(id);
+    }
+
+    @RequestMapping(path="/public/terrain/{terrainId}/horaires", method= RequestMethod.GET)
+    List<HoraireTerrain> getHorairesTerrain(@PathVariable("terrainId") Long terrainId) {
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
+        return horaireTerrainRepository.findByTerrain(terrain);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -79,4 +92,28 @@ public class TerrainController {
         }
     }
 
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain/{terrainId}/horaire", method = RequestMethod.PUT)
+    public HoraireTerrain updateHoraireTerrain(@PathVariable("terrainId") Long terrainId, @RequestBody HoraireTerrain horaireTerrain){
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
+        horaireTerrain.setTerrain(terrain);
+        return horaireTerrainRepository.save(horaireTerrain);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain/{terrainId}/horaire", method = RequestMethod.POST)
+    public HoraireTerrain addHoraireTerrain(@PathVariable("terrainId") Long terrainId,@RequestBody HoraireTerrain horaireTerrain){
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
+        horaireTerrain.setTerrain(terrain);
+        return horaireTerrainRepository.save(horaireTerrain);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain/{terrainId}/horaire", method = RequestMethod.DELETE)
+    public void deleteHoraireTerrain(@PathVariable("terrainId") Long terrainId, @RequestParam Long horaireTerrainId){
+        horaireTerrainRepository.delete(horaireTerrainId);
+    }
 }
