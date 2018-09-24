@@ -7,6 +7,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
 
     /**
@@ -78,6 +80,17 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     @Query(value = "select count(*) from rencontre " +
             " where rencontre.division_fk = :divisionId and ((rencontre.visites_fk = :equipe1Id and rencontre.visiteurs_fk = :equipe2Id) or (rencontre.visites_fk = :equipe2Id and rencontre.visiteurs_fk = :equipe1Id))", nativeQuery = true)
     Long countByDivisionAndEquipes(@Param("divisionId") Long divisionId, @Param("equipe1Id") Long equipe1Id, @Param("equipe2Id") Long equipe2Id);
+
+    /**
+     * Permet de recuperer les rencontres dans une division qui oppose deux equipes donnees
+     * @param divisionId Division
+     * @param equipe1Id Identifiant de la premiere equipe
+     * @param equipe2Id Identifiant de la seconde equipe
+     * @return Rencontres dans une division qui oppose deux equipes donnees
+     */
+    @Query(value = "select * from rencontre " +
+            " where rencontre.division_fk = :divisionId and ((rencontre.visites_fk = :equipe1Id and rencontre.visiteurs_fk = :equipe2Id) or (rencontre.visites_fk = :equipe2Id and rencontre.visiteurs_fk = :equipe1Id))", nativeQuery = true)
+    List<Rencontre> getRencontresByDivisionAndEquipes(@Param("divisionId") Long divisionId, @Param("equipe1Id") Long equipe1Id, @Param("equipe2Id") Long equipe2Id);
 
     /**
      * Permet de recuperer les rencontres validées d'une equipe

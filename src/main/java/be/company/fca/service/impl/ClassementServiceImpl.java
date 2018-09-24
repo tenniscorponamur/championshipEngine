@@ -439,7 +439,7 @@ public class ClassementServiceImpl implements ClassementService {
      * @param rencontre
      * @return
      */
-    private Equipe getGagnantRencontreInterserie(Rencontre rencontre){
+    public Equipe getGagnantRencontreInterserie(Rencontre rencontre){
 
         if (rencontre.getPointsVisites()!=null && rencontre.getPointsVisiteurs()!=null){
 

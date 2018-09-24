@@ -199,28 +199,49 @@ public class RencontreController {
                             // Si on a une division a interserie multiple, on va boucler sur les equipes du classement
 
                             Integer maxInterserie = 1;
+                            boolean switchFirsts = false;
 
                             // Boucler si plusieurs rencontres a des niveaux differents + boolean pour preciser cette caracteristique dans la division
 
+                            // Si interserie avec petite et grande finale, il faut switcher les deux premiers et faire 1-2 et 2-1
                             if (division.isMultiIS()){
                                 maxInterserie = Math.min(classementPoule1.getClassementEquipes().size(), classementPoule2.getClassementEquipes().size());
+                                if (false){
+                                    switchFirsts = true;
+                                }
+                            }else{
+                                // Si seul l'aspect "finales" est precise, seules les deux premieres rencontres vont etre jouees
+                                if (false){
+                                    maxInterserie = 2;
+                                    switchFirsts = true;
+                                }
                             }
 
-                            //TODO : si interserie avec petite et grande finale, il faut switcher les deux premiers et faire 1-2 et 2-1
-                            // Ensuite proposer la petite et grande finale
-                            // Analyser si les deux rencontres interseries concernes ont ete jouees et validees
-
-                            if (false){
-                                //rencontreA1B2 jouee et validee;
-                                //rencontreB1A2 jouee et validee;
-                                // Si oui, se faire rencontrer les vainqueurs d'un cote et les perdants de l'autre
-                            }
+                            // On conserve les informations des deux premieres equipes classees pour le cas des petite et grande finale
+                            Equipe equipeA = null;
+                            Equipe adversaireA = null;
+                            Equipe equipeB = null;
+                            Equipe adversaireB = null;
 
                             for (int i=0;i<maxInterserie;i++){
-
+                                int realI = i;
+                                // On inverse les adversaires pour les deux premieres rencontres (premier contre second)
+                                if (switchFirsts){
+                                    if (i==0){
+                                        realI = 1;
+                                    }else if (i==1){
+                                        realI = 0;
+                                    }
+                                }
                                 Equipe equipe1 = classementPoule1.getClassementEquipes().get(i).getEquipe();
-                                Equipe equipe2 = classementPoule2.getClassementEquipes().get(i).getEquipe();
-
+                                Equipe equipe2 = classementPoule2.getClassementEquipes().get(realI).getEquipe();
+                                if (i==0){
+                                    equipeA = equipe1;
+                                    adversaireA = equipe2;
+                                }else if (i==1){
+                                    equipeB = equipe1;
+                                    adversaireB = equipe2;
+                                }
                                 Rencontre rencontre = new Rencontre();
                                 rencontre.setDivision(division);
                                 rencontre.setEquipeVisites(equipe1);
@@ -229,9 +250,76 @@ public class RencontreController {
                                 if (!isInterserieExists(rencontre)) {
                                     rencontresInterseries.add(rencontre);
                                 }
-
                             }
 
+                            // Le cas echeant, proposer les petites et grandes finales
+                            if (false){
+                                // Analyser si les deux rencontres interseries concernes ont ete jouees et validees
+
+                                //rencontreA1B2 jouee et validee;
+                                //rencontreB1A2 jouee et validee;
+
+                                // Si oui, se faire rencontrer les vainqueurs d'un cote et les perdants de l'autre
+                                Equipe equipeGagnanteA = null;
+                                Equipe equipeGagnanteB = null;
+                                Equipe equipePerdanteA = null;
+                                Equipe equipePerdanteB = null;
+
+                                List<Rencontre> rencontres = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(),equipeA.getId(),adversaireA.getId());
+                                // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
+                                if (rencontres.size()>0){
+                                    Rencontre interserie = rencontres.get(0);
+                                    if (interserie.isValide()) {
+                                        equipeGagnanteA = classementService.getGagnantRencontreInterserie(interserie);
+                                        if (interserie.getEquipeVisites().equals(equipeGagnanteA)){
+                                            equipePerdanteA = interserie.getEquipeVisiteurs();
+                                        }else{
+                                            equipePerdanteA = interserie.getEquipeVisites();
+                                        }
+                                    }
+                                }
+                                rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(),equipeB.getId(),adversaireB.getId());
+                                // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
+                                if (rencontres.size()>0){
+                                    Rencontre interserie = rencontres.get(0);
+                                    if (interserie.isValide()) {
+                                        equipeGagnanteB = classementService.getGagnantRencontreInterserie(interserie);
+                                        if (interserie.getEquipeVisites().equals(equipeGagnanteB)){
+                                            equipePerdanteB = interserie.getEquipeVisiteurs();
+                                        }else{
+                                            equipePerdanteB = interserie.getEquipeVisites();
+                                        }
+                                    }
+                                }
+
+                                if (equipeGagnanteA!=null && equipePerdanteA !=null && equipeGagnanteB != null && equipePerdanteB !=null){
+
+                                    // Creation de la petite finale
+
+                                    Rencontre petiteFinale = new Rencontre();
+                                    petiteFinale.setDivision(division);
+                                    petiteFinale.setEquipeVisites(equipePerdanteA);
+                                    petiteFinale.setEquipeVisiteurs(equipePerdanteB);
+
+                                    if (!isInterserieExists(petiteFinale)) {
+                                        rencontresInterseries.add(petiteFinale);
+                                    }
+
+                                    // Creation de la grande finale
+
+                                    Rencontre finale = new Rencontre();
+                                    finale.setDivision(division);
+                                    finale.setEquipeVisites(equipeGagnanteA);
+                                    finale.setEquipeVisiteurs(equipeGagnanteB);
+
+                                    if (!isInterserieExists(finale)) {
+                                        rencontresInterseries.add(finale);
+                                    }
+
+                                }
+
+
+                            }
 
                         }
 
