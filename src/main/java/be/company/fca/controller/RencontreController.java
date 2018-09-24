@@ -38,7 +38,7 @@ public class RencontreController {
     // DTO pour les capitaines d'equipe afin de ne pas recuperer les donnees privees
 
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres")
-    public List<RencontreDto> getRencontresByDivisionOrPoule(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId, @RequestParam(required = false) Long equipeId) {
+    public List<RencontreDto> getRencontresByDivisionOrPouleOrEquipe(@RequestParam Long divisionId,@RequestParam(required = false) Long pouleId, @RequestParam(required = false) Long equipeId) {
         List<RencontreDto> rencontresDto = new ArrayList<>();
         List<Rencontre> rencontres = new ArrayList<Rencontre>();
 
@@ -203,7 +203,18 @@ public class RencontreController {
                             // Boucler si plusieurs rencontres a des niveaux differents + boolean pour preciser cette caracteristique dans la division
 
                             if (division.isMultiIS()){
-                                maxInterserie = Math.min(classementPoule1.getClassementEquipes().size(), classementPoule2.getClassementEquipes().size());                                               }
+                                maxInterserie = Math.min(classementPoule1.getClassementEquipes().size(), classementPoule2.getClassementEquipes().size());
+                            }
+
+                            //TODO : si interserie avec petite et grande finale, il faut switcher les deux premiers et faire 1-2 et 2-1
+                            // Ensuite proposer la petite et grande finale
+                            // Analyser si les deux rencontres interseries concernes ont ete jouees et validees
+
+                            if (false){
+                                //rencontreA1B2 jouee et validee;
+                                //rencontreB1A2 jouee et validee;
+                                // Si oui, se faire rencontrer les vainqueurs d'un cote et les perdants de l'autre
+                            }
 
                             for (int i=0;i<maxInterserie;i++){
 

@@ -354,7 +354,7 @@ public class ClassementServiceImpl implements ClassementService {
      */
     private void setGagnantInterseries(Classement classement, List<Rencontre> rencontreInterseries){
 
-        List<Equipe> equipesVictorieusesDivision = getEquipeVictorieuse(rencontreInterseries);
+        List<Equipe> equipesVictorieusesDivision = getEquipeVictorieuse(classement.getPoule().getDivision(),rencontreInterseries);
         for (Equipe equipeVictorieuseDivision : equipesVictorieusesDivision){
             if (equipeVictorieuseDivision!=null){
                 // Si l'equipe est classe dans cette poule, elle sera marquee comme gagnant la division suite a la rencontre interseries
@@ -367,18 +367,68 @@ public class ClassementServiceImpl implements ClassementService {
     }
 
     /**
-     * Permet de recuperer l'equipe victorieuse d'une liste de rencontre interserie
+     * Permet de recuperer l'equipe victorieuse d'une liste de rencontre interserie pour une division donnee
      * TODO : gerer le cas de rencontres multiples (actuellement seule une rencontre unique est consideree)
+     * @param division
      * @param rencontreInterserieList
      * @return
      */
-    private List<Equipe> getEquipeVictorieuse(List<Rencontre> rencontreInterserieList){
+    private List<Equipe> getEquipeVictorieuse(Division division, List<Rencontre> rencontreInterserieList){
+
         List<Equipe> equipes = new ArrayList<>();
+        // Dans la meme division, si plusieurs rencontres interseries avec la meme equipe, il faut conserver uniquement l'equipe victorieuse de ses deux matchs
 
-        // On considere qu'il n'y a qu'une rencontre interserie par division possible (deux poules maximum) par niveau au classement
+        // S'il s'agit d'une division avec petite finale et grande finale, on ne doit conserver que l'equipe qui a joue le plus de rencontres et qui a gagne l'ensemble de ceux-ci
+        if (false){
 
-        for (Rencontre interserie : rencontreInterserieList){
-            equipes.add(getGagnantRencontreInterserie(interserie));
+            Map<Equipe, List<Rencontre>> mapRencontresEquipe = new HashMap<>();
+            int maxRencontres = 0;
+            for (Rencontre interserie : rencontreInterserieList){
+                List<Rencontre> listeRencontresVisites = mapRencontresEquipe.get(interserie.getEquipeVisites());
+                List<Rencontre> listeRencontresVisiteurs = mapRencontresEquipe.get(interserie.getEquipeVisiteurs());
+                if (listeRencontresVisites==null){
+                    listeRencontresVisites = new ArrayList<>();
+                    mapRencontresEquipe.put(interserie.getEquipeVisites(),listeRencontresVisites);
+                }
+                if (listeRencontresVisiteurs==null){
+                    listeRencontresVisiteurs = new ArrayList<>();
+                    mapRencontresEquipe.put(interserie.getEquipeVisiteurs(),listeRencontresVisiteurs);
+                }
+                maxRencontres = Math.max(maxRencontres,listeRencontresVisites.size());
+                maxRencontres = Math.max(maxRencontres,listeRencontresVisiteurs.size());
+            }
+
+            // On ne va analyser que les rencontres des equipes qui ont joue le maximum de rencontres (deux selon le principe de creation de rencontres actuel)
+
+            List<Equipe> equipesRetenues = new ArrayList<>();
+            for (Equipe equipe : mapRencontresEquipe.keySet()){
+                if (mapRencontresEquipe.get(equipe).size()==maxRencontres){
+                    equipesRetenues.add(equipe);
+                }
+            }
+
+            // On va rechercher la rencontre entre les deux equipes
+            if (equipes.size()==2){
+                Equipe equipeA = equipes.get(0);
+                Equipe equipeB = equipes.get(1);
+
+                for (Rencontre interserie : rencontreInterserieList){
+                    if (  (interserie.getEquipeVisites().equals(equipeA) && interserie.getEquipeVisiteurs().equals(equipeB))
+                        || (interserie.getEquipeVisites().equals(equipeB) && interserie.getEquipeVisiteurs().equals(equipeA))){
+                        equipes.add(getGagnantRencontreInterserie(interserie));
+                    }
+                }
+
+            }
+
+        }else{
+
+            // On considere qu'il n'y a qu'une rencontre interserie par division possible (deux poules maximum) par niveau au classement
+
+            for (Rencontre interserie : rencontreInterserieList){
+                equipes.add(getGagnantRencontreInterserie(interserie));
+            }
+
         }
 
         return equipes;
