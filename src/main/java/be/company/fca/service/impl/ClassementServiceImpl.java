@@ -379,7 +379,7 @@ public class ClassementServiceImpl implements ClassementService {
         // Dans la meme division, si plusieurs rencontres interseries avec la meme equipe, il faut conserver uniquement l'equipe victorieuse de ses deux matchs
 
         // S'il s'agit d'une division avec petite finale et grande finale, on ne doit conserver que l'equipe qui a joue le plus de rencontres et qui a gagne l'ensemble de ceux-ci
-        if (false){
+        if (division.isWithFinales()){
 
             Map<Equipe, List<Rencontre>> mapRencontresEquipe = new HashMap<>();
             int maxRencontres = 0;

@@ -27,6 +27,9 @@ public class Division {
     @Column( name = "multi_is", nullable = false)
     private boolean multiIS=false;
 
+    @Column( name = "with_finales", nullable = false)
+    private boolean withFinales=false;
+
     public Long getId() {
         return id;
     }
@@ -73,6 +76,14 @@ public class Division {
 
     public void setMultiIS(boolean multiIS) {
         this.multiIS = multiIS;
+    }
+
+    public boolean isWithFinales() {
+        return withFinales;
+    }
+
+    public void setWithFinales(boolean withFinales) {
+        this.withFinales = withFinales;
     }
 
     @Override

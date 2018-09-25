@@ -206,12 +206,12 @@ public class RencontreController {
                             // Si interserie avec petite et grande finale, il faut switcher les deux premiers et faire 1-2 et 2-1
                             if (division.isMultiIS()){
                                 maxInterserie = Math.min(classementPoule1.getClassementEquipes().size(), classementPoule2.getClassementEquipes().size());
-                                if (false){
+                                if (division.isWithFinales()){
                                     switchFirsts = true;
                                 }
                             }else{
                                 // Si seul l'aspect "finales" est precise, seules les deux premieres rencontres vont etre jouees
-                                if (false){
+                                if (division.isWithFinales()){
                                     maxInterserie = 2;
                                     switchFirsts = true;
                                 }
@@ -253,7 +253,7 @@ public class RencontreController {
                             }
 
                             // Le cas echeant, proposer les petites et grandes finales
-                            if (false){
+                            if (division.isWithFinales()){
                                 // Analyser si les deux rencontres interseries concernes ont ete jouees et validees
 
                                 //rencontreA1B2 jouee et validee;
