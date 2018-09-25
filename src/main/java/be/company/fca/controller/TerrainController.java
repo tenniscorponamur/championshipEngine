@@ -52,6 +52,11 @@ public class TerrainController {
         return horaireTerrainRepository.findByTerrain(terrain);
     }
 
+    @RequestMapping(path="/public/horairesTerrain", method= RequestMethod.GET)
+    List<HoraireTerrain> getHorairesTerrainByTypeChampionnat(@RequestParam("typeChampionnat") TypeChampionnat typeChampionnat){
+        return horaireTerrainRepository.findByTypeChampionnat(typeChampionnat);
+}
+
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/terrain", method = RequestMethod.PUT)
     public Terrain updateTerrain(@RequestBody Terrain terrain){
