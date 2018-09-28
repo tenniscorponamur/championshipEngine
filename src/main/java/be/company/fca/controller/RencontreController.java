@@ -8,6 +8,8 @@ import be.company.fca.service.RencontreService;
 import be.company.fca.utils.DateUtils;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -71,37 +73,15 @@ public class RencontreController {
      * @return
      */
     @RequestMapping(method= RequestMethod.GET, path="/public/rencontres/last")
-    public List<Rencontre> getLastResults(@RequestParam Long numberOfResults){
-
-        // top {number}
-        // where valide = true
-        // order by date desc
-
-        return new ArrayList<>();
+    public List<Rencontre> getLastTenResults(@RequestParam Integer numberOfResults){
+        Pageable pageRequest = new PageRequest(0,numberOfResults);
+        return rencontreRepository.getLastResults(pageRequest);
     }
 
-    @RequestMapping(method= RequestMethod.GET, path="/public/rencontres/coming")
-    public List<Rencontre> getComingMeetings(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date startDate, @RequestParam Long numberOfResults){
-
-        // top {number}
-        // where date > startDate
-        // order by date
-
-        //DateUtils.shrinkToDay(startDate);
-
-        /*
-
-
-    @Query(value = "select * from match inner join rencontre on match.rencontre_fk = rencontre.id " +
-            "    where rencontre.valide = '1' " +
-            "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') > to_char(cast(:startDate AS date),'YYYY-MM-DD') " +
-            "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') <= to_char(cast(:endDate AS date),'YYYY-MM-DD') " +
-            "    and (joueurvisites1_fk = :membreId or joueurvisites2_fk = :membreId or joueurvisiteurs1_fk = :membreId or joueurvisiteurs2_fk = :membreId)", nativeQuery = true)
-
-
-         */
-
-        return new ArrayList<>();
+    @RequestMapping(method= RequestMethod.GET, path="/public/rencontres/next")
+    public List<Rencontre> getComingMeetings(@RequestParam Integer numberOfResults){
+        Pageable pageRequest = new PageRequest(0,numberOfResults);
+        return rencontreRepository.getNextMeetings(DateUtils.shrinkToDay(new Date()),pageRequest);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

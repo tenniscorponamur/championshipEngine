@@ -1,12 +1,14 @@
 package be.company.fca.repository;
 
 import be.company.fca.model.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
@@ -100,6 +102,23 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     @Query("select distinct rencontre from Rencontre rencontre " +
             " where rencontre.equipeVisites =:equipe or rencontre.equipeVisiteurs = :equipe")
     Iterable<Rencontre> findRencontresByEquipe(@Param("equipe") Equipe equipe);
+
+    /**
+     * Permet de recuperer les {X} dernieres rencontres validees (derniers resultats)
+     * @return
+     */
+    @Query(value = "select rencontre from Rencontre rencontre " +
+            " where rencontre.valide = '1' order by rencontre.dateHeureRencontre desc ")
+    List<Rencontre> getLastResults(Pageable pageable);
+
+    /**
+     * Permet de recuperer les {X} prochaines rencontres
+     * @param
+     * @return
+     */
+    @Query(value = "select rencontre from Rencontre rencontre " +
+            " where rencontre.dateHeureRencontre > :startDate order by rencontre.dateHeureRencontre asc ")
+    List<Rencontre> getNextMeetings(@Param("startDate") Date startDate, Pageable pageable);
 
     /**
      * Permet de supprimer une renconttre
