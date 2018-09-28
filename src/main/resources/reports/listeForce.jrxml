@@ -153,7 +153,7 @@ ORDER BY nom_club ASC,
 				</textElement>
 				<textFieldExpression><![CDATA[($F{nom_membre} + " " + $F{prenom_membre}).toUpperCase()]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="150" y="0" width="50" height="12" uuid="c22c567a-ba0c-448c-b2b2-7f026e35f26a"/>
 				<box topPadding="1">
 					<pen lineColor="#787878"/>

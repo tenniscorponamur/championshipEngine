@@ -4,9 +4,11 @@ import be.company.fca.dto.MembreDto;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.utils.POIUtils;
+import be.company.fca.utils.ReportUtils;
 import be.company.fca.utils.TemplateUtils;
 import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.Api;
+import net.sf.jasperreports.engine.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -25,14 +27,19 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.security.Principal;
+import java.sql.Connection;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 @Api(description = "API REST pour la gestion des membres")
 public class MembreController {
+
+    @Autowired
+    DataSource datasource;
 
     @Autowired
     private MembreRepository membreRepository;
@@ -204,6 +211,19 @@ public class MembreController {
             classementAFTRepository.deleteByMembreFk(membreId);
             membreRepository.delete(membreId);
         }
+    }
+
+    @RequestMapping(path="/public/membres/listeForce", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getListeForceMembres() throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getListeForceTemplate());
+        Connection conn = datasource.getConnection();
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, new HashMap(), conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

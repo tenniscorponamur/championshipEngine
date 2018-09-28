@@ -8,4 +8,10 @@ public class ReportUtils {
     public static InputStream getRapportTest(){
         return ReportUtils.class.getResourceAsStream("/reports/RapportTest.jrxml");
     }
+
+    public static InputStream getListeForceTemplate(){
+        return ReportUtils.class.getResourceAsStream("/reports/listeForce.jrxml");
+    }
+
+
 }
