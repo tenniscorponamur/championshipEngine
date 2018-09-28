@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listeForce" columnCount="4" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="200" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5966513a-5dd6-43cd-b7a2-e82d1037d5e2">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.report.description"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="TennisCorpoAdapter"/>
+	<queryString>
+		<![CDATA[SELECT membre.nom nom_membre,
+	membre.prenom prenom_membre,
+	membre.numero_Aft,
+	membre.genre,
+	club.numero numero_club,
+	club.nom nom_club,
+	classementcorpo.points pointsCorpo
+FROM membre
+	inner join club ON 
+	 club.id = membre.club_fk 
+	 inner join classementcorpo 
+	 on classementcorpo.id = membre.classementcorpo_fk
+	 where membre.actif = '1'
+ORDER BY nom_club ASC,
+	membre.genre ASC,
+	membre.nom ASC,
+	membre.prenom ASC]]>
+	</queryString>
+	<field name="nom_membre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nom_membre"/>
+	</field>
+	<field name="prenom_membre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="prenom_membre"/>
+	</field>
+	<field name="numero_aft" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="numero_aft"/>
+	</field>
+	<field name="genre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="genre"/>
+	</field>
+	<field name="numero_club" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="numero_club"/>
+	</field>
+	<field name="nom_club" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nom_club"/>
+	</field>
+	<field name="pointscorpo" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="pointscorpo"/>
+	</field>
+	<group name="club">
+		<groupExpression><![CDATA[$F{nom_club}]]></groupExpression>
+		<groupHeader>
+			<band height="17">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="200" height="17" forecolor="#FFFFFF" backcolor="#A8A8A8" uuid="82f61187-ea5e-4506-a349-08947f816003"/>
+					<box>
+						<pen lineColor="#787878"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{numero_club} + " - " + $F{nom_club}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="genre">
+		<groupExpression><![CDATA[$F{genre}]]></groupExpression>
+		<groupHeader>
+			<band height="14">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="200" height="14" backcolor="#8CCFFF" uuid="374a4e85-0d80-43da-8590-df4bc199ac6f">
+						<printWhenExpression><![CDATA["HOMME".equals($F{genre})]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<pen lineColor="#787878"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Messieurs"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="200" height="14" backcolor="#F5A9E8" uuid="11977d61-12e6-4ac7-a839-ddd6e9dacb76">
+						<printWhenExpression><![CDATA["FEMME".equals($F{genre})]]></printWhenExpression>
+					</reportElement>
+					<box>
+						<pen lineColor="#787878"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Dames"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="20" uuid="7b81c426-b1c9-4912-8828-5041cf4854c3"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[LISTE DE FORCES]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="702" y="0" width="100" height="20" uuid="9bb9b9b2-598a-40cb-a205-80c13e2539eb"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="35" y="0" width="115" height="12" uuid="e2e2dec2-cf93-4095-b44e-a6985a0f587d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18d9398a-6165-4046-ac6f-23fd9449c984"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="3" bottomPadding="0" rightPadding="0">
+					<pen lineColor="#787878"/>
+					<leftPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{nom_membre} + " " + $F{prenom_membre}).toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="0" width="50" height="12" uuid="c22c567a-ba0c-448c-b2b2-7f026e35f26a"/>
+				<box topPadding="1">
+					<pen lineColor="#787878"/>
+					<rightPen lineWidth="1.0" lineColor="#787878"/>
+				</box>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{numero_aft}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="35" height="12" uuid="cb860b5c-64fd-4669-b806-a56f15f01ac8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18d9398a-6165-4046-ac6f-23fd9449c984"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="0" bottomPadding="0" rightPadding="3">
+					<pen lineColor="#787878"/>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pointscorpo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="652" y="0" width="100" height="15" uuid="31cd2b5c-6b04-4bbd-9610-26dd68cbd7f8"/>
+				<box topPadding="3" rightPadding="1"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="752" y="0" width="50" height="15" uuid="a1112897-6300-492e-9243-498e676152de"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/" + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
