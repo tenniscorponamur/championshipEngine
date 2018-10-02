@@ -315,18 +315,22 @@ public class MembreController {
                             membre.setClub(club);
                         }
 
-                        // Garnir le classement AFT et Corpo actuel du membre : attention pour la mise a jour --> risque de creer des doublons --> a zapper si le membre existe
+                        // Garnir le classement AFT et Corpo actuel du membre : attention pour la mise a jour --> risque de creer des doublons --> a zapper s'il y a deja un classement connu
 
-                        if (membre.getId()==null){
-                            membre = membreRepository.save(membre);
-                            if (!StringUtils.isEmpty(pointsCorpo)){
+                        membre = membreRepository.save(membre);
+
+                        if (membre.getClassementCorpoActuel()==null) {
+                            if (!StringUtils.isEmpty(pointsCorpo)) {
                                 ClassementCorpo classementCorpo = new ClassementCorpo();
                                 classementCorpo.setMembreFk(membre.getId());
                                 classementCorpo.setDateClassement(new Date());
                                 classementCorpo.setPoints(Integer.valueOf(pointsCorpo));
                                 classementCorpoRepository.save(classementCorpo);
-                                membreRepository.updateClassementCorpo(membre.getId(),classementCorpo);
+                                membreRepository.updateClassementCorpo(membre.getId(), classementCorpo);
                             }
+                        }
+
+                        if (membre.getClassementAFTActuel()==null){
                             if (!StringUtils.isEmpty(pointsAft)){
                                 ClassementAFT classementAFT = new ClassementAFT();
                                 classementAFT.setMembreFk(membre.getId());
@@ -337,9 +341,8 @@ public class MembreController {
                                 membreRepository.updateClassementAFT(membre.getId(),classementAFT);
                             }
 
-                        }else{
-                            membre = membreRepository.save(membre);
                         }
+
                     }catch(Exception e){
                         e.printStackTrace();
                     }
