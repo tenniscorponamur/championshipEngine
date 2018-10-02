@@ -1,13 +1,11 @@
 package be.company.fca.controller;
 
 import be.company.fca.dto.EquipeDto;
-import be.company.fca.model.Club;
-import be.company.fca.model.Division;
-import be.company.fca.model.Equipe;
-import be.company.fca.model.Poule;
+import be.company.fca.model.*;
 import be.company.fca.repository.ChampionnatRepository;
 import be.company.fca.repository.DivisionRepository;
 import be.company.fca.repository.EquipeRepository;
+import be.company.fca.repository.RencontreRepository;
 import be.company.fca.service.DivisionService;
 import be.company.fca.service.EquipeService;
 import io.swagger.annotations.Api;
@@ -28,6 +26,9 @@ public class EquipeController {
 
     @Autowired
     private DivisionRepository divisionRepository;
+
+    @Autowired
+    private RencontreRepository rencontreRepository;
 
     @Autowired
     private ChampionnatRepository championnatRepository;
@@ -97,6 +98,12 @@ public class EquipeController {
         // Operation non-permise si le calendrier est valide ou cloture
         if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
+        }
+
+        // Supprimer les rencontres associees a cette equipe sinon on ne pourra pas la supprimer :-)
+        List<Rencontre> rencontresEquipe = (List<Rencontre>) rencontreRepository.findRencontresByEquipe(equipe);
+        for (Rencontre rencontreEquipe : rencontresEquipe){
+            rencontreRepository.delete(rencontreEquipe.getId());
         }
 
         equipeRepository.delete(id);

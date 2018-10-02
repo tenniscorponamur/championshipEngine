@@ -18,6 +18,12 @@ public interface PouleRepository extends CrudRepository<Poule,Long>{
      */
     Iterable<Poule> findByDivision(Division division);
 
+    /**
+     * Permet de supprimer les poules d'une division
+     * @param division Division
+     */
+    void deleteByDivision(Division division);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Poule poule " +

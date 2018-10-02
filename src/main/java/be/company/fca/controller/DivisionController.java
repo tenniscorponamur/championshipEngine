@@ -1,11 +1,9 @@
 package be.company.fca.controller;
 
-import be.company.fca.model.CategorieChampionnat;
-import be.company.fca.model.Championnat;
-import be.company.fca.model.Division;
-import be.company.fca.model.TypeChampionnat;
+import be.company.fca.model.*;
 import be.company.fca.repository.ChampionnatRepository;
 import be.company.fca.repository.DivisionRepository;
+import be.company.fca.repository.PouleRepository;
 import be.company.fca.service.DivisionService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +23,9 @@ public class DivisionController {
 
     @Autowired
     private DivisionRepository divisionRepository;
+
+    @Autowired
+    private PouleRepository pouleRepository;
 
     @Autowired
     private DivisionService divisionService;
@@ -74,6 +75,10 @@ public class DivisionController {
         if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
+
+        // Supprimer les poules relatives a la division
+        // Il ne doit plus y avoir d'equipe
+        pouleRepository.deleteByDivision(division);
 
         divisionRepository.delete(id);
         // On signale que le calendrier doit etre rafraichi si la division a ete supprimee
