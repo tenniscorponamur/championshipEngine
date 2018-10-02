@@ -80,7 +80,7 @@ public class RencontreServiceImpl implements RencontreService{
             newRencontre.setDateHeureRencontre(oldRencontre.getDateHeureRencontre());
             newRencontre.setTerrain(oldRencontre.getTerrain());
             newRencontre.setEquipeVisites(oldRencontre.getEquipeVisites());
-            newRencontre.setEquipeVisites(oldRencontre.getEquipeVisiteurs());
+            newRencontre.setEquipeVisiteurs(oldRencontre.getEquipeVisiteurs());
             newRencontre.setPointsVisites(oldRencontre.getPointsVisites());
             newRencontre.setPointsVisiteurs(oldRencontre.getPointsVisiteurs());
             newRencontre.setValide(oldRencontre.isValide());
