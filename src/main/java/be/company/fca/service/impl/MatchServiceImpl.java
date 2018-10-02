@@ -6,12 +6,13 @@ import be.company.fca.repository.SetRepository;
 import be.company.fca.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository
+@Service
 @Transactional(readOnly = true)
 public class MatchServiceImpl implements MatchService {
 

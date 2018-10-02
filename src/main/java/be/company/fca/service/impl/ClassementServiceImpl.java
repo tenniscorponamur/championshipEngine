@@ -6,11 +6,12 @@ import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-@Repository
+@Service
 @Transactional(readOnly = true)
 public class ClassementServiceImpl implements ClassementService {
 

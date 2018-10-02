@@ -125,7 +125,7 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
      * @param rencontreId Identifiant de la rencontre
      */
     @Transactional
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query(value = "delete from rencontre " +
             " where id = :rencontreId", nativeQuery = true)
     void deleteById(@Param("rencontreId") Long rencontreId);
