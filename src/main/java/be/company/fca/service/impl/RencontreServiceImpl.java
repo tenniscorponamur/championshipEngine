@@ -79,6 +79,8 @@ public class RencontreServiceImpl implements RencontreService{
         if (oldRencontre!=null) {
             newRencontre.setDateHeureRencontre(oldRencontre.getDateHeureRencontre());
             newRencontre.setTerrain(oldRencontre.getTerrain());
+            newRencontre.setEquipeVisites(oldRencontre.getEquipeVisites());
+            newRencontre.setEquipeVisites(oldRencontre.getEquipeVisiteurs());
             newRencontre.setPointsVisites(oldRencontre.getPointsVisites());
             newRencontre.setPointsVisiteurs(oldRencontre.getPointsVisiteurs());
             newRencontre.setValide(oldRencontre.isValide());
@@ -117,10 +119,9 @@ public class RencontreServiceImpl implements RencontreService{
             if (  (rencontreA.getPoule()==null&&rencontreB.getPoule()==null)
                 || (rencontreA.getPoule()!=null&&rencontreA.getPoule().equals(rencontreB.getPoule()))
                ){
-                if (rencontreA.getEquipeVisites().equals(rencontreB.getEquipeVisites())){
-                    if (rencontreA.getEquipeVisiteurs().equals(rencontreB.getEquipeVisiteurs())){
+                if ( (rencontreA.getEquipeVisites().equals(rencontreB.getEquipeVisites()) && rencontreA.getEquipeVisiteurs().equals(rencontreB.getEquipeVisiteurs()))
+                  || (rencontreA.getEquipeVisiteurs().equals(rencontreB.getEquipeVisites()) && rencontreA.getEquipeVisites().equals(rencontreB.getEquipeVisiteurs()))) {
                         return true;
-                    }
                 }
             }
         }
