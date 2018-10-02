@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class RencontreServiceImpl implements RencontreService{
 
     @Autowired
@@ -34,6 +35,7 @@ public class RencontreServiceImpl implements RencontreService{
     private SetRepository setRepository;
 
     @Override
+    @Transactional(readOnly = false)
     public List<Rencontre> saveRencontres(List<Rencontre> rencontreList) {
 
         List<Rencontre> savedRencontres = new ArrayList<>();
@@ -47,6 +49,7 @@ public class RencontreServiceImpl implements RencontreService{
     }
 
     @Override
+    @Transactional(readOnly = false)
     public List<Rencontre> refreshRencontres(List<Rencontre> oldRencontreList, List<Rencontre> newRencontreList) {
         // On recupere la date, le terrain, les points, le caractere valide et les matchs de l'ancienne rencontre
         // Cela signifie qu'on analyse sur base de equipeA contre equipeB dans une poule et une division donnee
@@ -57,7 +60,7 @@ public class RencontreServiceImpl implements RencontreService{
 
         for (Rencontre oldRencontre : oldRencontreList){
             setRepository.deleteByRencontreId(oldRencontre.getId());
-            matchRepository.deleteByRencontre(oldRencontre);
+            matchRepository.deleteByRencontreId(oldRencontre.getId());
             rencontreRepository.deleteById(oldRencontre.getId());
         }
 
@@ -69,6 +72,7 @@ public class RencontreServiceImpl implements RencontreService{
      * @param newRencontre
      * @param oldRencontreList
      */
+    @Transactional(readOnly = false)
     private void initAndSaveFromOlds(Rencontre newRencontre, List<Rencontre> oldRencontreList){
         Rencontre oldRencontre = getMatchingOldRencontre(newRencontre, oldRencontreList);
         // Initialisation de la nouvelle rencontre si une ancienne etait presente

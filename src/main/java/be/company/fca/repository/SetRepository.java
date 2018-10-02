@@ -41,7 +41,7 @@ public interface SetRepository extends CrudRepository<Set,Long> {
      * @param rencontreId Identifiant d'une rencontre
      */
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "delete from set " +
             " where match_fk in (select match.id from match where match.rencontre_fk = :rencontreId)", nativeQuery = true)
     void deleteByRencontreId(@Param("rencontreId") Long rencontreId);

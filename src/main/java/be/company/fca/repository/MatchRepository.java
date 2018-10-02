@@ -25,8 +25,9 @@ public interface MatchRepository extends CrudRepository<Match,Long> {
     Long countByMembreId(@Param("membreId") Long membreId);
 
     @Transactional
-    @Modifying
-    Iterable<Match> deleteByRencontre(Rencontre rencontre);
+    @Modifying(clearAutomatically = true)
+    @Query(value = "delete from match where match.rencontre_fk = :rencontreId", nativeQuery = true)
+    void deleteByRencontreId(@Param("rencontreId") Long rencontreId);
 
     @Query(value = "select * from match inner join rencontre on match.rencontre_fk = rencontre.id " +
             "    where rencontre.valide = '1' " +
