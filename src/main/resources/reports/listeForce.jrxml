@@ -139,7 +139,7 @@ ORDER BY nom_club ASC,
 	</columnHeader>
 	<detail>
 		<band height="12" splitType="Stretch">
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement x="35" y="0" width="115" height="12" uuid="e2e2dec2-cf93-4095-b44e-a6985a0f587d">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18d9398a-6165-4046-ac6f-23fd9449c984"/>
 				</reportElement>
@@ -154,18 +154,18 @@ ORDER BY nom_club ASC,
 				<textFieldExpression><![CDATA[($F{nom_membre} + " " + $F{prenom_membre}).toUpperCase()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="150" y="0" width="50" height="12" uuid="c22c567a-ba0c-448c-b2b2-7f026e35f26a"/>
+				<reportElement stretchType="ElementGroupHeight" x="150" y="0" width="50" height="12" uuid="c22c567a-ba0c-448c-b2b2-7f026e35f26a"/>
 				<box topPadding="1">
 					<pen lineColor="#787878"/>
 					<rightPen lineWidth="1.0" lineColor="#787878"/>
 				</box>
-				<textElement>
+				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{numero_aft}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="35" height="12" uuid="cb860b5c-64fd-4669-b806-a56f15f01ac8">
+				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="35" height="12" uuid="cb860b5c-64fd-4669-b806-a56f15f01ac8">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18d9398a-6165-4046-ac6f-23fd9449c984"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="0" bottomPadding="0" rightPadding="3">
@@ -173,7 +173,7 @@ ORDER BY nom_club ASC,
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="0.0"/>
 				</box>
-				<textElement textAlignment="Right">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{pointscorpo}]]></textFieldExpression>
