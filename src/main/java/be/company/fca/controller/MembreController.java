@@ -310,8 +310,24 @@ public class MembreController {
                         if ("9999".equals(numeroClubCorpo)){
                             membre.setActif(false);
                         }else{
+
+                            // Petite astuce mise en place pour trouver les clubs dont la codification est 05
+                            // qui sera represente par 5 dans le fichier Excel
+
+                            boolean testWithPrefixeZero = false;
+                            try{
+                                Integer numeroClubCorpoInt = Integer.valueOf(numeroClubCorpo);
+                                if (numeroClubCorpoInt<10){
+                                    testWithPrefixeZero = true;
+                                }
+                            }catch (Exception e){
+                            }
+
                             // Recuperer le club du membre
                             Club club = clubRepository.findByNumero(numeroClubCorpo);
+                            if (testWithPrefixeZero && club==null){
+                                club = clubRepository.findByNumero(numeroClubCorpo);
+                            }
                             membre.setClub(club);
                         }
 
