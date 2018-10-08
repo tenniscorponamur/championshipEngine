@@ -311,24 +311,28 @@ public class MembreController {
                             membre.setActif(false);
                         }else{
 
-                            // Petite astuce mise en place pour trouver les clubs dont la codification est 05
-                            // qui sera represente par 5 dans le fichier Excel
+                            if (numeroClubCorpo!=null){
 
-                            boolean testWithPrefixeZero = false;
-                            try{
-                                Integer numeroClubCorpoInt = Integer.valueOf(numeroClubCorpo);
-                                if (numeroClubCorpoInt<10){
-                                    testWithPrefixeZero = true;
+                                // Petite astuce mise en place pour trouver les clubs dont la codification est 05
+                                // qui sera represente par 5 dans le fichier Excel
+
+                                boolean testWithPrefixeZero = false;
+                                try{
+                                    Integer numeroClubCorpoInt = Integer.valueOf(numeroClubCorpo);
+                                    if (numeroClubCorpoInt<10){
+                                        testWithPrefixeZero = true;
+                                    }
+                                }catch (Exception e){
                                 }
-                            }catch (Exception e){
-                            }
 
-                            // Recuperer le club du membre
-                            Club club = clubRepository.findByNumero(numeroClubCorpo);
-                            if (testWithPrefixeZero && club==null){
-                                club = clubRepository.findByNumero(numeroClubCorpo);
+                                // Recuperer le club du membre
+                                Club club = clubRepository.findByNumero(numeroClubCorpo);
+                                if (testWithPrefixeZero && club==null){
+                                    club = clubRepository.findByNumero("0" + numeroClubCorpo);
+                                }
+                                membre.setClub(club);
+
                             }
-                            membre.setClub(club);
                         }
 
                         // Garnir le classement AFT et Corpo actuel du membre : attention pour la mise a jour --> risque de creer des doublons --> a zapper s'il y a deja un classement connu
