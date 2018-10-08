@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listeCapitaines" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7db9999e-0b7b-4e97-bfce-8b2c69d65a7b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.report.description" value=""/>
+	<parameter name="championnatId" class="java.lang.Long"/>
+	<queryString language="SQL">
+		<![CDATA[select championnat.annee, championnat.type type_championnat, championnat.categorie categorie_championnat, 
+division.numero division_numero, division.points_min, division.points_max,
+poule.numero poule_numero,
+rencontre.dateheurerencontre,
+terrain.nom terrain_nom,
+visites.code_alphabetique visites_nom,
+visiteurs.code_alphabetique visiteurs_nom
+from championnat 
+inner join division on division.championnat_fk = championnat.id 
+left join poule on poule.division_fk = division.id
+inner join rencontre on rencontre.division_fk = division.id
+left join terrain  on rencontre.terrain_fk = terrain.id
+inner join equipe visites on rencontre.visites_fk=visites.id
+inner join equipe visiteurs on rencontre.visiteurs_fk=visiteurs.id
+where championnat.id = $P{championnatId}
+order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre]]>
+	</queryString>
+	<field name="annee" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="annee"/>
+	</field>
+	<field name="type_championnat" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="type_championnat"/>
+	</field>
+	<field name="categorie_championnat" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="categorie_championnat"/>
+	</field>
+	<field name="division_numero" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="division_numero"/>
+	</field>
+	<field name="points_min" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="points_min"/>
+	</field>
+	<field name="points_max" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="points_max"/>
+	</field>
+	<field name="poule_numero" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="poule_numero"/>
+	</field>
+	<field name="dateheurerencontre" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="dateheurerencontre"/>
+	</field>
+	<field name="terrain_nom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="terrain_nom"/>
+	</field>
+	<field name="visites_nom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="visites_nom"/>
+	</field>
+	<field name="visiteurs_nom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="visiteurs_nom"/>
+	</field>
+	<group name="division">
+		<groupExpression><![CDATA[$F{division_numero}]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+	</group>
+	<group name="poule">
+		<groupExpression><![CDATA[$F{poule_numero}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="290" height="30" backcolor="#E0E0E0" uuid="61296313-d0e1-40f7-a0f6-a645cc3e0c7e"/>
+					<box leftPadding="10">
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Division " + $F{division_numero} + "\t" + ($F{poule_numero}!=null?("Poule "+ $F{poule_numero}):"Interséries")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement mode="Opaque" x="290" y="0" width="265" height="30" backcolor="#E0E0E0" uuid="729616e9-9774-4cdf-b1ab-ca542144e7a1"/>
+					<box rightPadding="10">
+						<topPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Points (min - max) : " + $F{points_min} + " - " + $F{points_max}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#999999" uuid="61dbfdbf-238c-40dc-87fc-10afe0cf5136"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[CALENDRIER]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="30" width="555" height="30" backcolor="#999999" uuid="9dfcd034-5f98-48be-85f4-71f0bc5999a3"/>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type_championnat} + " " + $F{categorie_championnat} + " " + $F{annee}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="80" height="30" uuid="5e9a8734-1745-49b7-afe3-ca2b0eb149ed"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{dateheurerencontre}!=null?(
+	$F{dateheurerencontre}.getDay()==0?"Dimanche":
+	($F{dateheurerencontre}.getDay()==1?"Lundi":
+	($F{dateheurerencontre}.getDay()==2?"Mardi":
+	($F{dateheurerencontre}.getDay()==3?"Mercredi":
+	($F{dateheurerencontre}.getDay()==4?"Jeudi":
+	($F{dateheurerencontre}.getDay()==5?"Vendredi":
+	($F{dateheurerencontre}.getDay()==6?"Samedi":""
+	))))))):""]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupHeight" x="285" y="0" width="135" height="30" uuid="d488d447-01c1-44d1-8a2d-d06736b56e91"/>
+				<box leftPadding="5">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{visites_nom}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupHeight" x="420" y="0" width="135" height="30" uuid="4cdc2991-2aa0-4b79-936c-a29abcc32026"/>
+				<box leftPadding="5">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{visiteurs_nom}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy hh:mm" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupHeight" x="80" y="0" width="85" height="30" uuid="04627e05-464b-424e-aa2b-65c504e16c08"/>
+				<box>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{dateheurerencontre}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="ElementGroupHeight" x="165" y="0" width="120" height="30" uuid="9c6d35c3-6138-496e-ae44-035f70dc6187"/>
+				<box leftPadding="5">
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{terrain_nom}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<textField evaluationTime="Report">
+				<reportElement x="495" y="10" width="50" height="20" uuid="3c47126c-370a-499f-94c7-2e1ae76d218c"/>
+				<box topPadding="3"/>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["/" + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="395" y="10" width="100" height="20" uuid="5f100706-925b-4865-b710-b4448a10b31e"/>
+				<box topPadding="3" rightPadding="1"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

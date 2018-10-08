@@ -17,5 +17,9 @@ public class ReportUtils {
         return ReportUtils.class.getResourceAsStream("/reports/listeCapitaines.jrxml");
     }
 
+    public static InputStream getCalendrierTemplate(){
+        return ReportUtils.class.getResourceAsStream("/reports/calendrier.jrxml");
+    }
+
 
 }

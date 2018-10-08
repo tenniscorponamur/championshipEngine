@@ -6,24 +6,31 @@ import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
 import be.company.fca.service.RencontreService;
 import be.company.fca.utils.DateUtils;
+import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
+import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 @Api(description = "API REST pour la gestion des rencontres")
 public class RencontreController {
 
+    @Autowired
+    DataSource datasource;
     @Autowired
     private RencontreRepository rencontreRepository;
     @Autowired
@@ -426,6 +433,24 @@ public class RencontreController {
             rencontreService.deleteByChampionnat(championnatId);
         }
     }
+
+
+//    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/public/rencontres/calendrier", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId) throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getCalendrierTemplate());
+        Connection conn = datasource.getConnection();
+        Map params = new HashMap();
+        params.put("championnatId", championnatId);
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
+
 
     /**
      * Permet de generer le calendrier d'une poule
