@@ -13,5 +13,9 @@ public class ReportUtils {
         return ReportUtils.class.getResourceAsStream("/reports/listeForce.jrxml");
     }
 
+    public static InputStream getListeCapitainesTemplate(){
+        return ReportUtils.class.getResourceAsStream("/reports/listeCapitaines.jrxml");
+    }
+
 
 }

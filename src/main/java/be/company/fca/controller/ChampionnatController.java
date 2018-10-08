@@ -2,18 +2,31 @@ package be.company.fca.controller;
 
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
+import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
+import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
 @Api(description = "API REST pour la gestion des championnats")
 public class ChampionnatController {
+
+    @Autowired
+    DataSource datasource;
 
     @Autowired
     private ChampionnatRepository championnatRepository;
@@ -136,6 +149,23 @@ public class ChampionnatController {
         }
         return false;
     }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/championnat/listeCapitaines", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getListeCapitaines(@RequestParam Long championnatId) throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getListeCapitainesTemplate());
+        Connection conn = datasource.getConnection();
+        Map params = new HashMap();
+        params.put("championnatId", championnatId);
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
+
 
 //    @RequestMapping(method= RequestMethod.GET, path="/public/championnat/createChampionnat")
 //    public Championnat createChampionnat() {
