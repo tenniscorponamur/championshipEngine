@@ -434,10 +434,8 @@ public class RencontreController {
         }
     }
 
-
-//    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/public/rencontres/calendrier", method= RequestMethod.GET)
-    ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId) throws Exception {
+    ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId, @RequestParam(required = false) boolean excel) throws Exception {
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getCalendrierTemplate());
         Connection conn = datasource.getConnection();
         Map params = new HashMap();
