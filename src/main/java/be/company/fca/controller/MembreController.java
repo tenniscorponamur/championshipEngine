@@ -9,13 +9,16 @@ import be.company.fca.utils.TemplateUtils;
 import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.Api;
 import net.sf.jasperreports.engine.*;
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.util.IOUtils;
 import org.hibernate.sql.Template;
 import org.omg.PortableServer.SERVANT_RETENTION_POLICY_ID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +34,7 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.security.Principal;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -225,6 +229,123 @@ public class MembreController {
         ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
         return response;
     }
+
+
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/membres/export", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getExportMembres() throws Exception {
+
+        List<Membre> membres = (List<Membre>) membreRepository.findAll(new Sort("nom","prenom"));
+
+        Workbook wb = POIUtils.createWorkbook(true);
+        Sheet sheet  = wb.createSheet("Membres"+new SimpleDateFormat("yyyyMMddhhmm").format(new Date()));
+
+        CreationHelper createHelper = wb.getCreationHelper();
+        CellStyle dateCellStyle = wb.createCellStyle();
+        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+
+        Cell firstCell = POIUtils.write(sheet,0,0,"Nom",null,null);
+        POIUtils.write(sheet,0,1,"Prénom",null,null);
+        int dateNaissanceIndex = 2;
+        POIUtils.write(sheet,0,dateNaissanceIndex,"Date de naissance",null,null);
+        POIUtils.write(sheet,0,3,"Age",null,null);
+        POIUtils.write(sheet,0,4,"Genre",null,null);
+        POIUtils.write(sheet,0,5,"Actif",null,null);
+        POIUtils.write(sheet,0,6,"Numéro AFT",null,null);
+        POIUtils.write(sheet,0,7,"Capitaine",null,null);
+        POIUtils.write(sheet,0,8,"Responsable de club",null,null);
+        POIUtils.write(sheet,0,9,"Numéro Corporation",null,null);
+        POIUtils.write(sheet,0,10,"Corporation",null,null);
+        POIUtils.write(sheet,0,11,"Date affiliation AFT",null,null);
+        POIUtils.write(sheet,0,12,"Numéro club AFT",null,null);
+        POIUtils.write(sheet,0,13,"Uniquement Corpo",null,null);
+        POIUtils.write(sheet,0,14,"Date affiliation Corpo",null,null);
+        POIUtils.write(sheet,0,15,"Date désaffiliation Corpo",null,null);
+        POIUtils.write(sheet,0,16,"Points Corpo",null,null);
+        POIUtils.write(sheet,0,17,"Classement AFT",null,null);
+        POIUtils.write(sheet,0,18,"Points AFT",null,null);
+        POIUtils.write(sheet,0,19,"Rue",null,null);
+        POIUtils.write(sheet,0,20,"Numéro",null,null);
+        POIUtils.write(sheet,0,21,"Boite",null,null);
+        POIUtils.write(sheet,0,22,"Code postal",null,null);
+        POIUtils.write(sheet,0,23,"Localite",null,null);
+        POIUtils.write(sheet,0,24,"Grand NAMUR",null,null);
+        POIUtils.write(sheet,0,25,"Province de NAMUR",null,null);
+        POIUtils.write(sheet,0,26,"Téléphone",null,null);
+        POIUtils.write(sheet,0,27,"Gsm",null,null);
+        Cell lastCell =POIUtils.write(sheet,0,28,"Mail",null,null);
+
+        POIUtils.write(sheet,0,29,"Date pivot",null,null);
+        Cell datePivotCell = POIUtils.write(sheet,0,30,new Date(),dateCellStyle,null);
+
+        for (int i=0;i<membres.size();i++){
+            Membre membre = membres.get(i);
+
+            lastCell = POIUtils.write(sheet,i+1,0,membre.getNom(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,1,membre.getPrenom(),null,null);
+            if (membre.getDateNaissance()!=null){
+                lastCell = POIUtils.write(sheet,i+1,2,membre.getDateNaissance(),dateCellStyle,null);
+                String formula= "DATEDIF(" + CellReference.convertNumToColString(dateNaissanceIndex) + (i+2)+ "," + CellReference.convertNumToColString(datePivotCell.getColumnIndex())+"1" + ",\"y\")";
+                lastCell = POIUtils.write(sheet,i+1,3,formula);
+            }
+            lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,5,membre.isActif(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,6,membre.getNumeroAft(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,7,membre.isCapitaine(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,8,membre.isResponsableClub(),null,null);
+            if (membre.getClub()!=null){
+                lastCell = POIUtils.write(sheet,i+1,9,membre.getClub().getNumero(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,10,membre.getClub().getNom(),null,null);
+            }
+            lastCell = POIUtils.write(sheet,i+1,11,membre.getDateAffiliationAft(),dateCellStyle,null);
+            lastCell = POIUtils.write(sheet,i+1,12,membre.getNumeroClubAft(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,13,membre.isOnlyCorpo(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,14,membre.getDateAffiliationCorpo(),dateCellStyle,null);
+            lastCell = POIUtils.write(sheet,i+1,15,membre.getDateDesaffiliationCorpo(),dateCellStyle,null);
+            if (membre.getClassementCorpoActuel()!=null){
+                lastCell = POIUtils.write(sheet,i+1,16,membre.getClassementCorpoActuel().getPoints(),null,null);
+            }
+            if (membre.getClassementAFTActuel()!=null){
+                lastCell = POIUtils.write(sheet,i+1,17,membre.getClassementAFTActuel().getCodeClassement(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,18,membre.getClassementAFTActuel().getPoints(),null,null);
+            }
+            lastCell = POIUtils.write(sheet,i+1,19,membre.getRue(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,20,membre.getRueNumero(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,21,membre.getRueBoite(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,22,membre.getCodePostal(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,23,membre.getLocalite(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,24,false,null,null);
+            lastCell = POIUtils.write(sheet,i+1,25,false,null,null);
+            lastCell = POIUtils.write(sheet,i+1,26,membre.getTelephone(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,27,membre.getGsm(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,28,membre.getMail(),null,null);
+
+        }
+
+        // Freeze de la premiere ligne
+        sheet.createFreezePane(0, 1);
+
+        // Auto-resize des colonnes
+        for (int i=0;i<31;i++){
+            sheet.autoSizeColumn(i);
+        }
+
+        // Filtre defini pour la plage de cellules remplies
+        sheet.setAutoFilter(new CellRangeAddress(firstCell.getRowIndex(), lastCell.getRowIndex(), firstCell.getColumnIndex(), lastCell.getColumnIndex()));
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        wb.write(os);
+        wb.close();
+        os.close();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
+        return response;
+
+    }
+
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/membres/import/template", method= RequestMethod.GET)

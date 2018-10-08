@@ -341,5 +341,28 @@ public class POIUtils {
 
     }
 
+    /**
+     * Ecrit une formule dans une cellule
+     * @param sheet sheet
+     * @param ri ligne
+     * @param ci colonne
+     * @param formula Formule
+     */
+    public static Cell write(Sheet sheet, Integer ri, Integer ci, String formula){
+        Row row = sheet.getRow(ri);
+        if (row == null){
+            row = sheet.createRow(ri);
+        }
+
+        Cell cell = row.getCell(ci);
+        if (cell == null) {
+            cell = row.createCell(ci);
+        }
+
+        cell.setCellType(CellType.FORMULA);
+        cell.setCellFormula(formula);
+
+        return cell;
+    }
 }
 
