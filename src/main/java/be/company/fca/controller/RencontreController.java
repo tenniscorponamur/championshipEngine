@@ -6,9 +6,13 @@ import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
 import be.company.fca.service.RencontreService;
 import be.company.fca.utils.DateUtils;
+import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
 import net.sf.jasperreports.engine.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
+import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.util.*;
 
@@ -436,17 +441,114 @@ public class RencontreController {
 
     @RequestMapping(path="/public/rencontres/calendrier", method= RequestMethod.GET)
     ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId, @RequestParam(required = false) boolean excel) throws Exception {
-        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getCalendrierTemplate());
-        Connection conn = datasource.getConnection();
-        Map params = new HashMap();
-        params.put("championnatId", championnatId);
-        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
-        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
-        conn.close();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/pdf"));
-        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
-        return response;
+        if (excel){
+            Championnat championnat = championnatRepository.findOne(championnatId);
+            List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+            List<Rencontre> rencontres = new ArrayList<>();
+            for (Division division : divisions){
+                rencontres.addAll((Collection<? extends Rencontre>) rencontreRepository.findByDivision(division));
+            }
+            Collections.sort(rencontres, new Comparator<Rencontre>() {
+                @Override
+                public int compare(Rencontre rencontre1, Rencontre rencontre2) {
+                    // Tri : Division, poule nulls last, dateheurerencontre nulls last
+                    int compareDivision = rencontre1.getDivision().getNumero().compareTo(rencontre2.getDivision().getNumero());
+                    if (compareDivision!=0){
+                        return compareDivision;
+                    }else{
+                        if (rencontre1.getPoule()==null && rencontre2.getPoule()!=null){
+                            return 1;
+                        }else if (rencontre1.getPoule()!=null && rencontre2.getPoule()==null){
+                            return -1;
+                        }else{
+                            int comparePoule = 0;
+                            if (rencontre1.getPoule()!=null && rencontre2.getPoule()!=null) {
+                                comparePoule = rencontre1.getPoule().getNumero().compareTo(rencontre2.getPoule().getNumero());
+                            }
+                            if (comparePoule!=0){
+                                return comparePoule;
+                            }else{
+                                if (rencontre1.getDateHeureRencontre()==null && rencontre2.getDateHeureRencontre()==null){
+                                    return 0;
+                                }else if (rencontre1.getDateHeureRencontre()==null && rencontre2.getDateHeureRencontre()!=null){
+                                    return 1;
+                                }else if (rencontre1.getDateHeureRencontre()!=null && rencontre2.getDateHeureRencontre()==null) {
+                                    return -1;
+                                }else{
+                                    return rencontre1.getDateHeureRencontre().compareTo(rencontre2.getDateHeureRencontre());
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            Workbook wb = POIUtils.createWorkbook(true);
+            Sheet sheet  = wb.createSheet("Calendrier_"+championnat.getType()+"_"+championnat.getCategorie()+"_"+championnat.getAnnee());
+
+            CreationHelper createHelper = wb.getCreationHelper();
+            CellStyle dateTimeCellStyle = wb.createCellStyle();
+            dateTimeCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy HH:MM"));
+
+            Cell firstCell = POIUtils.write(sheet,0,0,"Division",null,null);
+            POIUtils.write(sheet,0,1,"Poule",null,null);
+            POIUtils.write(sheet,0,2,"Date/Heure",null,null);
+            POIUtils.write(sheet,0,3,"Terrain",null,null);
+            POIUtils.write(sheet,0,4,"Visites",null,null);
+            Cell lastCell = POIUtils.write(sheet,0,5,"Visiteurs",null,null);
+
+            for (int i=0;i<rencontres.size();i++){
+                Rencontre rencontre = rencontres.get(i);
+
+                lastCell = POIUtils.write(sheet,i+1,0,rencontre.getDivision().getNumero(),null,null);
+                if (rencontre.getPoule()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,1,rencontre.getPoule().getNumero(),null,null);
+                }
+                if (rencontre.getDateHeureRencontre()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,2,rencontre.getDateHeureRencontre(),dateTimeCellStyle,null);
+                }
+                if (rencontre.getTerrain()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,3,rencontre.getTerrain().getNom(),null,null);
+                }
+                lastCell = POIUtils.write(sheet,i+1,4,rencontre.getEquipeVisites().getCodeAlphabetique(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,5,rencontre.getEquipeVisiteurs().getCodeAlphabetique(),null,null);
+
+            }
+
+            // Freeze de la premiere ligne
+            sheet.createFreezePane(0, 1);
+
+            // Auto-resize des colonnes
+            for (int i=0;i<6;i++){
+                sheet.autoSizeColumn(i);
+            }
+
+            // Filtre defini pour la plage de cellules remplies
+            sheet.setAutoFilter(new CellRangeAddress(firstCell.getRowIndex(), lastCell.getRowIndex(), firstCell.getColumnIndex(), lastCell.getColumnIndex()));
+
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            wb.write(os);
+            wb.close();
+            os.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+            ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
+            return response;
+
+        }else{
+            JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getCalendrierTemplate());
+            Connection conn = datasource.getConnection();
+            Map params = new HashMap();
+            params.put("championnatId", championnatId);
+            JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+            byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+            conn.close();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/pdf"));
+            ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+            return response;
+        }
     }
 
 

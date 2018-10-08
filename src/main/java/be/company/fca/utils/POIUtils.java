@@ -276,7 +276,7 @@ public class POIUtils {
      * @param value valeur
      * @param dateCellStyle Style pour la cellule de type Date
      */
-    public static void write(Sheet sheet, Integer ri, Integer ci, Object value, CellStyle dateCellStyle, CellStyle decimalCellStyle){
+    public static Cell write(Sheet sheet, Integer ri, Integer ci, Object value, CellStyle dateCellStyle, CellStyle decimalCellStyle){
         Row row = sheet.getRow(ri);
         if (row == null){
             row = sheet.createRow(ri);
@@ -336,6 +336,8 @@ public class POIUtils {
             //le type devient BLANK
             cell.setCellValue((String) null);
         }
+
+        return cell;
 
     }
 

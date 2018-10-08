@@ -21,7 +21,7 @@ left join terrain  on rencontre.terrain_fk = terrain.id
 inner join equipe visites on rencontre.visites_fk=visites.id
 inner join equipe visiteurs on rencontre.visiteurs_fk=visiteurs.id
 where championnat.id = $P{championnatId}
-order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre]]>
+order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre nulls last]]>
 	</queryString>
 	<field name="annee" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="annee"/>
