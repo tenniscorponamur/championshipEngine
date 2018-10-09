@@ -10,6 +10,7 @@ import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
 import net.sf.jasperreports.engine.*;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
@@ -28,6 +29,7 @@ import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.util.*;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -526,6 +528,79 @@ public class RencontreController {
             // Filtre defini pour la plage de cellules remplies
             sheet.setAutoFilter(new CellRangeAddress(firstCell.getRowIndex(), lastCell.getRowIndex(), firstCell.getColumnIndex(), lastCell.getColumnIndex()));
 
+            Sheet sheetRecap  = wb.createSheet("Recapitulatif");
+
+            Font titleFont = wb.createFont();
+            titleFont.setBold(true);
+            titleFont.setColor(HSSFColor.HSSFColorPredefined.WHITE.getIndex());
+            CellStyle titleStyle = wb.createCellStyle();
+            titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            titleStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_50_PERCENT.getIndex());
+            titleStyle.setFont(titleFont);
+
+            CellStyle clubStyle = wb.createCellStyle();
+            clubStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            clubStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREY_25_PERCENT.getIndex());
+
+            Cell titre = POIUtils.write(sheetRecap,0,0,"Nombre de rencontres par club/équipe",null,null);
+            titre.setCellStyle(titleStyle);
+            Cell titre2 = POIUtils.write(sheetRecap,0,1,null,null,null);
+            titre2.setCellStyle(titleStyle);
+
+            Map<Club,Map<Equipe,List<Rencontre>>> clubsMap = getClubMapFromRencontres(rencontres);
+
+            List<Club> clubs = new ArrayList(clubsMap.keySet());
+            Collections.sort(clubs, new Comparator<Club>() {
+                @Override
+                public int compare(Club o1, Club o2) {
+                    return o1.getNom().compareTo(o2.getNom());
+                }
+            });
+
+            int rowIndex = 1;
+
+            for (Club club : clubs){
+
+                Cell clubCell = POIUtils.write(sheetRecap, rowIndex, 0, club.getNom() + " (" + club.getNumero() +  ")", null, null);
+                clubCell.setCellStyle(clubStyle);
+
+                int nbRencontresClub = 0;
+                for (Equipe equipe : clubsMap.get(club).keySet()){
+                    nbRencontresClub += clubsMap.get(club).get(equipe).size();
+                }
+
+                Cell clubCell2 = POIUtils.write(sheetRecap,rowIndex,1,nbRencontresClub,null,null);
+                clubCell2.setCellStyle(clubStyle);
+
+                List<Equipe> equipes = new ArrayList<>(clubsMap.get(club).keySet());
+                Collections.sort(equipes, new Comparator<Equipe>() {
+                    @Override
+                    public int compare(Equipe o1, Equipe o2) {
+                        return o1.getCodeAlphabetique().compareTo(o2.getCodeAlphabetique());
+                    }
+                });
+
+                rowIndex++;
+
+                for (Equipe equipe : equipes){
+                    POIUtils.write(sheetRecap,rowIndex,0,equipe.getCodeAlphabetique(),null,null);
+                    POIUtils.write(sheetRecap,rowIndex,1,clubsMap.get(club).get(equipe).size(),null,null);
+
+                    rowIndex++;
+                }
+
+            }
+
+            Cell total = POIUtils.write(sheetRecap,rowIndex,0,"TOTAL",null,null);
+            total.setCellStyle(titleStyle);
+            Cell total2 = POIUtils.write(sheetRecap,rowIndex,1,rencontres.size(),null,null);
+            total2.setCellStyle(titleStyle);
+
+            // Auto-resize des colonnes
+            for (int i=0;i<2;i++){
+                sheetRecap.autoSizeColumn(i);
+            }
+
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             wb.write(os);
             wb.close();
@@ -551,6 +626,42 @@ public class RencontreController {
         }
     }
 
+    /**
+     * Permet de recuperer une map des rencontres triees par club et par equipe
+     * @param rencontres
+     * @return
+     */
+    private Map<Club, Map<Equipe ,List<Rencontre>>> getClubMapFromRencontres(List<Rencontre> rencontres){
+        Map<Club, Map<Equipe,List<Rencontre>>> globalMap = new HashMap<>();
+        for (Rencontre rencontre : rencontres){
+            Club clubVisite = rencontre.getEquipeVisites().getClub();
+            Map<Equipe,List<Rencontre>> clubVisiteMap = globalMap.get(clubVisite);
+            if (clubVisiteMap==null){
+                clubVisiteMap = new HashMap<>();
+                globalMap.put(clubVisite,clubVisiteMap);
+            }
+            List<Rencontre> rencontresVisites = clubVisiteMap.get(rencontre.getEquipeVisites());
+            if (rencontresVisites==null){
+                rencontresVisites = new ArrayList<>();
+                clubVisiteMap.put(rencontre.getEquipeVisites(),rencontresVisites);
+            }
+            rencontresVisites.add(rencontre);
+
+            Club clubVisiteur = rencontre.getEquipeVisiteurs().getClub();
+            Map<Equipe,List<Rencontre>> clubVisiteurMap = globalMap.get(clubVisiteur);
+            if (clubVisiteurMap==null){
+                clubVisiteurMap = new HashMap<>();
+                globalMap.put(clubVisiteur,clubVisiteurMap);
+            }
+            List<Rencontre> rencontresVisiteurs = clubVisiteurMap.get(rencontre.getEquipeVisiteurs());
+            if (rencontresVisiteurs==null){
+                rencontresVisiteurs = new ArrayList<>();
+                clubVisiteurMap.put(rencontre.getEquipeVisiteurs(),rencontresVisiteurs);
+            }
+            rencontresVisiteurs.add(rencontre);
+        }
+        return globalMap;
+    }
 
     /**
      * Permet de generer le calendrier d'une poule
