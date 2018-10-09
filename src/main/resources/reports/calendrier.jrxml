@@ -166,7 +166,7 @@ order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre 
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{visiteurs_nom}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy hh:mm" isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
 				<reportElement stretchType="ElementGroupHeight" x="80" y="0" width="85" height="30" uuid="04627e05-464b-424e-aa2b-65c504e16c08"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
