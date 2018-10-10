@@ -15,8 +15,8 @@ public class LocaliteUtils {
      * @return
      */
     public static boolean isGrandNamur(String codePostal){
-        if (!StringUtils.isEmpty(codePostal)){
-            return Arrays.asList(codesPostauxGrandNamur).contains(codePostal);
+        if (!StringUtils.isEmpty(codePostal) && codePostal.trim().length()>0){
+            return Arrays.asList(codesPostauxGrandNamur).contains(codePostal.trim());
         }
         return false;
     }
@@ -28,8 +28,8 @@ public class LocaliteUtils {
      * @return
      */
     public static boolean isProvinceNamur(String codePostal){
-        if (!StringUtils.isEmpty(codePostal)){
-            return Arrays.asList(codesPostauxProvinceNamur).contains(codePostal);
+        if (!StringUtils.isEmpty(codePostal) && codePostal.trim().length()>0){
+            return Arrays.asList(codesPostauxProvinceNamur).contains(codePostal.trim());
         }
         return false;
     }
