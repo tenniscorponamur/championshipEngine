@@ -132,7 +132,7 @@ order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre 
 	<detail>
 		<band height="30" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="80" height="30" uuid="5e9a8734-1745-49b7-afe3-ca2b0eb149ed"/>
+				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="65" height="30" uuid="5e9a8734-1745-49b7-afe3-ca2b0eb149ed"/>
 				<box leftPadding="5">
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
@@ -167,7 +167,7 @@ order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre 
 				<textFieldExpression><![CDATA[$F{visiteurs_nom}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="80" y="0" width="85" height="30" uuid="04627e05-464b-424e-aa2b-65c504e16c08"/>
+				<reportElement stretchType="ElementGroupHeight" x="65" y="0" width="100" height="30" uuid="04627e05-464b-424e-aa2b-65c504e16c08"/>
 				<box>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
