@@ -286,7 +286,7 @@ public class MembreController {
                 String formula= "DATEDIF(" + CellReference.convertNumToColString(dateNaissanceIndex) + (i+2)+ "," + CellReference.convertNumToColString(datePivotCell.getColumnIndex())+"1" + ",\"y\")";
                 lastCell = POIUtils.write(sheet,i+1,3,formula);
             }
-            lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre(),null,null);
+            lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre().toString(),null,null);
             lastCell = POIUtils.write(sheet,i+1,5,membre.isActif(),null,null);
             lastCell = POIUtils.write(sheet,i+1,6,membre.getNumeroAft(),null,null);
             lastCell = POIUtils.write(sheet,i+1,7,membre.isCapitaine(),null,null);
@@ -337,7 +337,7 @@ public class MembreController {
         os.close();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
         ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
         return response;
 
