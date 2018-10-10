@@ -22,6 +22,7 @@ public class RencontreDto {
         this.id = rencontre.getId();
         this.numeroJournee = rencontre.getNumeroJournee();
         this.dateHeureRencontre = rencontre.getDateHeureRencontre();
+        System.err.println("Date heure rencontre : " + this.dateHeureRencontre);
         this.division = rencontre.getDivision();
         this.poule = rencontre.getPoule();
         if (rencontre.getEquipeVisites()!=null){
