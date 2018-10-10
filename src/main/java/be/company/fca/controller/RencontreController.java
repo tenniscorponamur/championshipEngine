@@ -618,6 +618,7 @@ public class RencontreController {
             JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getCalendrierTemplate());
             Connection conn = datasource.getConnection();
             Map params = new HashMap();
+            params.put("REPORT_LOCALE",Locale.FRANCE);
             params.put("championnatId", championnatId);
             JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
             byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
