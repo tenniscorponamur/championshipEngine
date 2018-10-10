@@ -373,17 +373,19 @@ public class MembreController {
                 Object dateNaissanceObj = POIUtils.readDate(sheet,i,3);
                 String genre = POIUtils.readAsString(sheet,i,4);
                 String rue = POIUtils.readAsString(sheet,i,5);
-                String codePostal = POIUtils.readAsString(sheet,i,6);
-                String localite = POIUtils.readAsString(sheet,i,7);
-                String telephone = POIUtils.readAsString(sheet,i,8);
-                String gsm = POIUtils.readAsString(sheet,i,9);
-                String mail = POIUtils.readAsString(sheet,i,10);
-                String responsableClub = POIUtils.readAsString(sheet,i,11);
-                String codeClassementAft = POIUtils.readAsString(sheet,i,12);
-                String pointsAft = POIUtils.readAsString(sheet,i,13);
-                String pointsCorpo = POIUtils.readAsString(sheet,i,14);
-                String numeroClubCorpo = POIUtils.readAsString(sheet,i,15);
-                String numeroClubAft = POIUtils.readAsString(sheet,i,16);
+                String numero = POIUtils.readAsString(sheet,i,6);
+                String boite = POIUtils.readAsString(sheet,i,7);
+                String codePostal = POIUtils.readAsString(sheet,i,8);
+                String localite = POIUtils.readAsString(sheet,i,9);
+                String telephone = POIUtils.readAsString(sheet,i,10);
+                String gsm = POIUtils.readAsString(sheet,i,11);
+                String mail = POIUtils.readAsString(sheet,i,12);
+                String responsableClub = POIUtils.readAsString(sheet,i,13);
+                String codeClassementAft = POIUtils.readAsString(sheet,i,14);
+                String pointsAft = POIUtils.readAsString(sheet,i,15);
+                String pointsCorpo = POIUtils.readAsString(sheet,i,16);
+                String numeroClubCorpo = POIUtils.readAsString(sheet,i,17);
+                String numeroClubAft = POIUtils.readAsString(sheet,i,18);
 
                 if (!StringUtils.isEmpty(numeroAft)){
 
@@ -417,6 +419,8 @@ public class MembreController {
                         }
 
                         membre.setRue(rue);
+                        membre.setRueNumero(numero);
+                        membre.setRueBoite(boite);
                         membre.setCodePostal(codePostal);
                         membre.setLocalite(localite);
                         membre.setTelephone(telephone);
@@ -424,6 +428,11 @@ public class MembreController {
                         membre.setMail(mail);
                         membre.setResponsableClub("1".equals(responsableClub));
                         membre.setNumeroClubAft(numeroClubAft);
+
+                        membre.setOnlyCorpo("6045".equals(numeroClubAft));
+
+                        //TODO : voir quelle date preciser. En attendant, date du jour mise automatiquement
+                        membre.setDateAffiliationCorpo(new Date());
 
                         if ("9999".equals(numeroClubCorpo)){
                             membre.setActif(false);
