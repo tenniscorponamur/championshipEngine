@@ -60,7 +60,7 @@ ORDER BY nom_club ASC,
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{numero_club} + " - " + $F{nom_club}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{nom_club} + " (" + $F{numero_club} + ")"]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

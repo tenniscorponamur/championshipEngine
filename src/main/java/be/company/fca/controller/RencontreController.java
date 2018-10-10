@@ -14,6 +14,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.LocaleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -484,6 +485,8 @@ public class RencontreController {
                     }
                 }
             });
+
+            LocaleUtil.setUserTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 
             Workbook wb = POIUtils.createWorkbook(true);
             Sheet sheet  = wb.createSheet("Calendrier_"+championnat.getType()+"_"+championnat.getCategorie()+"_"+championnat.getAnnee());

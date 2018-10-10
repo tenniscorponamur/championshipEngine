@@ -132,7 +132,7 @@ order by  club_nom, equipe_code]]>
 				<textFieldExpression><![CDATA[$F{equipe_code}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="280" y="0" width="76" height="30" uuid="a2f99815-144b-4fbb-a9e5-aefa0c2c0d7d"/>
+				<reportElement stretchType="ElementGroupHeight" x="280" y="0" width="85" height="30" uuid="a2f99815-144b-4fbb-a9e5-aefa0c2c0d7d"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
@@ -140,17 +140,8 @@ order by  club_nom, equipe_code]]>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{membre_gsm}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="356" y="0" width="74" height="30" uuid="b1e1d5bf-331a-4a8b-969e-f6bbad11c3e9"/>
-				<box leftPadding="2">
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-				</box>
-				<textElement verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{membre_telephone}]]></textFieldExpression>
-			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="430" y="0" width="125" height="30" uuid="e351f3b6-4e51-4393-b8cf-bc8e5bd27521"/>
+				<reportElement stretchType="ElementGroupHeight" x="365" y="0" width="190" height="30" uuid="e351f3b6-4e51-4393-b8cf-bc8e5bd27521"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
