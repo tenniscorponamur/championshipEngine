@@ -444,6 +444,9 @@ public class RencontreController {
 
     @RequestMapping(path="/public/rencontres/calendrier", method= RequestMethod.GET)
     ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId, @RequestParam(required = false) boolean excel) throws Exception {
+
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+
         if (excel){
             Championnat championnat = championnatRepository.findOne(championnatId);
             List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
@@ -486,7 +489,9 @@ public class RencontreController {
                 }
             });
 
-            LocaleUtil.setUserTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+
+
+            LocaleUtil.setUserTimeZone(timeZone);
 
             Workbook wb = POIUtils.createWorkbook(true);
             Sheet sheet  = wb.createSheet("Calendrier_"+championnat.getType()+"_"+championnat.getCategorie()+"_"+championnat.getAnnee());
@@ -618,7 +623,7 @@ public class RencontreController {
             JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getCalendrierTemplate());
             Connection conn = datasource.getConnection();
             Map params = new HashMap();
-            params.put("REPORT_LOCALE",Locale.FRANCE);
+            params.put("REPORT_TIME_ZONE",timeZone);
             params.put("championnatId", championnatId);
             JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
             byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
