@@ -71,6 +71,12 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/user", method = RequestMethod.DELETE)
+    public void deleteUser(@RequestParam Long userId){
+        userRepository.delete(userId);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/changePassword", method = RequestMethod.PUT)
     public boolean updatePassword(Authentication authentication, @RequestBody ChangePasswordDto changePasswordDto ){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
