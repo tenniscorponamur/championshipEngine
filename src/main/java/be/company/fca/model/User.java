@@ -29,9 +29,12 @@ public class User implements UserDetails {
     @Column( name =  "nom", length = 500, nullable = false)
     private String nom;
 
-    //TODO :
-    // Admin role
-    // ForeignKey Membre
+    @Column( name = "admin", nullable = false)
+    private boolean admin=false;
+
+    @ManyToOne
+    @JoinColumn(name = "membre_fk")
+    private Membre membre;
 
     @Transient
     List<GrantedAuthority> authorities = new ArrayList<>();
@@ -76,6 +79,22 @@ public class User implements UserDetails {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public Membre getMembre() {
+        return membre;
+    }
+
+    public void setMembre(Membre membre) {
+        this.membre = membre;
     }
 
     @Override

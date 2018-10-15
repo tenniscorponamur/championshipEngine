@@ -1,6 +1,7 @@
 package be.company.fca.utils;
 
 import be.company.fca.model.Role;
+import be.company.fca.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -13,9 +14,19 @@ public class UserUtils {
      * Roles attribues par defaut a un utilisateur
      * @return Liste des roles attribues par defaut a un utilisateur
      */
-    public static List<String> getDefaultRoles(){
+    public static List<String> getRoles(User user){
         List<String> roles = new ArrayList<String>();
-        roles.add(Role.ADMIN_USER.toString());
+        if (user.isAdmin()){
+            roles.add(Role.ADMIN_USER.toString());
+        }
+        if (user.getMembre()!=null){
+            if (user.getMembre().isCapitaine()){
+                roles.add(Role.CAPITAINE.toString());
+            }
+            if (user.getMembre().isResponsableClub()){
+                roles.add(Role.RESPONSABLE_CLUB.toString());
+            }
+        }
         return roles;
     }
 

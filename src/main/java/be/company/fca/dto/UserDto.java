@@ -10,6 +10,8 @@ public class UserDto {
     private String username;
     private String prenom;
     private String nom;
+    private boolean admin;
+    private MembreDto membre;
     private List<String> roles;
 
     public UserDto() {
@@ -20,7 +22,27 @@ public class UserDto {
         this.username=user.getUsername();
         this.prenom=user.getPrenom();
         this.nom=user.getNom();
+        this.admin=user.isAdmin();
+        if (user.getMembre()!=null){
+            this.membre = new MembreDto(user.getMembre(),false);
+        }
         this.roles=roles;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public MembreDto getMembre() {
+        return membre;
+    }
+
+    public void setMembre(MembreDto membre) {
+        this.membre = membre;
     }
 
     public List<String> getRoles() {

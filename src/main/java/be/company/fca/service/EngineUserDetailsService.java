@@ -32,7 +32,7 @@ public class EngineUserDetailsService implements UserDetailsService {
         }
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String role : UserUtils.getDefaultRoles()){
+        for (String role : UserUtils.getRoles(user)){
             authorities.add(new SimpleGrantedAuthority(role));
         }
         user.setAuthorities(authorities);

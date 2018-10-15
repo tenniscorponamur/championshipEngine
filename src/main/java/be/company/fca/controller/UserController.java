@@ -2,8 +2,10 @@ package be.company.fca.controller;
 
 import be.company.fca.dto.ChangePasswordDto;
 import be.company.fca.dto.UserDto;
+import be.company.fca.model.Membre;
 import be.company.fca.model.Role;
 import be.company.fca.model.User;
+import be.company.fca.repository.MembreRepository;
 import be.company.fca.repository.UserRepository;
 import be.company.fca.utils.PasswordUtils;
 import be.company.fca.utils.UserUtils;
@@ -27,18 +29,26 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MembreRepository membreRepository;
+
     @ApiOperation(value = "Get current user",
             notes = "Ceci est une méthode privée pour récupérer l'utilisateur reconnu par le token d'accès")
     @RequestMapping(method=RequestMethod.GET, path="/private/user/current")
     public UserDto getCurrentUser(Principal principal) {
         User user = userRepository.findByUsername(principal.getName().toLowerCase());
-        return new UserDto(user, UserUtils.getDefaultRoles());
+        return new UserDto(user,UserUtils.getRoles(user));
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/users", method= RequestMethod.GET)
-    public Iterable<User> getAllUsers(){
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers(){
+        List<UserDto> usersDto = new ArrayList<>();
+        List<User> userList = (List<User>) userRepository.findAll();
+        for (User user : userList){
+            usersDto.add(new UserDto(user,UserUtils.getRoles(user)));
+        }
+        return usersDto;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -54,8 +64,13 @@ public class UserController {
         user.setUsername(userDto.getUsername().toLowerCase());
         user.setPrenom(userDto.getPrenom());
         user.setNom(userDto.getNom());
+        user.setAdmin(userDto.isAdmin());
+        if (userDto.getMembre()!=null && userDto.getMembre().getId()!=null){
+            Membre membre = membreRepository.findOne(userDto.getMembre().getId());
+            user.setMembre(membre);
+        }
         userRepository.save(user);
-        return new UserDto(user,UserUtils.getDefaultRoles());
+        return new UserDto(user,UserUtils.getRoles(user));
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -65,9 +80,14 @@ public class UserController {
         user.setUsername(userDto.getUsername().toLowerCase());
         user.setPrenom(userDto.getPrenom());
         user.setNom(userDto.getNom());
+        user.setAdmin(userDto.isAdmin());
+        if (userDto.getMembre()!=null && userDto.getMembre().getId()!=null){
+            Membre membre = membreRepository.findOne(userDto.getMembre().getId());
+            user.setMembre(membre);
+        }
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
         userRepository.save(user);
-        return new UserDto(user,UserUtils.getDefaultRoles());
+        return new UserDto(user,UserUtils.getRoles(user));
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
