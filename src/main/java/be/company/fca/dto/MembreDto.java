@@ -37,6 +37,9 @@ public class MembreDto {
     private String gsm;
     private String mail;
 
+    public MembreDto() {
+    }
+
     /**
      * Constructeur permettant de filtrer les donnees du membre a transmettre aux appelants
      * @param membre

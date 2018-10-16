@@ -68,6 +68,8 @@ public class UserController {
         if (userDto.getMembre()!=null && userDto.getMembre().getId()!=null){
             Membre membre = membreRepository.findOne(userDto.getMembre().getId());
             user.setMembre(membre);
+        }else{
+            user.setMembre(null);
         }
         userRepository.save(user);
         return new UserDto(user,UserUtils.getRoles(user));
@@ -84,6 +86,8 @@ public class UserController {
         if (userDto.getMembre()!=null && userDto.getMembre().getId()!=null){
             Membre membre = membreRepository.findOne(userDto.getMembre().getId());
             user.setMembre(membre);
+        }else{
+            user.setMembre(null);
         }
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
         userRepository.save(user);
