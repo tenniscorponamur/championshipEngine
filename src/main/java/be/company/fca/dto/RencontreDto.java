@@ -14,6 +14,7 @@ public class RencontreDto {
     private EquipeDto equipeVisites;
     private EquipeDto equipeVisiteurs;
     private Terrain terrain;
+    private Court court;
     private Integer pointsVisites;
     private Integer pointsVisiteurs;
     private boolean valide;
@@ -31,6 +32,7 @@ public class RencontreDto {
             this.equipeVisiteurs = new EquipeDto(rencontre.getEquipeVisiteurs());
         }
         this.terrain = rencontre.getTerrain();
+        this.court = rencontre.getCourt();
         this.pointsVisites = rencontre.getPointsVisites();
         this.pointsVisiteurs = rencontre.getPointsVisiteurs();
         this.valide = rencontre.isValide();
@@ -98,6 +100,14 @@ public class RencontreDto {
 
     public void setTerrain(Terrain terrain) {
         this.terrain = terrain;
+    }
+
+    public Court getCourt() {
+        return court;
+    }
+
+    public void setCourt(Court court) {
+        this.court = court;
     }
 
     public Integer getPointsVisites() {
