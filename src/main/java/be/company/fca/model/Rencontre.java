@@ -40,6 +40,10 @@ public class Rencontre {
     @JoinColumn(name = "terrain_fk")
     private Terrain terrain;
 
+    @ManyToOne
+    @JoinColumn(name = "court_fk")
+    private Court court;
+
     @Column( name =  "pointsvisites")
     private Integer pointsVisites;
 
@@ -103,6 +107,14 @@ public class Rencontre {
 
     public void setTerrain(Terrain terrain) {
         this.terrain = terrain;
+    }
+
+    public Court getCourt() {
+        return court;
+    }
+
+    public void setCourt(Court court) {
+        this.court = court;
     }
 
     public Date getDateHeureRencontre() {

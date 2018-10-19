@@ -1,9 +1,6 @@
 package be.company.fca.controller;
 
-import be.company.fca.model.Club;
-import be.company.fca.model.HoraireTerrain;
-import be.company.fca.model.Terrain;
-import be.company.fca.model.TypeChampionnat;
+import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +22,9 @@ public class TerrainController {
 
     @Autowired
     private HoraireTerrainRepository horaireTerrainRepository;
+
+    @Autowired
+    private CourtRepository courtRepository;
 
     @Autowired
     private ClubRepository clubRepository;
@@ -50,6 +50,13 @@ public class TerrainController {
         Terrain terrain = new Terrain();
         terrain.setId(terrainId);
         return horaireTerrainRepository.findByTerrain(terrain);
+    }
+
+    @RequestMapping(path="/public/terrain/{terrainId}/courts", method= RequestMethod.GET)
+    List<Court> getCourtsTerrain(@PathVariable("terrainId") Long terrainId) {
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
+        return courtRepository.findByTerrain(terrain);
     }
 
     @RequestMapping(path="/public/horairesTerrain", method= RequestMethod.GET)
@@ -120,5 +127,29 @@ public class TerrainController {
     @RequestMapping(value = "/private/terrain/{terrainId}/horaire", method = RequestMethod.DELETE)
     public void deleteHoraireTerrain(@PathVariable("terrainId") Long terrainId, @RequestParam Long horaireTerrainId){
         horaireTerrainRepository.delete(horaireTerrainId);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain/{terrainId}/court", method = RequestMethod.PUT)
+    public Court updateCourt(@PathVariable("terrainId") Long terrainId, @RequestBody Court court){
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
+        court.setTerrain(terrain);
+        return courtRepository.save(court);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain/{terrainId}/court", method = RequestMethod.POST)
+    public Court addCourt(@PathVariable("terrainId") Long terrainId,@RequestBody Court court){
+        Terrain terrain = new Terrain();
+        terrain.setId(terrainId);
+        court.setTerrain(terrain);
+        return courtRepository.save(court);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/terrain/{terrainId}/court", method = RequestMethod.DELETE)
+    public void deleteCourt(@PathVariable("terrainId") Long terrainId, @RequestParam Long courtId){
+        courtRepository.delete(courtId);
     }
 }
