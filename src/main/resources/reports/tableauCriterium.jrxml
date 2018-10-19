@@ -41,7 +41,6 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<parameter name="championnatId" class="java.lang.Long"/>
 	<parameter name="date" class="java.util.Date"/>
 	<queryString language="SQL">
 		<![CDATA[select 
@@ -59,7 +58,7 @@ inner join equipe visites on visites.id = rencontre.visites_fk
 inner join equipe visiteurs on visiteurs.id = rencontre.visiteurs_fk 
 inner join court on court.id = rencontre.court_fk
 inner join championnat on championnat.id = division.championnat_fk
-where championnat.id = $P{championnatId}
+where championnat.type = 'CRITERIUM'
 and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} as date),'YYYY-MM-DD')]]>
 	</queryString>
 	<field name="categorie" class="java.lang.String">

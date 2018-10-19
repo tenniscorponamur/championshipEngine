@@ -166,11 +166,10 @@ public class ChampionnatController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/championnat/tableauCriterium", method= RequestMethod.GET)
-    ResponseEntity<byte[]> getListeCapitaines(@RequestParam Long championnatId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
+    ResponseEntity<byte[]> getTableauCriterium(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumTemplate());
         Connection conn = datasource.getConnection();
         Map params = new HashMap();
-        params.put("championnatId", championnatId);
         params.put("date", date);
         JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
         byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
