@@ -103,6 +103,16 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
             " where rencontre.equipeVisites =:equipe or rencontre.equipeVisiteurs = :equipe")
     Iterable<Rencontre> findRencontresByEquipe(@Param("equipe") Equipe equipe);
 
+
+    /**
+     * Permet de recuperer les rencontres se jouant une date donnee
+     * @param date
+     * @return
+     */
+    @Query(value = "select * from rencontre " +
+            " where to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast(:date AS date),'YYYY-MM-DD') ", nativeQuery = true)
+    List<Rencontre> getRencontresByDate(@Param("date") Date date);
+
     /**
      * Permet de recuperer les {X} dernieres rencontres validees (derniers resultats)
      * @return

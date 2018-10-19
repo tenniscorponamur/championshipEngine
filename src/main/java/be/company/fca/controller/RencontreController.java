@@ -99,6 +99,11 @@ public class RencontreController {
         return rencontreRepository.getNextMeetings(DateUtils.shrinkToDay(new Date()),pageRequest);
     }
 
+    @RequestMapping(method= RequestMethod.GET, path="/public/rencontres/byDate")
+    public List<Rencontre> getComingMeetings(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date){
+        return rencontreRepository.getRencontresByDate(date);
+    }
+
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre", method = RequestMethod.POST)
     public Rencontre createRencontre(@RequestBody Rencontre rencontre){
