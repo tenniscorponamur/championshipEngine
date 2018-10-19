@@ -6,6 +6,7 @@ import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
 import net.sf.jasperreports.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -157,6 +155,23 @@ public class ChampionnatController {
         Connection conn = datasource.getConnection();
         Map params = new HashMap();
         params.put("championnatId", championnatId);
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/championnat/tableauCriterium", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getListeCapitaines(@RequestParam Long championnatId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumTemplate());
+        Connection conn = datasource.getConnection();
+        Map params = new HashMap();
+        params.put("championnatId", championnatId);
+        params.put("date", date);
         JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
         byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
         conn.close();

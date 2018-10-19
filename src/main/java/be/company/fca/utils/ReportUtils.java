@@ -21,5 +21,8 @@ public class ReportUtils {
         return ReportUtils.class.getResourceAsStream("/reports/calendrier.jrxml");
     }
 
+    public static InputStream getTableauCriteriumTemplate(){
+        return ReportUtils.class.getResourceAsStream("/reports/tableauCriterium.jrxml");
+    }
 
 }
