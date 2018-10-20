@@ -17,6 +17,7 @@ public class RencontreDto {
     private Court court;
     private Integer pointsVisites;
     private Integer pointsVisiteurs;
+    private boolean resultatsEncodes;
     private boolean valide;
 
     public RencontreDto(Rencontre rencontre) {
@@ -35,6 +36,7 @@ public class RencontreDto {
         this.court = rencontre.getCourt();
         this.pointsVisites = rencontre.getPointsVisites();
         this.pointsVisiteurs = rencontre.getPointsVisiteurs();
+        this.resultatsEncodes = rencontre.isResultatsEncodes();
         this.valide = rencontre.isValide();
     }
 
@@ -132,5 +134,13 @@ public class RencontreDto {
 
     public void setValide(boolean valide) {
         this.valide = valide;
+    }
+
+    public boolean isResultatsEncodes() {
+        return resultatsEncodes;
+    }
+
+    public void setResultatsEncodes(boolean resultatsEncodes) {
+        this.resultatsEncodes = resultatsEncodes;
     }
 }

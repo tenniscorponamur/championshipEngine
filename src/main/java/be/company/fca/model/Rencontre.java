@@ -50,6 +50,9 @@ public class Rencontre {
     @Column( name =  "pointsvisiteurs")
     private Integer pointsVisiteurs;
 
+    @Column( name = "resultats_encodes", nullable = false)
+    private boolean resultatsEncodes=false;
+
     @Column( name = "valide", nullable = false)
     private boolean valide=false;
 
@@ -147,6 +150,14 @@ public class Rencontre {
 
     public void setValide(boolean valide) {
         this.valide = valide;
+    }
+
+    public boolean isResultatsEncodes() {
+        return resultatsEncodes;
+    }
+
+    public void setResultatsEncodes(boolean resultatsEncodes) {
+        this.resultatsEncodes = resultatsEncodes;
     }
 
     @Override
