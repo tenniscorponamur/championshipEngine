@@ -5,6 +5,7 @@ import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
 import be.company.fca.service.RencontreService;
+import be.company.fca.service.TraceService;
 import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.ReportUtils;
@@ -24,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
@@ -49,6 +51,9 @@ public class RencontreController {
     private PouleRepository pouleRepository;
     @Autowired
     private ChampionnatRepository championnatRepository;
+
+    @Autowired
+    private TraceService traceService;
 
     @Autowired
     private ClassementService classementService;
@@ -223,13 +228,19 @@ public class RencontreController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/resultatsEncodes", method = RequestMethod.PUT)
-    public boolean updateResultatsEncodes(@PathVariable("rencontreId") Long rencontreId, @RequestBody boolean resultatsEncodes) {
+    public boolean updateResultatsEncodes(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean resultatsEncodes, @RequestBody(required = false) String message) {
+
+        String trace = "";
+
         if (resultatsEncodes) {
 
             //TODO : seul le capitaine visites, responsable club visite et admin peuvent signaler la fin de l'encodage --> via le test "is.."
 
+            // TODO : tracer qui a finalisé l'encodage --> table pour conserver l'activite sur une rencontre
+
             if (isResultatsCloturables(rencontreId)) {
                 rencontreRepository.updateResultatsEncodes(rencontreId, resultatsEncodes);
+                trace = "Encodage des résultats terminé";
             } else {
                 return false;
             }
@@ -239,35 +250,54 @@ public class RencontreController {
                 // TODO : Les capitaines des equipes, responsable de clubs et admin peuvent demander la poursuite de l'encodage --> via le test "is..."
 
                 rencontreRepository.updateResultatsEncodes(rencontreId, resultatsEncodes);
+                trace = "Poursuite de l'encodage des résultats";
             }
         }
+
+        if (message!=null){
+            trace += " : " + message;
+        }
+
+        traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
 
         return resultatsEncodes;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/validite", method = RequestMethod.PUT)
-    public boolean updateValiditeRencontre(@PathVariable("rencontreId") Long rencontreId, @RequestBody boolean validite) {
+    public boolean updateValiditeRencontre(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean validite, @RequestBody(required = false) String message) {
+
+        String trace = "";
+
         if (validite) {
 
             //TODO : seul le capitaine visiteurs, responsable club visiteur et admin peuvent signaler la fin de l'encodage --> via le test "is.."
 
             if (isRencontreValidable(rencontreId)) {
                 rencontreRepository.updateValiditeRencontre(rencontreId, validite);
+                trace = "Validation des résultats";
             } else {
                 return false;
             }
         } else {
 
             // TODO : only admin peut devalider une rencontre tant que le championnat n'est pas cloture
+            // TODO : tracer qui a validé
 
             Rencontre rencontre = rencontreRepository.findOne(rencontreId);
             if (!rencontre.getDivision().getChampionnat().isCloture()){
                 rencontreRepository.updateValiditeRencontre(rencontreId, validite);
+                trace = "Dévalidation des résultats";
             }else{
                 return true;
             }
         }
+
+        if (message!=null){
+            trace += " : " + message;
+        }
+
+        traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
 
         return validite;
     }
