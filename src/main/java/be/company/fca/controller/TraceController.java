@@ -26,16 +26,9 @@ public class TraceController {
     @Autowired
     TraceRepository traceRepository;
 
-    @RequestMapping(value = "/public/traces", method = RequestMethod.GET)
+    @RequestMapping(value = "/private/traces", method = RequestMethod.GET)
     public List<Trace> getTraces(Authentication authentication, @RequestParam String type, @RequestParam String foreignKey){
-        //TODO : getByTypeAndForeignKey + order by date desc
-        return (List<Trace>) traceRepository.findAll();
+        return traceRepository.findByTypeAndForeignKeyOrderByDateHeureDesc(type,foreignKey);
     }
-
-    @RequestMapping(value = "/private/trace", method = RequestMethod.POST)
-    public Trace addTrace(Authentication authentication, @RequestParam String type, @RequestParam String foreignKey, @RequestBody String message){
-        return traceService.addTrace(authentication.getName(),type,foreignKey,message);
-    }
-
 
 }
