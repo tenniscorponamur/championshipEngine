@@ -155,50 +155,71 @@ public class ClassementServiceImpl implements ClassementService {
         // Ce classement n'est construit que pour le criterium
         // Parcourir les equipes et les classements des poules --> attribuer des points aux clubs concernes
 
-        Championnat championnat = championnatRepository.findOne(championnatId);
-        if (TypeChampionnat.CRITERIUM.equals(championnat.getType())){
+        Championnat championnatSelected = championnatRepository.findOne(championnatId);
+
+        if (TypeChampionnat.CRITERIUM.equals(championnatSelected.getType())) {
+            // Boucler sur les championnats CRITERIUM de la saison correspondante
+
+            List<Championnat> championnats = championnatRepository.findByTypeAndAnnee(TypeChampionnat.CRITERIUM, championnatSelected.getAnnee());
 
             Map<Club, Integer> pointsClub = new HashMap<>();
 
-            List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
-            for (Division division : divisions){
-                List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
-                for (Poule poule : poules){
-                    Classement classement = getClassementPoule(poule);
-                    List<ClassementEquipe> classementEquipes = classement.getClassementEquipes();
-                    for (int i=0;i<classementEquipes.size();i++){
-                        ClassementEquipe classementEquipe = classementEquipes.get(i);
-                        Club club = classementEquipe.getEquipe().getClub();
+            for (Championnat championnat : championnats) {
 
-                        //TODO : etablir la regle d'attribution des points (je n'ai pas compris jusqu'a present
-                        // Conflit entre le mail expliquant le systeme et ce qui est present sur le site
-                        Integer pointsAttribues = Math.max(2 - i,0);
+                List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+                for (Division division : divisions) {
+                    Map<Club, Integer> nbEquipesClubs = new HashMap<>();
+                    List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+                    for (Poule poule : poules) {
+                        Classement classement = getClassementPoule(poule);
+                        List<ClassementEquipe> classementEquipes = classement.getClassementEquipes();
+                        for (int i = 0; i < classementEquipes.size(); i++) {
+                            ClassementEquipe classementEquipe = classementEquipes.get(i);
+                            Club club = classementEquipe.getEquipe().getClub();
 
-                        Integer points = pointsClub.get(club);
-                        if (points==null){
-                            points = 0;
+                            // Dans chaque classement, on prend les 2 premieres equipes du club
+                            // Pour la premiere, on multiplie par 2 les points obtenus (sets gagnés)
+                            // Pour la seconde, on prend directement les points obtenus
+                            // Pas de points pour la troisieme equipe
+
+                            // Premiere equipe du club dans ce classement -> setsGagnes * 2
+                            // Seconde equipe du club dans ce classement -> setsGagnes * 1
+                            // Troisieme et suivante -> setGagnes * 0 = 0
+
+                            Integer nbEquipesClubInClassement = nbEquipesClubs.get(club);
+                            if (nbEquipesClubInClassement == null) {
+                                nbEquipesClubInClassement = 0;
+                            }
+                            Integer pointsAttribues = Math.max(2 - nbEquipesClubInClassement, 0) * classementEquipe.getSetsGagnes();
+                            nbEquipesClubInClassement = nbEquipesClubInClassement + 1;
+                            nbEquipesClubs.put(club, nbEquipesClubInClassement);
+
+                            // Ajout des points pour le club
+                            Integer points = pointsClub.get(club);
+                            if (points == null) {
+                                points = 0;
+                            }
+                            points += pointsAttribues;
+                            pointsClub.put(club, points);
                         }
-                        points+=pointsAttribues;
-                        pointsClub.put(club, points);
                     }
                 }
-            }
 
-            for (Club club : pointsClub.keySet()){
-                ClassementClub classementClub = new ClassementClub();
-                classementClub.setClub(club);
-                classementClub.setPoints(pointsClub.get(club));
-                classementClubs.add(classementClub);
-            }
-
-            Collections.sort(classementClubs, new Comparator<ClassementClub>() {
-                @Override
-                public int compare(ClassementClub o1, ClassementClub o2) {
-                    return (-1) * Integer.compare(o1.getPoints(),o2.getPoints());
+                for (Club club : pointsClub.keySet()) {
+                    ClassementClub classementClub = new ClassementClub();
+                    classementClub.setClub(club);
+                    classementClub.setPoints(pointsClub.get(club));
+                    classementClubs.add(classementClub);
                 }
-            });
-        }
 
+                Collections.sort(classementClubs, new Comparator<ClassementClub>() {
+                    @Override
+                    public int compare(ClassementClub o1, ClassementClub o2) {
+                        return (-1) * Integer.compare(o1.getPoints(), o2.getPoints());
+                    }
+                });
+            }
+        }
         return classementClubs;
     }
 
