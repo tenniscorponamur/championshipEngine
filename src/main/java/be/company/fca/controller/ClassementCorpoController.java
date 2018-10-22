@@ -91,13 +91,19 @@ public class ClassementCorpoController {
 
         List<Match> matchs = (List<Match>) matchRepository.findValidesByMembreBetweenDates(membre.getId(),DateUtils.shrinkToDay(startDate),DateUtils.shrinkToDay(endDate));
 
+        // On va filtrer la liste des matchs valides en analysant si tous les joueurs sont bien precises pour simple et double
+        // Les matchs où des joueurs manquent à l'appel sont comptabilisés pour les points des rencontres mais ne rentrent pas
+        // en ligne de compte pour le calcul des classements
+
+        List<Match> matchsValables = filtreMatchsValables(matchs);
+
         // On ne calcule un nouveau classement qu'a partir de 3 matchs joues
 
         Integer totalGagnesPerdus = 0;
 
-        if (matchs.size()>=3){
+        if (matchsValables.size()>=3){
 
-            for (Match match : matchs){
+            for (Match match : matchsValables){
 
                 Integer differencePoints = getDifferencePoints(match,membre);
 
@@ -134,6 +140,29 @@ public class ClassementCorpoController {
 
         return classementCorpo;
 
+    }
+
+    /**
+     * Permet de retourner la liste des matchs "valables" d'une liste de matchs
+     * On entend par match valable, un match à prendre en compte pour le calcul des classements corpo
+     * Pour ce faire, il faut que le match référence bien tous les joueurs (2 adversaires pour simple, 4 adversaires pour double)
+     * @param matchs
+     * @return
+     */
+    private List<Match> filtreMatchsValables(List<Match> matchs){
+        List<Match> matchsValables = new ArrayList<>();
+        for (Match match : matchs){
+            if (TypeMatch.SIMPLE.equals(match.getType())){
+                if (match.getJoueurVisites1()!=null && match.getJoueurVisiteurs1()!=null){
+                    matchsValables.add(match);
+                }
+            }else if (TypeMatch.DOUBLE.equals(match.getType())){
+                if (match.getJoueurVisites1()!=null && match.getJoueurVisiteurs1()!=null && match.getJoueurVisites2()!=null && match.getJoueurVisiteurs2()!=null){
+                    matchsValables.add(match);
+                }
+            }
+        }
+        return matchsValables;
     }
 
     private enum ResultatMatch {
