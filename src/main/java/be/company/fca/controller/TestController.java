@@ -34,38 +34,39 @@ public class TestController {
     String home() {
         return "Tennis Corpo Engine started !";
     }
-
-    @RequestMapping("/testRapport")
-    ResponseEntity<byte[]> testRapport() throws Exception {
-
-        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getRapportTest());
-
-        // Get the connection
-        Connection conn = datasource.getConnection();
-
-        // Generate jasper print
-
-        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, new HashMap(), conn);
-
-        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
-
-        conn.close();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/pdf"));
-//        String filename = "RapportTest.pdf";
-//        headers.setContentDispositionFormData(filename, filename);
-//        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-//        headers.add("content-disposition", "inline; filename=" + filename);
-        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
-        return response;
-    }
+//
+//    @RequestMapping("/testRapport")
+//    ResponseEntity<byte[]> testRapport() throws Exception {
+//
+//        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getRapportTest());
+//
+//        // Get the connection
+//        Connection conn = datasource.getConnection();
+//
+//        // Generate jasper print
+//
+//        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, new HashMap(), conn);
+//
+//        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+//
+//        conn.close();
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+////        String filename = "RapportTest.pdf";
+////        headers.setContentDispositionFormData(filename, filename);
+////        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+////        headers.add("content-disposition", "inline; filename=" + filename);
+//        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+//        return response;
+//    }
 
     @RequestMapping("/public/testWithoutAuth")
     String testWithoutAuth() {
         return "Test public";
     }
 
+/*
     @RequestMapping("/public/testMail")
     void testMail(@RequestParam String mailAdress) {
 
@@ -89,6 +90,7 @@ public class TestController {
             ex.printStackTrace(System.err);
         }
     }
+    */
 
     @RequestMapping("/private/testWithAuth")
     @PreAuthorize("hasAuthority('ADMIN_USER') or hasAuthority('STANDARD_USER')")

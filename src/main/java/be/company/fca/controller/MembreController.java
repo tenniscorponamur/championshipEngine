@@ -175,10 +175,26 @@ public class MembreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/resetPassword", method = RequestMethod.POST)
+    public boolean resetPassword(@PathVariable("membreId") Long membreId){
+        Membre membre = membreRepository.findOne(membreId);
+        if (!StringUtils.isEmpty(membre.getMail())){
+            String newPassword = PasswordUtils.generatePassword();
+            boolean mailSended = MailUtils.sendPasswordMail(membre.getPrenom(),membre.getNom(),membre.getMail(),newPassword);
+            if (mailSended){
+                membre.setPassword(newPassword);
+                membreRepository.save(membre);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
-        newMembre.setPassword(PasswordUtils.DEFAULT_PASSWORD);
+        newMembre.setPassword(PasswordUtils.DEFAULT_MEMBER_PASSWORD);
         newMembre.setGenre(membre.getGenre());
         newMembre.setPrenom(membre.getPrenom());
         newMembre.setNom(membre.getNom());

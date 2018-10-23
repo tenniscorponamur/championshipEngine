@@ -137,8 +137,6 @@ public class UserController {
     @RequestMapping(value = "/private/user/resetPassword", method = RequestMethod.POST)
     public boolean resetPassword(@RequestParam Long id){
 
-        //TODO : pour les membres, associer un mot de passe et prevoir un envoi de mail avec un mot de passe genere par le systeme
-
         User user = userRepository.findOne(id);
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
         userRepository.save(user);
