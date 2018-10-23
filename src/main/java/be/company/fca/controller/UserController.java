@@ -38,9 +38,13 @@ public class UserController {
     public UserDto getCurrentUser(Principal principal) {
 
         // Pour l'authentification des membres
-        //TODO : si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+        // Si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
 
         User user = userRepository.findByUsername(principal.getName().toLowerCase());
+        if (user==null){
+            Membre membre = membreRepository.findByNumeroAft(principal.getName());
+            user = UserUtils.getUserFromMembre(membre);
+        }
         return new UserDto(user,UserUtils.getRoles(user));
     }
 
@@ -107,9 +111,12 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/changePassword", method = RequestMethod.PUT)
     public boolean updatePassword(Authentication authentication, @RequestBody ChangePasswordDto changePasswordDto ){
+
+        //TODO : pour les membres, prevoir une propriete conservant le mot de passe
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         User user = userRepository.findByUsername(authentication.getName());
-        if (encoder.matches(changePasswordDto.getOldPassword(),user.getPassword())){
+        if (user!=null && encoder.matches(changePasswordDto.getOldPassword(),user.getPassword())){
             user.setPassword(encoder.encode(changePasswordDto.getNewPassword()));
             userRepository.save(user);
             return true;
@@ -121,6 +128,8 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/resetPassword", method = RequestMethod.POST)
     public boolean resetPassword(@RequestParam Long id){
+
+        //TODO : pour les membres, associer un mot de passe et prevoir un envoi de mail avec un mot de passe genere
 
         User user = userRepository.findOne(id);
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);

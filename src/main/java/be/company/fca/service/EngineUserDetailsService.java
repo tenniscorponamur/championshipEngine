@@ -1,8 +1,10 @@
 package be.company.fca.service;
 
 import be.company.fca.dto.UserDto;
+import be.company.fca.model.Membre;
 import be.company.fca.model.Role;
 import be.company.fca.model.User;
+import be.company.fca.repository.MembreRepository;
 import be.company.fca.repository.UserRepository;
 import be.company.fca.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,20 @@ public class EngineUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MembreRepository membreRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username.toLowerCase());
 
         // Pour l'authentification des membres
-        //TODO : si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+        // Si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+
+        if (user==null){
+            Membre membre = membreRepository.findByNumeroAft(username);
+            user = UserUtils.getUserFromMembre(membre);
+        }
 
         if (user==null){
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", username));

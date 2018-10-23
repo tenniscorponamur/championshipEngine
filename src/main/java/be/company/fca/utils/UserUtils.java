@@ -1,5 +1,6 @@
 package be.company.fca.utils;
 
+import be.company.fca.model.Membre;
 import be.company.fca.model.Role;
 import be.company.fca.model.User;
 import org.springframework.security.core.Authentication;
@@ -9,6 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserUtils {
+
+    /**
+     * Permet de construire un utilisateur sur base d'un membre
+     * @param membre
+     * @return
+     */
+    public static User getUserFromMembre(Membre membre){
+        if (membre.isActif()){
+            User user = new User();
+            user.setUsername(membre.getNumeroAft());
+            user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
+            user.setPrenom(membre.getPrenom());
+            user.setNom(membre.getNom());
+            user.setMembre(membre);
+            return user;
+        }
+        return null;
+    }
 
     /**
      * Roles attribues par defaut a un utilisateur
