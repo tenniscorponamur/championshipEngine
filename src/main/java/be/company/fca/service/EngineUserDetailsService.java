@@ -27,6 +27,9 @@ public class EngineUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username.toLowerCase());
 
+        // Pour l'authentification des membres
+        //TODO : si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+
         if (user==null){
             throw new UsernameNotFoundException(String.format("The username %s doesn't exist", username));
         }

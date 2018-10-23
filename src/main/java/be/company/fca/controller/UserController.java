@@ -36,6 +36,10 @@ public class UserController {
             notes = "Ceci est une méthode privée pour récupérer l'utilisateur reconnu par le token d'accès")
     @RequestMapping(method=RequestMethod.GET, path="/private/user/current")
     public UserDto getCurrentUser(Principal principal) {
+
+        // Pour l'authentification des membres
+        //TODO : si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+
         User user = userRepository.findByUsername(principal.getName().toLowerCase());
         return new UserDto(user,UserUtils.getRoles(user));
     }
