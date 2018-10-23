@@ -1,6 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.utils.ReportUtils;
+import com.sendgrid.*;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.export.JRHtmlExporterContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.sql.DataSource;
@@ -62,6 +64,30 @@ public class TestController {
     @RequestMapping("/public/testWithoutAuth")
     String testWithoutAuth() {
         return "Test public";
+    }
+
+    @RequestMapping("/public/testMail")
+    void testMail(@RequestParam String mailAdress) {
+
+        Email from = new Email("noreply@tenniscorponamur.be");
+        String subject = "Hello World from the SendGrid Java Library!";
+        Email to = new Email(mailAdress);
+        Content content = new Content("text/plain", "Hello, Email!");
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+        Request request = new Request();
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+            System.out.println(response.getHeaders());
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
     }
 
     @RequestMapping("/private/testWithAuth")
