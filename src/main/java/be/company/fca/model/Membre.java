@@ -20,6 +20,9 @@ public class Membre {
     @Column( name =  "nom", length = 500, nullable = false)
     private String nom;
 
+    @Column( name =  "password", length = 500, nullable = false)
+    private String password;
+
     @Temporal(TemporalType.DATE)
     @Column( name = "dateNaissance" )
     private Date dateNaissance;
@@ -304,6 +307,14 @@ public class Membre {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

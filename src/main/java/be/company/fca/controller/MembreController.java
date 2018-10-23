@@ -178,6 +178,7 @@ public class MembreController {
     @RequestMapping(value = "/private/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
+        newMembre.setPassword(PasswordUtils.DEFAULT_PASSWORD);
         newMembre.setGenre(membre.getGenre());
         newMembre.setPrenom(membre.getPrenom());
         newMembre.setNom(membre.getNom());

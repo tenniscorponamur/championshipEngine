@@ -108,18 +108,26 @@ public class UserController {
         userRepository.delete(userId);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+
     @RequestMapping(value = "/private/user/changePassword", method = RequestMethod.PUT)
     public boolean updatePassword(Authentication authentication, @RequestBody ChangePasswordDto changePasswordDto ){
-
-        //TODO : pour les membres, prevoir une propriete conservant le mot de passe
-
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         User user = userRepository.findByUsername(authentication.getName());
-        if (user!=null && encoder.matches(changePasswordDto.getOldPassword(),user.getPassword())){
-            user.setPassword(encoder.encode(changePasswordDto.getNewPassword()));
-            userRepository.save(user);
-            return true;
+        if (user!=null){
+            // On teste si le mot de passe coïncide
+            if (encoder.matches(changePasswordDto.getOldPassword(),user.getPassword())) {
+                user.setPassword(encoder.encode(changePasswordDto.getNewPassword()));
+                userRepository.save(user);
+                return true;
+            }
+        }else{
+            Membre membre = membreRepository.findByNumeroAft(authentication.getName());
+            // On teste si le mot de passe coïncide
+            if (encoder.matches(changePasswordDto.getOldPassword(),membre.getPassword())) {
+                membre.setPassword(encoder.encode(changePasswordDto.getNewPassword()));
+                membreRepository.save(membre);
+                return true;
+            }
         }
         return false;
     }
@@ -129,7 +137,7 @@ public class UserController {
     @RequestMapping(value = "/private/user/resetPassword", method = RequestMethod.POST)
     public boolean resetPassword(@RequestParam Long id){
 
-        //TODO : pour les membres, associer un mot de passe et prevoir un envoi de mail avec un mot de passe genere
+        //TODO : pour les membres, associer un mot de passe et prevoir un envoi de mail avec un mot de passe genere par le systeme
 
         User user = userRepository.findOne(id);
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);

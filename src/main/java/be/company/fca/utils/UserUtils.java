@@ -20,7 +20,7 @@ public class UserUtils {
         if (membre.isActif()){
             User user = new User();
             user.setUsername(membre.getNumeroAft());
-            user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
+            user.setPassword(membre.getPassword());
             user.setPrenom(membre.getPrenom());
             user.setNom(membre.getNom());
             user.setMembre(membre);
