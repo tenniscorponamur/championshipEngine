@@ -122,6 +122,17 @@ public class RencontreController {
         return rencontreRepository.save(rencontre);
     }
 
+    // TODO : permettre a certains utilisateurs d'autoriser d'autres membres a encoder/valider les resultats
+    // TODO : nouvelles methodes d'autorisations qui seront egalement appeles avant la sauvegarde/suppression des autorisations sur des rencontres
+
+    // Deux types d'autorisation : encodage et validation
+
+    // --> ces autorisations sont accessibles par uniquement les capitaines, responsables de club de l'equipe concernee + administrateur
+    // Entite Autorisation = typeAutorisation (enum:encodage/validation), membreFk, rencontreFk
+
+    // Les methodes de modification des resultats et validation sont etendues pour recuperer la liste de ces autorisations sur base de la rencontre
+
+
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isResultatsModifiables", method = RequestMethod.GET)
     public boolean isResultatsRencontreModifiables(@PathVariable("rencontreId") Long rencontreId) {
@@ -225,6 +236,8 @@ public class RencontreController {
         }
         return false;
     }
+
+    //TODO : envoi d'un mail/sms si poursuite ou validation a effectuer
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/resultatsEncodes", method = RequestMethod.PUT)

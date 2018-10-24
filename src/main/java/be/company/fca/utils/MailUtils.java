@@ -7,6 +7,9 @@ import java.io.IOException;
 
 public class MailUtils {
 
+
+    //TODO : alternative possible : MailJet
+
     /**
      * Permet d'envoyer le nouveau mot de passe a un utilisateur
      * @param mailTo

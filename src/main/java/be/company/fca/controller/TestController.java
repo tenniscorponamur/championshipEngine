@@ -34,6 +34,11 @@ public class TestController {
     String home() {
         return "Tennis Corpo Engine started !";
     }
+
+//    @RequestMapping("/login/google")
+//    String loginGoogle() {
+//        return "Tennis Corpo Engine login with Google !";
+//    }
 //
 //    @RequestMapping("/testRapport")
 //    ResponseEntity<byte[]> testRapport() throws Exception {
