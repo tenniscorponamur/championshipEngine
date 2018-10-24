@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
@@ -182,7 +183,8 @@ public class MembreController {
             String newPassword = PasswordUtils.generatePassword();
             boolean mailSended = MailUtils.sendPasswordMail(membre.getPrenom(),membre.getNom(),membre.getMail(),newPassword);
             if (mailSended){
-                membre.setPassword(newPassword);
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                membre.setPassword(encoder.encode(newPassword));
                 membreRepository.save(membre);
                 return true;
             }
