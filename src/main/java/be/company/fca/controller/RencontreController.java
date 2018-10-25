@@ -6,6 +6,7 @@ import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
 import be.company.fca.service.RencontreService;
 import be.company.fca.service.TraceService;
+import be.company.fca.service.UserService;
 import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.ReportUtils;
@@ -44,6 +45,8 @@ public class RencontreController {
     @Autowired
     private RencontreRepository rencontreRepository;
     @Autowired
+    private AutorisationRencontreRepository autorisationrencontreRepository;
+    @Autowired
     private EquipeRepository equipeRepository;
     @Autowired
     private DivisionRepository divisionRepository;
@@ -59,6 +62,8 @@ public class RencontreController {
     private ClassementService classementService;
     @Autowired
     private RencontreService rencontreService;
+    @Autowired
+    private UserService userService;
 
     // DTO pour les capitaines d'equipe afin de ne pas recuperer les donnees privees
 
@@ -122,16 +127,93 @@ public class RencontreController {
         return rencontreRepository.save(rencontre);
     }
 
-    // TODO : permettre a certains utilisateurs d'autoriser d'autres membres a encoder/valider les resultats
-    // TODO : nouvelles methodes d'autorisations qui seront egalement appeles avant la sauvegarde/suppression des autorisations sur des rencontres
-
-    // Deux types d'autorisation : encodage et validation
+    // Permettre a certains utilisateurs d'autoriser d'autres membres a encoder/valider les resultats
 
     // --> ces autorisations sont accessibles par uniquement les capitaines, responsables de club de l'equipe concernee + administrateur
     // Entite Autorisation = typeAutorisation (enum:encodage/validation), membreFk, rencontreFk
 
-    // Les methodes de modification des resultats et validation sont etendues pour recuperer la liste de ces autorisations sur base de la rencontre
+    // Nouvelles methodes d'autorisations qui seront egalement appeles avant la sauvegarde/suppression des autorisations sur des rencontres
 
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/canAuthoriseEncodage", method = RequestMethod.GET)
+    public boolean canAuthoriseEncodage(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+        if (rencontreId!=null){
+            if (userService.isAdmin(authentication)){
+                return true;
+            }
+            // On va analyser si l'utilisateur connecte est capitaine de l'equipe visitee ou responsable du club de l'equipe visitee
+            Membre membre = userService.getMembreFromAuthentication(authentication);
+            if (membre!=null){
+                Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+                if (membre.equals(rencontre.getEquipeVisites().getCapitaine())){
+                    return true;
+                }
+                if (rencontre.getEquipeVisites().getClub().equals(membre.getClub())){
+                    return membre.isResponsableClub();
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/canAuthoriseValidation", method = RequestMethod.GET)
+    public boolean canAuthoriseValidation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+        if (rencontreId!=null){
+            if (userService.isAdmin(authentication)){
+                return true;
+            }
+            // On va analyser si l'utilisateur connecte est capitaine de l'equipe visiteur ou responsable du club de l'equipe visiteur
+            Membre membre = userService.getMembreFromAuthentication(authentication);
+            if (membre!=null){
+                Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+                if (membre.equals(rencontre.getEquipeVisiteurs().getCapitaine())){
+                    return true;
+                }
+                if (rencontre.getEquipeVisiteurs().getClub().equals(membre.getClub())){
+                    return membre.isResponsableClub();
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisations", method = RequestMethod.GET)
+    public List<AutorisationRencontre> getAutorisations(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+        return autorisationrencontreRepository.findByRencontreFk(rencontreId);
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.POST)
+    public AutorisationRencontre addAutorisation(Authentication authentication, @RequestBody AutorisationRencontre autorisationRencontre){
+        if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
+            if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
+                return autorisationrencontreRepository.save(autorisationRencontre);
+            }
+        }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
+            if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
+                return autorisationrencontreRepository.save(autorisationRencontre);
+            }
+        }
+        throw new RuntimeException("Not authorized");
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.DELETE)
+    public void removeAutorisation(Authentication authentication, @RequestParam Long autorisationRencontreId){
+        AutorisationRencontre autorisationRencontre = autorisationrencontreRepository.findOne(autorisationRencontreId);
+        if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
+            if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
+                autorisationrencontreRepository.delete(autorisationRencontreId);
+            }
+        }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
+            if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
+                autorisationrencontreRepository.delete(autorisationRencontreId);
+            }
+        }
+        throw new RuntimeException("Not authorized");
+    }
+
+
+    // TODO : Les methodes de modification des resultats et validation sont etendues pour recuperer la liste de ces autorisations sur base de la rencontre
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isResultatsModifiables", method = RequestMethod.GET)

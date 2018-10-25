@@ -3,6 +3,7 @@ package be.company.fca.controller;
 import be.company.fca.dto.MembreDto;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
+import be.company.fca.service.UserService;
 import be.company.fca.utils.*;
 import io.swagger.annotations.Api;
 import net.sf.jasperreports.engine.*;
@@ -61,6 +62,9 @@ public class MembreController {
     @Autowired
     private ClassementAFTRepository classementAFTRepository;
 
+    @Autowired
+    private UserService userService;
+
     // DTO pour les membres afin de ne pas recuperer l'adresse si on n'est pas authentifie
 
     @RequestMapping(method= RequestMethod.GET, path="/public/membres")
@@ -77,9 +81,10 @@ public class MembreController {
             membres = (List<Membre>) membreRepository.findAll();
         }
 
+        boolean privateInformationsAuthorized = userService.isPrivateInformationsAuthorized(authentication);
         for (Membre membre : membres){
-            if (UserUtils.isPrivateInformationsAuthorized(authentication) || membre.isActif()){
-                membresDto.add(new MembreDto(membre,UserUtils.isPrivateInformationsAuthorized(authentication)));
+            if (privateInformationsAuthorized || membre.isActif()){
+                membresDto.add(new MembreDto(membre,privateInformationsAuthorized));
             }
         }
 

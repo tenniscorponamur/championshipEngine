@@ -49,19 +49,4 @@ public class UserUtils {
         return roles;
     }
 
-    /**
-     * Permet de determiner si un utilisateur connecte peut acceder aux informations privees des membres
-     * @param authentication Utilisateur connecte
-     * @return true si l'utilisateur connecte peut acceder aux informations privees des membres
-     */
-    public static boolean isPrivateInformationsAuthorized(Authentication authentication){
-        if (authentication!=null){
-            List<String> roles = new ArrayList<>();
-            for (GrantedAuthority grantedAuthority : authentication.getAuthorities()){
-                roles.add(grantedAuthority.getAuthority());
-            }
-            return roles.contains(Role.ADMIN_USER.toString());
-        }
-        return false;
-    }
 }
