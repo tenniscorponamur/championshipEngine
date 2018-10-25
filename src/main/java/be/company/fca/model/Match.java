@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -8,7 +10,11 @@ import java.util.Objects;
 public class Match {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "match-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "match-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "ordre", nullable = false)

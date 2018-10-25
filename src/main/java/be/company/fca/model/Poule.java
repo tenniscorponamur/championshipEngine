@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -8,7 +10,11 @@ import java.util.Objects;
 public class Poule {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "poule-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "poule-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "numero", nullable = false)

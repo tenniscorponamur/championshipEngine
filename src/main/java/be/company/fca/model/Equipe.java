@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -8,7 +10,11 @@ import java.util.Objects;
 public class Equipe {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "equipe-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "equipe-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     // Code alphabetique pour preciser le "numero" de l'equipe. Ex : UNAMUR B

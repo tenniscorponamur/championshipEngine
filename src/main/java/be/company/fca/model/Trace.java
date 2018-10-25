@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -9,7 +11,11 @@ import java.util.Objects;
 public class Trace {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "trace-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "trace-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "dateheure")

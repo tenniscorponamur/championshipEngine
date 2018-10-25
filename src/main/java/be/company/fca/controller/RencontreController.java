@@ -1,6 +1,8 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.AutorisationRencontreDto;
 import be.company.fca.dto.RencontreDto;
+import be.company.fca.exceptions.ForbiddenException;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.service.ClassementService;
@@ -179,37 +181,45 @@ public class RencontreController {
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisations", method = RequestMethod.GET)
-    public List<AutorisationRencontre> getAutorisations(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
-        return autorisationrencontreRepository.findByRencontreFk(rencontreId);
+    public List<AutorisationRencontreDto> getAutorisations(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+        List<AutorisationRencontreDto> autorisationRencontreDtos = new ArrayList<>();
+        List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByRencontreFk(rencontreId);
+        for (AutorisationRencontre autorisationRencontre: autorisationRencontres){
+            autorisationRencontreDtos.add(new AutorisationRencontreDto(autorisationRencontre));
+        }
+        return autorisationRencontreDtos;
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.POST)
-    public AutorisationRencontre addAutorisation(Authentication authentication, @RequestBody AutorisationRencontre autorisationRencontre){
+    public AutorisationRencontreDto addAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestBody AutorisationRencontre autorisationRencontre){
+        autorisationRencontre.setRencontreFk(rencontreId);
         if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
             if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
-                return autorisationrencontreRepository.save(autorisationRencontre);
+                return new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
             }
         }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
             if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
-                return autorisationrencontreRepository.save(autorisationRencontre);
+                return new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
             }
         }
-        throw new RuntimeException("Not authorized");
+        throw new ForbiddenException();
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.DELETE)
-    public void removeAutorisation(Authentication authentication, @RequestParam Long autorisationRencontreId){
+    public boolean removeAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long autorisationRencontreId){
         AutorisationRencontre autorisationRencontre = autorisationrencontreRepository.findOne(autorisationRencontreId);
         if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
             if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
                 autorisationrencontreRepository.delete(autorisationRencontreId);
+                return true;
             }
         }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
             if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
                 autorisationrencontreRepository.delete(autorisationRencontreId);
+                return true;
             }
         }
-        throw new RuntimeException("Not authorized");
+        throw new ForbiddenException();
     }
 
 

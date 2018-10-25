@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -8,7 +10,11 @@ import java.util.Objects;
 public class Set {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "set-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "set-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "ordre", nullable = false)

@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -8,7 +10,11 @@ import java.util.Objects;
 public class Terrain {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "terrain-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "terrain-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "nom", nullable = false)

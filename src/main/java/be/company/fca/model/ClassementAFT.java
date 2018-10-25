@@ -1,5 +1,7 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -11,7 +13,11 @@ public class ClassementAFT {
     // afin de pouvoir gerer une adaptation du reglement sans impacter les anciens codes
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "classement-aft-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "classement-aft-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "codeclassement", nullable = false)
