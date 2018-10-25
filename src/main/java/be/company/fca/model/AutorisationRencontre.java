@@ -1,5 +1,9 @@
 package be.company.fca.model;
 
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.id.enhanced.SequenceStyleGenerator;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,7 +11,11 @@ import javax.persistence.*;
 public class AutorisationRencontre {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "autorisation-rencontre-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "autorisation-rencontre-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "type", nullable = false)

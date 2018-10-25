@@ -1,5 +1,6 @@
 package be.company.fca.model;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -14,7 +15,11 @@ import java.util.Objects;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GenericGenerator(
+            name = "user-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
+    @GeneratedValue(generator = "user-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column( name =  "username", length = 500, nullable = false, unique = true)
