@@ -177,7 +177,7 @@ public class MembreController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/resetPassword", method = RequestMethod.POST)
-    public boolean resetPassword(@PathVariable("membreId") Long membreId){
+    public boolean resetMemberPassword(@PathVariable("membreId") Long membreId){
         Membre membre = membreRepository.findOne(membreId);
         if (!StringUtils.isEmpty(membre.getMail())){
             String newPassword = PasswordUtils.generatePassword();
@@ -207,7 +207,7 @@ public class MembreController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/membre/{membreId}/deletable", method= RequestMethod.GET)
-    public boolean isDeletable(@PathVariable("membreId") Long membreId){
+    public boolean isMembreDeletable(@PathVariable("membreId") Long membreId){
 
         Membre membre = new Membre();
         membre.setId(membreId);
@@ -226,7 +226,7 @@ public class MembreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre", method = RequestMethod.DELETE)
     public void deleteMembre(@RequestParam Long membreId){
-        if (isDeletable(membreId)){
+        if (isMembreDeletable(membreId)){
             classementCorpoRepository.deleteByMembreFk(membreId);
             classementAFTRepository.deleteByMembreFk(membreId);
             membreRepository.delete(membreId);

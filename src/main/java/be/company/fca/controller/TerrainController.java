@@ -78,7 +78,7 @@ public class TerrainController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/terrain/{terrainId}/deletable", method= RequestMethod.GET)
-    public boolean isDeletable(@PathVariable("terrainId") Long terrainId){
+    public boolean isTerrainDeletable(@PathVariable("terrainId") Long terrainId){
         Terrain terrain = new Terrain();
         terrain.setId(terrainId);
 
@@ -99,7 +99,7 @@ public class TerrainController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/terrain", method = RequestMethod.DELETE)
     public void deleteTerrain(@RequestParam Long terrainId){
-        if (isDeletable(terrainId)){
+        if (isTerrainDeletable(terrainId)){
             terrainRepository.delete(terrainId);
         }
     }

@@ -135,7 +135,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user/resetPassword", method = RequestMethod.POST)
-    public boolean resetPassword(@RequestParam Long id){
+    public boolean resetUserPassword(@RequestParam Long id){
 
         User user = userRepository.findOne(id);
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);

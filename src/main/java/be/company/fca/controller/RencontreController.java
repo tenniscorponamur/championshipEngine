@@ -106,7 +106,7 @@ public class RencontreController {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/public/rencontres/byDate")
-    public List<Rencontre> getComingMeetings(@RequestParam @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+    public List<Rencontre> getRencontresByDate(@RequestParam @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
         return rencontreRepository.getRencontresByDate(date);
     }
 

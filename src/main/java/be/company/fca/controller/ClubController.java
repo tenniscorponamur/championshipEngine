@@ -51,7 +51,7 @@ public class ClubController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/club/{clubId}/deletable", method= RequestMethod.GET)
-    public boolean isDeletable(@PathVariable("clubId") Long clubId){
+    public boolean isClubDeletable(@PathVariable("clubId") Long clubId){
         Club club = new Club();
         club.setId(clubId);
 
@@ -69,7 +69,7 @@ public class ClubController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/club", method = RequestMethod.DELETE)
     public void deleteClub(@RequestParam Long clubId){
-        if (isDeletable(clubId)){
+        if (isClubDeletable(clubId)){
             clubRepository.delete(clubId);
         }
     }
