@@ -7,18 +7,28 @@ import be.company.fca.model.Role;
 import be.company.fca.model.User;
 import be.company.fca.repository.MembreRepository;
 import be.company.fca.repository.UserRepository;
+import be.company.fca.utils.MailUtils;
 import be.company.fca.utils.PasswordUtils;
 import be.company.fca.utils.UserUtils;
 import io.swagger.annotations.*;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -142,6 +152,59 @@ public class UserController {
         userRepository.save(user);
 
         return true;
+    }
+
+    @RequestMapping(value = "/public/user/askPassword", method = RequestMethod.POST)
+    public boolean getOfficialAFT(@RequestParam("numeroAft") String numeroAft, @RequestBody String captchaResponse){
+
+        // secretKey en variable d'environnement
+
+        String recaptchaSecretKey = System.getenv("RECAPTCHA_SECRET_KEY");
+        if (StringUtils.isEmpty(recaptchaSecretKey)){
+            return false;
+        }
+
+        boolean captchaCheck = false;
+        try{
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            String result = restTemplate.postForObject("https://www.google.com/recaptcha/api/siteverify?secret="+recaptchaSecretKey+"&response="+captchaResponse, request,String.class);
+
+            JsonNode jsonNode = new ObjectMapper().readTree(result);
+            captchaCheck = jsonNode.findValue("success").asBoolean();
+
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
+        //Si le captcha est correct, on continue
+        if (!captchaCheck){
+            return false;
+        }
+
+        // Verifier que le numero Aft est connu
+        Membre membre = membreRepository.findByNumeroAft(numeroAft);
+        if (membre==null){
+            return false;
+        }
+
+        // Verifier qu'il y a bien un mail connu
+        if (!StringUtils.isEmpty(membre.getMail())){
+            String newPassword = PasswordUtils.generatePassword();
+            boolean mailSended = MailUtils.sendPasswordMail(membre.getPrenom(),membre.getNom(),membre.getMail(),newPassword);
+            // Verifier que le mail a bien ete envoye
+            if (mailSended){
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                membre.setPassword(encoder.encode(newPassword));
+                membreRepository.save(membre);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
