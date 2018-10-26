@@ -143,16 +143,8 @@ public class RencontreController {
                 return true;
             }
             // On va analyser si l'utilisateur connecte est capitaine de l'equipe visitee ou responsable du club de l'equipe visitee
-            Membre membre = userService.getMembreFromAuthentication(authentication);
-            if (membre!=null){
-                Rencontre rencontre = rencontreRepository.findOne(rencontreId);
-                if (membre.equals(rencontre.getEquipeVisites().getCapitaine())){
-                    return true;
-                }
-                if (rencontre.getEquipeVisites().getClub().equals(membre.getClub())){
-                    return membre.isResponsableClub();
-                }
-            }
+            Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+            return isCapitaineOrResponsableClub(authentication,rencontre.getEquipeVisites());
         }
 
         return false;
@@ -165,16 +157,8 @@ public class RencontreController {
                 return true;
             }
             // On va analyser si l'utilisateur connecte est capitaine de l'equipe visiteur ou responsable du club de l'equipe visiteur
-            Membre membre = userService.getMembreFromAuthentication(authentication);
-            if (membre!=null){
-                Rencontre rencontre = rencontreRepository.findOne(rencontreId);
-                if (membre.equals(rencontre.getEquipeVisiteurs().getCapitaine())){
-                    return true;
-                }
-                if (rencontre.getEquipeVisiteurs().getClub().equals(membre.getClub())){
-                    return membre.isResponsableClub();
-                }
-            }
+            Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+            return isCapitaineOrResponsableClub(authentication,rencontre.getEquipeVisiteurs());
         }
 
         return false;
@@ -223,31 +207,51 @@ public class RencontreController {
     }
 
 
-    // TODO : Les methodes de modification des resultats et validation sont etendues pour recuperer la liste de ces autorisations sur base de la rencontre
+    // Les methodes de modification des resultats et validation sont etendues pour recuperer la liste de ces autorisations sur base de la rencontre
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isResultatsModifiables", method = RequestMethod.GET)
-    public boolean isResultatsRencontreModifiables(@PathVariable("rencontreId") Long rencontreId) {
+    public boolean isResultatsRencontreModifiables(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
 
-        //TODO : tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin
-        //TODO : factoriser ce test car utile pour d'autres methodes ci-dessous
+        // Tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin + analyse des autorisations donnees
 
         Rencontre rencontre = rencontreRepository.findOne(rencontreId);
         if (!rencontre.isResultatsEncodes() && !rencontre.isValide()){
             if (rencontre.getDivision().getChampionnat() != null) {
                 if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()) {
-                    return true;
+
+                    // Administrateur : OK
+                    if (userService.isAdmin(authentication)){
+                        return true;
+                    }
+                    // Capitaine Equipe visites : OK
+                    // Responsable Club visite : OK
+                    Membre membre = userService.getMembreFromAuthentication(authentication);
+                    boolean capitaineOrResponsableVisites = isCapitaineOrResponsableClub(membre,rencontre.getEquipeVisites());
+                    if (capitaineOrResponsableVisites){
+                        return true;
+                    }
+
+                    // Analyse des autorisations
+
+                    List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByRencontreFk(rencontreId);
+                    for (AutorisationRencontre autorisationRencontre : autorisationRencontres){
+                        if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType()) && autorisationRencontre.getMembre().equals(membre)){
+                            return true;
+                        }
+                    }
+
                 }
             }
         }
         return false;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isResultatsCloturables", method = RequestMethod.GET)
-    public boolean isResultatsCloturables(@PathVariable("rencontreId") Long rencontreId) {
+    public boolean isResultatsCloturables(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
 
-        //TODO : tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin
+        // Tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin ou en fonction des autorisations
+
+        boolean totauxSuffisants = false;
 
         Rencontre rencontre = rencontreRepository.findOne(rencontreId);
 
@@ -272,7 +276,7 @@ public class RencontreController {
                             // 6 rencontres de 2 points chacune
 
                             Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
-                            return totalPoints == 12;
+                            totauxSuffisants = totalPoints == 12;
                         }
 
                     } else if (TypeChampionnat.COUPE_HIVER.equals(championnat.getType())) {
@@ -281,14 +285,14 @@ public class RencontreController {
 
                         if (rencontre.getPointsVisites() != null && rencontre.getPointsVisiteurs() != null) {
                             Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
-                            return totalPoints == 8;
+                            totauxSuffisants = totalPoints == 8;
                         }
 
                     } else if (TypeChampionnat.CRITERIUM.equals(championnat.getType())) {
 
                         if (rencontre.getPointsVisites() != null && rencontre.getPointsVisiteurs() != null) {
                             Integer totalPoints = rencontre.getPointsVisites() + rencontre.getPointsVisiteurs();
-                            return totalPoints == 2;
+                            totauxSuffisants = totalPoints == 2;
                         }
 
                     }
@@ -296,34 +300,104 @@ public class RencontreController {
             }
         }
 
+        if (totauxSuffisants){
+
+            // Administrateur : OK
+            if (userService.isAdmin(authentication)){
+                return true;
+            }
+            // Capitaine Equipe visites : OK
+            // Responsable Club visite : OK
+            Membre membre = userService.getMembreFromAuthentication(authentication);
+            boolean capitaineOrResponsableVisites = isCapitaineOrResponsableClub(membre,rencontre.getEquipeVisites());
+            if (capitaineOrResponsableVisites){
+                return true;
+            }
+
+            // Analyse des autorisations
+
+            List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByRencontreFk(rencontreId);
+            for (AutorisationRencontre autorisationRencontre : autorisationRencontres){
+                if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType()) && autorisationRencontre.getMembre().equals(membre)){
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isPoursuiteEncodagePossible", method = RequestMethod.GET)
-    public boolean isPoursuiteEncodagePossible(@PathVariable("rencontreId") Long rencontreId) {
+    public boolean isPoursuiteEncodagePossible(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
 
-        //TODO : tester le fait d'etre capitaine des equipes ou responsables des clubs ou admin
+        // Tester le fait d'etre capitaine des equipes ou responsables des clubs ou admin
 
         Rencontre rencontre = rencontreRepository.findOne(rencontreId);
         if (rencontre.isResultatsEncodes() && !rencontre.isValide()) {
             if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()){
-                return true;
+
+
+                // Administrateur : OK
+                if (userService.isAdmin(authentication)){
+                    return true;
+                }
+                // Capitaine Equipe visites : OK
+                // Responsable Club visite : OK
+                Membre membre = userService.getMembreFromAuthentication(authentication);
+                boolean capitaineOrResponsableVisites = isCapitaineOrResponsableClub(membre,rencontre.getEquipeVisites());
+                if (capitaineOrResponsableVisites){
+                    return true;
+                }
+                boolean capitaineOrResponsableVisiteurs = isCapitaineOrResponsableClub(membre,rencontre.getEquipeVisiteurs());
+                if (capitaineOrResponsableVisiteurs){
+                    return true;
+                }
+
+                // Analyse des autorisations
+
+                List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByRencontreFk(rencontreId);
+                for (AutorisationRencontre autorisationRencontre : autorisationRencontres){
+                    if (autorisationRencontre.getMembre().equals(membre)){
+                        return true;
+                    }
+                }
+
             }
         }
         return false;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isValidable", method = RequestMethod.GET)
-    public boolean isRencontreValidable(@PathVariable("rencontreId") Long rencontreId) {
+    public boolean isRencontreValidable(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
 
-        //TODO : tester le fait d'etre capitaine de l'equipe visiteurs ou resp. visiteurs ou admin
+        // Tester le fait d'etre capitaine de l'equipe visiteurs ou resp. visiteurs ou admin
 
         Rencontre rencontre = rencontreRepository.findOne(rencontreId);
         if (rencontre.isResultatsEncodes() && !rencontre.isValide()) {
             if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()){
-                return true;
+
+                // Administrateur : OK
+                if (userService.isAdmin(authentication)){
+                    return true;
+                }
+                // Capitaine Equipe visiteurs : OK
+                // Responsable Club visiteur : OK
+                Membre membre = userService.getMembreFromAuthentication(authentication);
+                boolean capitaineOrResponsableVisiteurs = isCapitaineOrResponsableClub(membre,rencontre.getEquipeVisiteurs());
+                if (capitaineOrResponsableVisiteurs){
+                    return true;
+                }
+
+                // Analyse des autorisations
+
+                List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByRencontreFk(rencontreId);
+                for (AutorisationRencontre autorisationRencontre : autorisationRencontres){
+                    if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType()) && autorisationRencontre.getMembre().equals(membre)){
+                        return true;
+                    }
+                }
+
+
             }
         }
         return false;
@@ -331,7 +405,6 @@ public class RencontreController {
 
     //TODO : envoi d'un mail/sms si poursuite ou validation a effectuer
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/resultatsEncodes", method = RequestMethod.PUT)
     public boolean updateResultatsEncodes(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean resultatsEncodes, @RequestBody(required = false) String message) {
 
@@ -339,20 +412,19 @@ public class RencontreController {
 
         if (resultatsEncodes) {
 
-            //TODO : seul le capitaine visites, responsable club visite et admin peuvent signaler la fin de l'encodage --> via le test "is.."
+            // seul le capitaine visites, responsable club visite et admin peuvent signaler la fin de l'encodage --> via le test "is.."
+            // tracer qui a finalisé l'encodage --> table pour conserver l'activite sur une rencontre
 
-            // TODO : tracer qui a finalisé l'encodage --> table pour conserver l'activite sur une rencontre
-
-            if (isResultatsCloturables(rencontreId)) {
+            if (isResultatsCloturables(authentication,rencontreId)) {
                 rencontreRepository.updateResultatsEncodes(rencontreId, resultatsEncodes);
                 trace = "Encodage des résultats terminé";
             } else {
                 return false;
             }
         } else {
-            if (isPoursuiteEncodagePossible(rencontreId)){
+            if (isPoursuiteEncodagePossible(authentication,rencontreId)){
 
-                // TODO : Les capitaines des equipes, responsable de clubs et admin peuvent demander la poursuite de l'encodage --> via le test "is..."
+                // Les capitaines des equipes, responsable de clubs et admin peuvent demander la poursuite de l'encodage --> via le test "is..."
 
                 rencontreRepository.updateResultatsEncodes(rencontreId, resultatsEncodes);
                 trace = "Poursuite de l'encodage des résultats";
@@ -368,7 +440,6 @@ public class RencontreController {
         return resultatsEncodes;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/rencontre/{rencontreId}/validite", method = RequestMethod.PUT)
     public boolean updateValiditeRencontre(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean validite, @RequestBody(required = false) String message) {
 
@@ -376,9 +447,10 @@ public class RencontreController {
 
         if (validite) {
 
-            //TODO : seul le capitaine visiteurs, responsable club visiteur et admin peuvent signaler la fin de l'encodage --> via le test "is.."
+            // Seul le capitaine visiteurs, responsable club visiteur et admin peuvent signaler la fin de l'encodage --> via le test "is.."
+            // Tracer qui a validé
 
-            if (isRencontreValidable(rencontreId)) {
+            if (isRencontreValidable(authentication,rencontreId)) {
                 rencontreRepository.updateValiditeRencontre(rencontreId, validite);
                 trace = "Validation des résultats";
             } else {
@@ -386,11 +458,11 @@ public class RencontreController {
             }
         } else {
 
-            // TODO : only admin peut devalider une rencontre tant que le championnat n'est pas cloture
-            // TODO : tracer qui a validé
+            // Only admin peut devalider une rencontre tant que le championnat n'est pas cloture
+            // Tracer qui a dévalidé
 
             Rencontre rencontre = rencontreRepository.findOne(rencontreId);
-            if (!rencontre.getDivision().getChampionnat().isCloture()){
+            if (!rencontre.getDivision().getChampionnat().isCloture() && (userService.isAdmin(authentication))){
                 rencontreRepository.updateValiditeRencontre(rencontreId, validite);
                 trace = "Dévalidation des résultats";
             }else{
@@ -405,6 +477,37 @@ public class RencontreController {
         traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
 
         return validite;
+    }
+
+    /**
+     * Permet de tester si un utilisateur connecte est capitaine ou responsable de club d'une equipe
+     * @param authentication
+     * @param equipe
+     * @return
+     */
+    private boolean isCapitaineOrResponsableClub(Authentication authentication, Equipe equipe){
+        Membre membre = userService.getMembreFromAuthentication(authentication);
+        return isCapitaineOrResponsableClub(membre, equipe);
+    }
+
+    /**
+     * Permet de tester si un membre est capitaine ou responsable de club d'une equipe
+     * @param membre
+     * @param equipe
+     * @return
+     */
+    private boolean isCapitaineOrResponsableClub(Membre membre, Equipe equipe){
+        if (membre!=null){
+            if (membre.equals(equipe.getCapitaine())){
+                return true;
+            }
+            if (equipe.getClub().equals(membre.getClub())){
+                if (membre.isResponsableClub()){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
