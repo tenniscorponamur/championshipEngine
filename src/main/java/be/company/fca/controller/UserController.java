@@ -155,7 +155,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/public/user/askPassword", method = RequestMethod.POST)
-    public boolean getOfficialAFT(@RequestParam("numeroAft") String numeroAft, @RequestBody String captchaResponse){
+    public boolean askPassword(@RequestParam("numeroAft") String numeroAft, @RequestBody String captchaResponse){
 
         // secretKey en variable d'environnement
 
