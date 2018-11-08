@@ -27,7 +27,7 @@ public class EchelleAFTController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/officialAFT/{numAft}", method = RequestMethod.GET)
-    public ResponseEntity<String> getOfficialAFT(@PathVariable("numAft") String numAft){
+    public String getOfficialAFT(@PathVariable("numAft") String numAft){
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -47,8 +47,7 @@ public class EchelleAFTController {
             e.printStackTrace();
         }
 
-        ResponseEntity<String> response = new ResponseEntity<String>(classementSimple, headers, HttpStatus.OK);
-        return response;
+        return classementSimple;
 //
         // Pour les tests
 //        return "[{\"Nom\":\"CALAY\",\"Prenom\":\"Fabrice\",\"NumFed\":\"6065450\",\"ClasmtSimple\":\"NC\",\"DateNaisText\":\"02/11/1982\"}]";
