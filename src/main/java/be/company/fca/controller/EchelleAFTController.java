@@ -57,16 +57,27 @@ public class EchelleAFTController {
 
 
     public static void main(String[] args){
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+//        RestTemplate restTemplate = new RestTemplate();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        String requestJson = "{text:\"6065450\"}";
+//
+//        HttpEntity<String> request = new HttpEntity<>(requestJson,headers);
+//        String result = restTemplate.postForObject("http://www.aftnet.be/MyAFT/Players/GetPlayersAutocomplete", request, String.class);
 
-        String requestJson = "{text:\"6065450\"}";
+String result = "[{\"Nom\":\"CALAY\",\"Prenom\":\"Fabrice\",\"NumFed\":\"6065450\",\"ClasmtSimple\":\"C30.6     \",\"DateNaisText\":\"02/11/1982\"},{\"Nom\":\"CALddAY\",\"Prenom\":\"Fabrice\",\"NumFed\":\"6065450\",\"ClasmtSimple\":\"C3dd0.6     \",\"DateNaisText\":\"02/11/1982\"}]";
 
-        HttpEntity<String> request = new HttpEntity<>(requestJson,headers);
-        String result = restTemplate.postForObject("http://www.aftnet.be/MyAFT/Players/GetPlayersAutocomplete", request, String.class);
+        String classementSimple = null;
+        try {
+            JsonNode jsonNode = new ObjectMapper().readTree(result);
+            classementSimple = jsonNode.findValue("ClasmtSimple").asText().trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         System.err.println(result);
+        System.err.println(classementSimple);
 
     }
 }
