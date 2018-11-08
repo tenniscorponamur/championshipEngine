@@ -7,8 +7,8 @@ public class EchelleAFT {
 
     public static List<EchelleAFT> getAllEchellesAFT(){
         List<EchelleAFT> echellesAFT = new ArrayList<>();
-        echellesAFT.add(new EchelleAFT("NC",5));
         echellesAFT.add(new EchelleAFT("C30.6",3));
+        echellesAFT.add(new EchelleAFT("NC",5));
         echellesAFT.add(new EchelleAFT("C30.5",5));
         echellesAFT.add(new EchelleAFT("C30.4",10));
         echellesAFT.add(new EchelleAFT("C30.3",15));

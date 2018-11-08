@@ -2,6 +2,8 @@ package be.company.fca.controller;
 
 import be.company.fca.model.EchelleAFT;
 import io.swagger.annotations.Api;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @RestController
@@ -38,7 +41,15 @@ public class EchelleAFTController {
         HttpEntity<String> request = new HttpEntity<>(requestJson,headers);
         String result = restTemplate.postForObject("http://www.aftnet.be/MyAFT/Players/GetPlayersAutocomplete", request, String.class);
 
-        return result;
+        String classementSimple = null;
+        try {
+            JsonNode jsonNode = new ObjectMapper().readTree(result);
+            classementSimple = jsonNode.findValue("ClasmtSimple").asText().trim();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return classementSimple;
 //
         // Pour les tests
 //        return "[{\"Nom\":\"CALAY\",\"Prenom\":\"Fabrice\",\"NumFed\":\"6065450\",\"ClasmtSimple\":\"NC\",\"DateNaisText\":\"02/11/1982\"}]";
