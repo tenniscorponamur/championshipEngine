@@ -47,7 +47,7 @@ public class EchelleAFTController {
             e.printStackTrace();
         }
 
-        return classementSimple;
+        return "{\"echelle\":\"" + classementSimple + "\"}";
 //
         // Pour les tests
 //        return "[{\"Nom\":\"CALAY\",\"Prenom\":\"Fabrice\",\"NumFed\":\"6065450\",\"ClasmtSimple\":\"NC\",\"DateNaisText\":\"02/11/1982\"}]";
