@@ -4,9 +4,7 @@ import be.company.fca.model.EchelleAFT;
 import io.swagger.annotations.Api;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +27,7 @@ public class EchelleAFTController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/officialAFT/{numAft}", method = RequestMethod.GET)
-    public String getOfficialAFT(@PathVariable("numAft") String numAft){
+    public ResponseEntity<String> getOfficialAFT(@PathVariable("numAft") String numAft){
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -49,7 +47,8 @@ public class EchelleAFTController {
             e.printStackTrace();
         }
 
-        return classementSimple;
+        ResponseEntity<String> response = new ResponseEntity<String>(classementSimple, headers, HttpStatus.OK);
+        return response;
 //
         // Pour les tests
 //        return "[{\"Nom\":\"CALAY\",\"Prenom\":\"Fabrice\",\"NumFed\":\"6065450\",\"ClasmtSimple\":\"NC\",\"DateNaisText\":\"02/11/1982\"}]";
