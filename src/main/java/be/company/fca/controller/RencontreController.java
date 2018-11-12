@@ -112,6 +112,19 @@ public class RencontreController {
         return rencontreRepository.getNextMeetings(DateUtils.shrinkToDay(new Date()), pageRequest);
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/public/rencontres/criterium")
+    public List<Rencontre> getRencontresCriteriumByAnnee(@RequestParam String annee) {
+        List<Rencontre> rencontres = new ArrayList<>();
+        List<Championnat> championnats = championnatRepository.findByTypeAndAnnee(TypeChampionnat.CRITERIUM,annee);
+        for (Championnat championnat : championnats){
+            List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+            for (Division division : divisions){
+                rencontres.addAll((Collection<? extends Rencontre>) rencontreRepository.findByDivision(division));
+            }
+        }
+        return rencontres;
+    }
+
     @RequestMapping(method = RequestMethod.GET, path = "/public/rencontres/byDate")
     public List<Rencontre> getRencontresByDate(@RequestParam @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
         return rencontreRepository.getRencontresByDate(date);
