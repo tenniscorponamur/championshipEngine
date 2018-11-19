@@ -98,6 +98,18 @@ public class ChampionnatController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/championnat/isCriteriumEditable", method = RequestMethod.GET)
+    public boolean isCriteriumEditable(@RequestParam String annee){
+        List<Championnat> championnats = championnatRepository.findByTypeAndAnnee(TypeChampionnat.CRITERIUM,annee);
+        // On considere le criterium comme editable si tous les championnats y relatifs ne sont pas encore clotures
+        boolean criteriumEditable = true;
+        for (Championnat championnat : championnats){
+            criteriumEditable = criteriumEditable && !championnat.isCloture();
+        }
+        return criteriumEditable;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat/isCalendrierARafraichir", method = RequestMethod.GET)
     public boolean isCalendrierARafraichir(@RequestParam Long championnatId){
         Championnat championnat = championnatRepository.findOne(championnatId);
