@@ -25,18 +25,6 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public boolean isPrivateInformationsAuthorized(Authentication authentication) {
-        if (authentication!=null){
-            List<String> roles = new ArrayList<>();
-            for (GrantedAuthority grantedAuthority : authentication.getAuthorities()){
-                roles.add(grantedAuthority.getAuthority());
-            }
-            return roles.contains(Role.ADMIN_USER.toString());
-        }
-        return false;
-    }
-
-    @Override
     public boolean isAdmin(Authentication authentication) {
         if (authentication!=null){
             List<String> roles = new ArrayList<>();
@@ -50,13 +38,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Membre getMembreFromAuthentication(Authentication authentication){
-        User user = userRepository.findByUsername(authentication.getName());
-        if (user!=null){
-            return user.getMembre();
-        }else{
-            Membre membre = membreRepository.findByNumeroAft(authentication.getName());
-            if (membre.isActif()){
-                return membre;
+        if (authentication!=null) {
+            User user = userRepository.findByUsername(authentication.getName());
+            if (user != null) {
+                return user.getMembre();
+            } else {
+                Membre membre = membreRepository.findByNumeroAft(authentication.getName());
+                if (membre.isActif()) {
+                    return membre;
+                }
             }
         }
         return null;

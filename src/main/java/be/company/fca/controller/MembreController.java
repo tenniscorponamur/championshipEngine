@@ -1,6 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.dto.MembreDto;
+import be.company.fca.exceptions.ForbiddenException;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.service.UserService;
@@ -81,14 +82,39 @@ public class MembreController {
             membres = (List<Membre>) membreRepository.findAll();
         }
 
-        boolean privateInformationsAuthorized = userService.isPrivateInformationsAuthorized(authentication);
+        boolean adminConnected = userService.isAdmin(authentication);
+        Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+
+        /* Les informations privees sont retournes si
+            - l'utilisateur connecte est admnistrateur
+            - l'utilisateur connecte est responsable du club du membre
+
+            Dans un premier temps, les membres inactifs ne seront retournes que pour les administrateurs
+        */
+
         for (Membre membre : membres){
-            if (privateInformationsAuthorized || membre.isActif()){
-                membresDto.add(new MembreDto(membre,privateInformationsAuthorized));
+            boolean informationsMembreAccessibles = adminConnected || isResponsableMembre(membreConnecte, membre);
+            if (adminConnected || membre.isActif()){
+                membresDto.add(new MembreDto(membre,informationsMembreAccessibles));
             }
         }
 
         return membresDto;
+    }
+
+    /**
+     * Permet de savoir si un membre est responsable du club d'un autre membre
+     * @param membreParent
+     * @param otherMembre
+     * @return true si le membreParent est responsable du club de l'autre membre
+     */
+    private boolean isResponsableMembre(Membre membreParent, Membre otherMembre){
+        if (membreParent!=null && membreParent.isResponsableClub()){
+            if (membreParent.getClub()!=null && membreParent.getClub().equals(otherMembre.getClub())){
+                return true;
+            }
+        }
+        return false;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -116,28 +142,68 @@ public class MembreController {
         return membre;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/membre/{membreId}/coordonnees", method = RequestMethod.PUT)
-    public Membre updateCoordonnees(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
-        membreRepository.updateCoordonnees(membreId,
-                membre.getCodePostal(),
-                membre.getLocalite(),
-                membre.getRue(),
-                membre.getRueNumero(),
-                membre.getRueBoite()
-        );
-        return membre;
+    public Membre updateCoordonnees(Authentication authentication, @PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        boolean autorise = privateInformationsEditables(authentication,membreId);
+
+        // Admin et responsable de club autorises
+        if (autorise){
+
+            membreRepository.updateCoordonnees(membreId,
+                    membre.getCodePostal(),
+                    membre.getLocalite(),
+                    membre.getRue(),
+                    membre.getRueNumero(),
+                    membre.getRueBoite()
+            );
+            return membre;
+
+        }else{
+            throw new ForbiddenException();
+        }
+
+
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/membre/{membreId}/contacts", method = RequestMethod.PUT)
-    public Membre updateContacts(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
-        membreRepository.updateContacts(membreId,
-                membre.getTelephone(),
-                membre.getGsm(),
-                membre.getMail()
-        );
-        return membre;
+    public Membre updateContacts(Authentication authentication, @PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+        boolean autorise = privateInformationsEditables(authentication,membreId);
+
+        // Admin et responsable de club autorises
+        if (autorise){
+            membreRepository.updateContacts(membreId,
+                    membre.getTelephone(),
+                    membre.getGsm(),
+                    membre.getMail()
+            );
+            return membre;
+        }else{
+            throw new ForbiddenException();
+        }
+    }
+
+    /**
+     * Permet de savoir si un utilisateur connecte peut modifier les informations privees d'un membre
+     * Seul un administrateur ou un responsable du club du membre peuvent les modifier
+     * @return
+     */
+    private boolean privateInformationsEditables(Authentication authentication, Long membreId){
+        boolean autorise = false;
+        boolean adminConnected = userService.isAdmin(authentication);
+        if (adminConnected){
+            autorise = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            if (membreConnecte!=null && membreConnecte.isResponsableClub() && membreConnecte.getClub()!=null){
+                Membre membreExistant = membreRepository.findOne(membreId);
+                if (membreExistant.getClub()!=null){
+                    autorise = membreExistant.getClub().equals(membreConnecte.getClub());
+                }
+            }
+        }
+        return autorise;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
