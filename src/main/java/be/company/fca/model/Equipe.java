@@ -42,6 +42,9 @@ public class Equipe {
     @JoinColumn(name = "terrain_fk")
     private Terrain terrain;
 
+    @Column( name = "hybride", nullable = false)
+    private boolean hybride=false;
+
     public Long getId() {
         return id;
     }
@@ -96,6 +99,14 @@ public class Equipe {
 
     public void setTerrain(Terrain terrain) {
         this.terrain = terrain;
+    }
+
+    public boolean isHybride() {
+        return hybride;
+    }
+
+    public void setHybride(boolean hybride) {
+        this.hybride = hybride;
     }
 
     @Override

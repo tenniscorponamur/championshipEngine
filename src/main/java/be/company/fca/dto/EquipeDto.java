@@ -11,6 +11,7 @@ public class EquipeDto {
     private MembreDto capitaine;
     private Poule poule;
     private Terrain terrain;
+    private boolean hybride;
 
     public EquipeDto(Equipe equipe) {
         this.id = equipe.getId();
@@ -22,6 +23,7 @@ public class EquipeDto {
         }
         this.poule = equipe.getPoule();
         this.terrain = equipe.getTerrain();
+        this.hybride = equipe.isHybride();
     }
 
     public Long getId() {
@@ -78,5 +80,13 @@ public class EquipeDto {
 
     public void setTerrain(Terrain terrain) {
         this.terrain = terrain;
+    }
+
+    public boolean isHybride() {
+        return hybride;
+    }
+
+    public void setHybride(boolean hybride) {
+        this.hybride = hybride;
     }
 }
