@@ -89,12 +89,11 @@
             <version>4.3.0</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.sendinblue/sendinblue -->
+        <!-- https://mvnrepository.com/artifact/com.mailjet/mailjet-client -->
         <dependency>
-            <groupId>com.sendinblue</groupId>
-            <artifactId>sib-api-v3-sdk</artifactId>
-            <version>3.0.1</version>
-            <scope>compile</scope>
+            <groupId>com.mailjet</groupId>
+            <artifactId>mailjet-client</artifactId>
+            <version>4.1.1</version>
         </dependency>
 
     </dependencies>

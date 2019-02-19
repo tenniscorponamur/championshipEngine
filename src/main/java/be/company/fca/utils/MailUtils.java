@@ -1,11 +1,16 @@
 package be.company.fca.utils;
 
+import com.mailjet.client.MailjetClient;
 import com.sendgrid.*;
-import sendinblue.*;
-import sendinblue.auth.*;
-import sibApi.SmtpApi;
-import sibModel.*;
-import sibApi.AccountApi;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.MailjetResponse;
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.resource.Emailv31;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.*;
@@ -26,46 +31,50 @@ public class MailUtils {
      * @return true si le mail est bien parti
      */
     public static boolean sendPasswordMail(String prenom, String nom, String mailTo, String password) {
-        return sendPasswordMailUsingSendinBlue(prenom,nom,mailTo,password);
+        return sendPasswordMailUsingMailjet(prenom,nom,mailTo,password);
     }
-
-    private static boolean sendPasswordMailUsingSendinBlue(String prenom, String nom, String mailTo, String password){
-        ApiClient defaultClient = Configuration.getDefaultApiClient();
-
-        // Configure API key authorization: api-key
-        ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
-        apiKey.setApiKey("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");
-
-        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
-        //apiKey.setApiKeyPrefix("Token");
-
-        SmtpApi apiInstance = new SmtpApi();
-        SendSmtpEmail sendSmtpEmail = new SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
-        SendSmtpEmailSender sendSmtpEmailSender = new SendSmtpEmailSender();
-        sendSmtpEmailSender.setEmail("tenniscorponamur@gmail.com");
-        sendSmtpEmailSender.setName("Tennis Corpo Namur");
-        sendSmtpEmail.setSender(sendSmtpEmailSender);
-        sendSmtpEmail.setSubject("Ceci est mon sujet");
-        sendSmtpEmail.setHtmlContent("Ceci est mon contenu");
-        SendSmtpEmailTo sendSmtpEmailTo = new SendSmtpEmailTo();
-        sendSmtpEmailTo.setName(prenom + nom);
-        sendSmtpEmailTo.setEmail(mailTo);
-        sendSmtpEmail.setTo(Collections.singletonList(sendSmtpEmailTo));
-
-        try {
-            CreateSmtpEmail result = apiInstance.sendTransacEmail(sendSmtpEmail);
-            System.out.println(result);
-            return true;
-        } catch (ApiException e) {
-            System.err.println("Exception when calling SmtpApi#sendTransacEmail");
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 
     /**
      * Permet d'envoyer le nouveau mot de passe a un utilisateur
+     * @param mailTo
+     * @param password
+     * @return true si le mail est bien parti
+     */
+    private static boolean sendPasswordMailUsingMailjet(String prenom, String nom, String mailTo, String password){
+
+        try{
+
+            MailjetClient client;
+            MailjetRequest request;
+            MailjetResponse response;
+            client = new MailjetClient(System.getenv("MAILJET_APIKEY_PUBLIC"), System.getenv("MAILJET_APIKEY_PRIVATE"), new ClientOptions("v3.1"));
+            request = new MailjetRequest(Emailv31.resource)
+                    .property(Emailv31.MESSAGES, new JSONArray()
+                            .put(new JSONObject()
+                                    .put(Emailv31.Message.FROM, new JSONObject()
+                                            .put("Email", "no-reply@tenniscorponamur.be")
+                                            .put("Name", "Test de mail"))
+                                    .put(Emailv31.Message.TO, new JSONArray()
+                                            .put(new JSONObject()
+                                                    .put("Email", "fabrice.calay@gmail.com")
+                                                    .put("Name", "Fabrice")))
+                                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
+                                    .put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
+                                    .put(Emailv31.Message.HTMLPART, "<h3>Dear passenger 1, welcome to Mailjet!</h3><br />May the delivery force be with you!")));
+            response = client.post(request);
+            System.out.println(response.getStatus());
+            System.out.println(response.getData());
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace(System.err);
+            return false;
+        }
+
+    }
+
+    /**
+     * Permet d'envoyer le nouveau mot de passe a un utilisateur en utilisant SendGrid
      * @param mailTo
      * @param password
      * @return true si le mail est bien parti
