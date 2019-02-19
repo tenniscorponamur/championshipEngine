@@ -23,6 +23,7 @@ public class MailUtils {
 
         String apiKey = System.getenv("SENDGRID_API_KEY");
         String frontEndUrl = System.getenv("FRONT_END_URL");
+        String backupMail = System.getenv("BACKUP_MAIL");
 
         if (!StringUtils.isEmpty(apiKey)){
             Email from = new Email("noreply@tenniscorponamur.be");
@@ -36,6 +37,7 @@ public class MailUtils {
 
             String htmlContent = "<p>Bonjour " + prenom + " " + nom + ",</p>\n" +
                     "<p>Vous trouverez ci-dessous votre nouveau mot de passe pour acc&eacute;der &agrave; l'application " + link + ".</p>\n" +
+                    "<p>Votre nom d'utilisateur correspond à votre numéro AFT.</p>\n" +
                     "<p>Nouveau mot de passe : <strong>" + password + "</strong></p>\n" +
                     "<p>Vous pouvez &agrave; tout moment modifier ce mot de passe une fois connect&eacute; &agrave; l'application.</p>\n" +
                     "<p>Salutations,</p>\n" +
@@ -43,6 +45,12 @@ public class MailUtils {
 
             Content content = new Content("text/html", htmlContent);
             Mail mail = new Mail(from, subject, to, content);
+
+            if (!StringUtils.isEmpty(backupMail)){
+                Personalization personalization = new Personalization();
+                personalization.addBcc(new Email(backupMail));
+                mail.addPersonalization(personalization);
+            }
 
             SendGrid sg = new SendGrid(apiKey);
             Request request = new Request();
