@@ -52,7 +52,7 @@ public class MailUtils {
                     .property(Emailv31.MESSAGES, new JSONArray()
                             .put(new JSONObject()
                                     .put(Emailv31.Message.FROM, new JSONObject()
-                                            .put("Email", "no-reply@tenniscorponamur.be")
+                                            .put("Email", "tenniscorponamur@gmail.com")
                                             .put("Name", "Test de mail"))
                                     .put(Emailv31.Message.TO, new JSONArray()
                                             .put(new JSONObject()
