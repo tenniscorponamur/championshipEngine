@@ -1,14 +1,23 @@
 package be.company.fca.utils;
 
 import com.sendgrid.*;
+import sendinblue.*;
+import sendinblue.auth.*;
+import sibApi.SmtpApi;
+import sibModel.*;
+import sibApi.AccountApi;
+
+import java.io.File;
+import java.util.*;
 import org.apache.commons.lang.StringUtils;
+
 
 import java.io.IOException;
 
 public class MailUtils {
 
 
-    //TODO : alternative possible : MailJet
+    //TODO : alternative possible : SendInBlue
 
     /**
      * Permet d'envoyer le nouveau mot de passe a un utilisateur
@@ -16,7 +25,52 @@ public class MailUtils {
      * @param password
      * @return true si le mail est bien parti
      */
-    public static boolean sendPasswordMail(String prenom, String nom, String mailTo, String password){
+    public static boolean sendPasswordMail(String prenom, String nom, String mailTo, String password) {
+        return sendPasswordMailUsingSendinBlue(prenom,nom,mailTo,password);
+    }
+
+    private static boolean sendPasswordMailUsingSendinBlue(String prenom, String nom, String mailTo, String password){
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+        // Configure API key authorization: api-key
+        ApiKeyAuth apiKey = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
+        apiKey.setApiKey("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");
+
+        // Uncomment the following line to set a prefix for the API key, e.g. "Token" (defaults to null)
+        //apiKey.setApiKeyPrefix("Token");
+
+        SmtpApi apiInstance = new SmtpApi();
+        SendSmtpEmail sendSmtpEmail = new SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
+        SendSmtpEmailSender sendSmtpEmailSender = new SendSmtpEmailSender();
+        sendSmtpEmailSender.setEmail("tenniscorponamur@gmail.com");
+        sendSmtpEmailSender.setName("Tennis Corpo Namur");
+        sendSmtpEmail.setSender(sendSmtpEmailSender);
+        sendSmtpEmail.setSubject("Ceci est mon sujet");
+        sendSmtpEmail.setHtmlContent("Ceci est mon contenu");
+        SendSmtpEmailTo sendSmtpEmailTo = new SendSmtpEmailTo();
+        sendSmtpEmailTo.setName(prenom + nom);
+        sendSmtpEmailTo.setEmail(mailTo);
+        sendSmtpEmail.setTo(Collections.singletonList(sendSmtpEmailTo));
+
+        try {
+            CreateSmtpEmail result = apiInstance.sendTransacEmail(sendSmtpEmail);
+            System.out.println(result);
+            return true;
+        } catch (ApiException e) {
+            System.err.println("Exception when calling SmtpApi#sendTransacEmail");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    /**
+     * Permet d'envoyer le nouveau mot de passe a un utilisateur
+     * @param mailTo
+     * @param password
+     * @return true si le mail est bien parti
+     */
+    private static boolean sendPasswordMailUsingSendGrid(String prenom, String nom, String mailTo, String password){
 
         // ApiKey a preciser dans l'environnement de production
         // En test, le mot de passe s'inscrira dans la console

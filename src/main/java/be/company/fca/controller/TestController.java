@@ -1,5 +1,6 @@
 package be.company.fca.controller;
 
+import be.company.fca.utils.MailUtils;
 import be.company.fca.utils.ReportUtils;
 import com.sendgrid.*;
 import net.sf.jasperreports.engine.*;
@@ -29,6 +30,15 @@ public class TestController {
 
     @Autowired
     DataSource datasource;
+
+    @RequestMapping("/public/testMail")
+    String testMail() {
+        if (MailUtils.sendPasswordMail("Fabrice","Calay", "fabrice.calay@gmail.com", "TEST")){
+            return "Mail envoye";
+        }else{
+            return "Probleme lors de l'envoi du mail";
+        }
+    }
 
     @RequestMapping("/public")
     String home() {
