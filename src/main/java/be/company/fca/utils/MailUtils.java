@@ -21,8 +21,7 @@ import java.io.IOException;
 
 public class MailUtils {
 
-
-    //TODO : alternative possible : SendInBlue
+    private static final String MAIL_FROM = "tenniscorponamur@gmail.com";
 
     /**
      * Permet d'envoyer le nouveau mot de passe a un utilisateur
@@ -42,33 +41,51 @@ public class MailUtils {
      */
     private static boolean sendPasswordMailUsingMailjet(String prenom, String nom, String mailTo, String password){
 
-        try{
+        // ApiKey a preciser dans l'environnement de production
+        // En test, le mot de passe s'inscrira dans la console
 
-            MailjetClient client;
-            MailjetRequest request;
-            MailjetResponse response;
-            client = new MailjetClient(System.getenv("MAILJET_APIKEY_PUBLIC"), System.getenv("MAILJET_APIKEY_PRIVATE"), new ClientOptions("v3.1"));
-            request = new MailjetRequest(Emailv31.resource)
-                    .property(Emailv31.MESSAGES, new JSONArray()
-                            .put(new JSONObject()
-                                    .put(Emailv31.Message.FROM, new JSONObject()
-                                            .put("Email", "tenniscorponamur@gmail.com")
-                                            .put("Name", "Test de mail"))
-                                    .put(Emailv31.Message.TO, new JSONArray()
-                                            .put(new JSONObject()
-                                                    .put("Email", "fabrice.calay@gmail.com")
-                                                    .put("Name", "Fabrice")))
-                                    .put(Emailv31.Message.SUBJECT, "Your email flight plan!")
-                                    .put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
-                                    .put(Emailv31.Message.HTMLPART, "<h3>Dear passenger 1, welcome to Mailjet!</h3><br />May the delivery force be with you!")));
-            response = client.post(request);
-            System.out.println(response.getStatus());
-            System.out.println(response.getData());
+        String apiPublicKey = System.getenv("MAILJET_APIKEY_PUBLIC");
+        String apiPrivateKey = System.getenv("MAILJET_APIKEY_PRIVATE");
+        String frontEndUrl = System.getenv("FRONT_END_URL");
+
+        String subject = "Votre mot de passe pour Tennis Corpo Namur";
+        String htmlContent = getHtmlContent(frontEndUrl,prenom,nom,password);
+
+        if (!StringUtils.isEmpty(apiPublicKey) && !StringUtils.isEmpty(apiPrivateKey)){
+
+            try{
+
+                MailjetClient client;
+                MailjetRequest request;
+                MailjetResponse response;
+                client = new MailjetClient(apiPublicKey, apiPrivateKey, new ClientOptions("v3.1"));
+                request = new MailjetRequest(Emailv31.resource)
+                        .property(Emailv31.MESSAGES, new JSONArray()
+                                .put(new JSONObject()
+                                        .put(Emailv31.Message.FROM, new JSONObject()
+                                                .put("Email", MAIL_FROM)
+                                                .put("Name", "Tennis Corpo Namur"))
+                                        .put(Emailv31.Message.TO, new JSONArray()
+                                                .put(new JSONObject()
+                                                        .put("Email", mailTo)
+                                                        .put("Name", prenom + " " + nom)))
+                                        .put(Emailv31.Message.SUBJECT, subject)
+                                        .put(Emailv31.Message.HTMLPART, htmlContent)));
+                response = client.post(request);
+                System.out.println(response.getStatus());
+                System.out.println(response.getData());
+                return true;
+
+            }catch(Exception e){
+                e.printStackTrace(System.err);
+                return false;
+            }
+
+        }else{
+
+            System.err.println("Nouveau mot de passe : " + password);
             return true;
 
-        }catch(Exception e){
-            e.printStackTrace(System.err);
-            return false;
         }
 
     }
@@ -86,34 +103,14 @@ public class MailUtils {
 
         String apiKey = System.getenv("SENDGRID_API_KEY");
         String frontEndUrl = System.getenv("FRONT_END_URL");
-        String backupMail = System.getenv("BACKUP_MAIL");
+
+        String subject = "Votre mot de passe pour Tennis Corpo Namur";
+        String htmlContent = getHtmlContent(frontEndUrl,prenom,nom,password);
 
         if (!StringUtils.isEmpty(apiKey)){
-            Email from = new Email("noreply@tenniscorponamur.be");
-            String subject = "Votre mot de passe pour Tennis Corpo Namur";
-            Email to = new Email(mailTo);
-
-            String link = "<strong>Tennis Corpo Namur</strong>";
-            if (!StringUtils.isEmpty(frontEndUrl)){
-                link = "<a href=\"" + frontEndUrl + "\">" + link + "</a>";
-            }
-
-            String htmlContent = "<p>Bonjour " + prenom + " " + nom + ",</p>\n" +
-                    "<p>Vous trouverez ci-dessous votre nouveau mot de passe pour acc&eacute;der &agrave; l'application " + link + ".</p>\n" +
-                    "<p>Votre nom d'utilisateur correspond à votre numéro AFT.</p>\n" +
-                    "<p>Nouveau mot de passe : <strong>" + password + "</strong></p>\n" +
-                    "<p>Vous pouvez &agrave; tout moment modifier ce mot de passe une fois connect&eacute; &agrave; l'application.</p>\n" +
-                    "<p>Salutations,</p>\n" +
-                    "<p>L'&eacute;quipe Tennis Corpo Namur</p>";
 
             Content content = new Content("text/html", htmlContent);
-            Mail mail = new Mail(from, subject, to, content);
-
-            if (!StringUtils.isEmpty(backupMail)){
-                Personalization personalization = new Personalization();
-                personalization.addBcc(new Email(backupMail));
-                mail.addPersonalization(personalization);
-            }
+            Mail mail = new Mail(new Email(MAIL_FROM), subject, new Email(mailTo), content);
 
             SendGrid sg = new SendGrid(apiKey);
             Request request = new Request();
@@ -136,6 +133,25 @@ public class MailUtils {
             return true;
 
         }
+
+    }
+
+    private static String getHtmlContent(String frontEndUrl, String prenom, String nom, String password){
+
+        String link = "<strong>Tennis Corpo Namur</strong>";
+        if (!StringUtils.isEmpty(frontEndUrl)){
+            link = "<a href=\"" + frontEndUrl + "\">" + link + "</a>";
+        }
+
+        String htmlContent = "<p>Bonjour " + prenom + " " + nom + ",</p>\n" +
+                "<p>Vous trouverez ci-dessous votre nouveau mot de passe pour acc&eacute;der &agrave; l'application " + link + ".</p>\n" +
+                "<p>Votre nom d'utilisateur correspond à votre numéro AFT.</p>\n" +
+                "<p>Nouveau mot de passe : <strong>" + password + "</strong></p>\n" +
+                "<p>Vous pouvez &agrave; tout moment modifier ce mot de passe une fois connect&eacute; &agrave; l'application.</p>\n" +
+                "<p>Salutations,</p>\n" +
+                "<p>L'&eacute;quipe Tennis Corpo Namur</p>";
+
+        return htmlContent;
 
     }
 
