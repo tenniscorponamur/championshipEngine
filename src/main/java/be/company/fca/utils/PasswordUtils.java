@@ -5,7 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class PasswordUtils {
 
-    public static String DEFAULT_PASSWORD = "$2a$10$Uq.lmbGwvrynxRMoMLoYt.rFotX.PykXYpk0L1Pze8mrE3neN7ALi";
+    public static String DEFAULT_PASSWORD = "$2a$10$Yu2pTeQIiy345M9GcS3Hd.8OhGfzj5DVD8vFm5.wj2.2qKq47LZzu";
 
     public static String DEFAULT_MEMBER_PASSWORD = "$2a$10$5J7DVDpYAmgwa7rF4k9LweMNS4/aVGYkhgv7Np3MIpDvHU9wlvISm";
 
