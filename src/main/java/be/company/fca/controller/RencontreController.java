@@ -1,14 +1,13 @@
 package be.company.fca.controller;
 
 import be.company.fca.dto.AutorisationRencontreDto;
+import be.company.fca.dto.MatchDto;
 import be.company.fca.dto.RencontreDto;
 import be.company.fca.exceptions.ForbiddenException;
 import be.company.fca.model.*;
+import be.company.fca.model.Set;
 import be.company.fca.repository.*;
-import be.company.fca.service.ClassementService;
-import be.company.fca.service.RencontreService;
-import be.company.fca.service.TraceService;
-import be.company.fca.service.UserService;
+import be.company.fca.service.*;
 import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.ReportUtils;
@@ -35,7 +34,6 @@ import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.util.*;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -56,6 +54,12 @@ public class RencontreController {
     private PouleRepository pouleRepository;
     @Autowired
     private ChampionnatRepository championnatRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private MatchService matchService;
 
     @Autowired
     private TraceService traceService;
@@ -140,6 +144,80 @@ public class RencontreController {
     @RequestMapping(value = "/private/rencontre", method = RequestMethod.PUT)
     public Rencontre updateRencontre(@RequestBody Rencontre rencontre) {
         return rencontreRepository.save(rencontre);
+    }
+
+    @RequestMapping(value = "/private/rencontre/points", method = RequestMethod.PUT)
+    public Rencontre updateRencontrePoints(Authentication authentication, @RequestBody Rencontre rencontre) {
+
+        // Verifier les autorisations des joueurs qui tentent de mettre a jour la rencontre (resultats) --> separer les deux methodes...
+
+        if (isResultatsRencontreModifiables(authentication,rencontre.getId())) {
+            rencontreRepository.updatePoints(rencontre.getId(),rencontre.getPointsVisites(),rencontre.getPointsVisiteurs());
+            return rencontre;
+        }else{
+            throw new ForbiddenException();
+        }
+
+    }
+
+    // DTO pour les membres afin de ne pas recuperer les donnees privees
+    // Attention a la rencontre --> rencontreDto
+
+    /**
+     * Permet de recuperer les matchs pour une rencontre
+     * Si les matchs n'existent pas, ils sont créés à la volée
+     *
+     * Cette création dépend du type de championnat et de la catégorie
+     *
+     * @param rencontreId
+     * @return
+     */
+    @RequestMapping(method= RequestMethod.GET, path="/public/rencontre/{rencontreId}/matchs")
+    public List<MatchDto> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
+
+        List<MatchDto> matchsDto = new ArrayList<>();
+        List<Match> matchs = new ArrayList<Match>();
+
+        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+
+        matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+
+        if (matchs.isEmpty()){
+            matchs = matchService.createMatchs(rencontre);
+        }
+
+        for (Match match : matchs){
+            matchsDto.add(new MatchDto(match));
+        }
+
+        return matchsDto;
+
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/match", method = RequestMethod.PUT)
+    public Match updateMatch(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestBody Match match){
+
+        //  Verifier les autorisations des joueurs qui tentent de mettre a jour les matchs
+
+        if (isResultatsRencontreModifiables(authentication,rencontreId)) {
+            return matchRepository.save(match);
+        }else{
+            throw new ForbiddenException();
+        }
+
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/match/sets", method = RequestMethod.PUT)
+    public Match updateMatchAndSets(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long matchId, @RequestBody List<Set> sets){
+
+        //  Verifier les autorisations des joueurs qui tentent de mettre a jour les matchs
+
+        if (isResultatsRencontreModifiables(authentication,rencontreId)) {
+            return matchService.updateMatchAndSets(matchId,sets);
+        }else{
+            throw new ForbiddenException();
+        }
+
     }
 
     // Permettre a certains utilisateurs d'autoriser d'autres membres a encoder/valider les resultats

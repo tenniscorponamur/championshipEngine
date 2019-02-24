@@ -27,6 +27,16 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
      */
     Iterable<Rencontre> findByPoule(Poule poule);
 
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Rencontre rencontre " +
+            " set rencontre.pointsVisites =:pointsVisites, " +
+            " rencontre.pointsVisiteurs =:pointsVisiteurs " +
+            " where rencontre.id = :rencontreId")
+    void updatePoints(@Param("rencontreId") Long rencontreId,
+                              @Param("pointsVisites") Integer pointsVisites,
+                              @Param("pointsVisiteurs") Integer pointsVisiteurs);
+
     /**
      * Permet de compter le nombre de rencontres par terrain
      * @param terrain

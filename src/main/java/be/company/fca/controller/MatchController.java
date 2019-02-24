@@ -29,52 +29,6 @@ public class MatchController {
     private MatchService matchService;
 
 
-    // DTO pour les membres afin de ne pas recuperer les donnees privees
-    // Attention a la rencontre --> rencontreDto
-
-    /**
-     * Permet de recuperer les matchs pour une rencontre
-     * Si les matchs n'existent pas, ils sont créés à la volée
-     *
-     * Cette création dépend du type de championnat et de la catégorie
-     *
-     * @param rencontreId
-     * @return
-     */
-    @RequestMapping(method= RequestMethod.GET, path="/public/rencontre/{rencontreId}/matchs")
-    public List<MatchDto> getMatchsByRencontre(@PathVariable("rencontreId") Long rencontreId) {
-
-        List<MatchDto> matchsDto = new ArrayList<>();
-        List<Match> matchs = new ArrayList<Match>();
-
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
-
-        matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
-
-        if (matchs.isEmpty()){
-            matchs = matchService.createMatchs(rencontre);
-        }
-
-        for (Match match : matchs){
-            matchsDto.add(new MatchDto(match));
-        }
-
-        return matchsDto;
-
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/match", method = RequestMethod.PUT)
-    public Match updateMatch(@RequestBody Match match){
-        return matchRepository.save(match);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(value = "/private/match/sets", method = RequestMethod.PUT)
-    public Match updateMatchAndSets(@RequestParam Long matchId, @RequestBody List<Set> sets){
-        return matchService.updateMatchAndSets(matchId,sets);
-    }
-
 //    @PreAuthorize("hasAuthority('ADMIN_USER')")
 //    @RequestMapping(value = "/private/match", method = RequestMethod.POST)
 //    public Match addMatch(@RequestBody Match match){
