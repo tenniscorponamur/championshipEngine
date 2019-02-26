@@ -1,17 +1,18 @@
 package be.company.fca.controller;
 
+import be.company.fca.exceptions.ForbiddenException;
 import be.company.fca.model.*;
-import be.company.fca.repository.ClassementCorpoRepository;
-import be.company.fca.repository.MatchRepository;
-import be.company.fca.repository.MembreRepository;
+import be.company.fca.repository.*;
 import be.company.fca.service.ClassementCorpoService;
 import be.company.fca.utils.DateUtils;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -31,6 +32,12 @@ public class ClassementCorpoController {
 
     @Autowired
     private ClassementCorpoService classementCorpoService;
+
+    @Autowired
+    private ClassementJobRepository classementJobRepository;
+
+    @Autowired
+    private ClassementJobTraceRepository classementJobTraceRepository;
 
 
     // Table de correspondance pour le calcul des points
@@ -140,6 +147,130 @@ public class ClassementCorpoController {
 
         return classementCorpo;
 
+    }
+
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/classementCorpo/job", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ClassementJob calculClassementsMembres(@RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate) {
+
+        // Si un job est en cours d'execution, on ne peut pas en lancer un autre
+
+        List<ClassementJob> jobs = classementJobRepository.findByStatus(ClassementJobStatus.INITIALIZED);
+        if (!jobs.isEmpty()){
+            System.err.println("Job en cours d'execution : " + jobs);
+            throw new ForbiddenException();
+        }
+
+        jobs = classementJobRepository.findByStatus(ClassementJobStatus.WORK_IN_PROGRESS);
+        if (!jobs.isEmpty()) {
+            System.err.println("Job en cours d'execution : " + jobs);
+            throw new ForbiddenException();
+        }
+
+        ClassementJob classementJob = new ClassementJob();
+        classementJob.setStartDate(startDate);
+        classementJob.setEndDate(new Date());
+        classementJob.setStatus(ClassementJobStatus.INITIALIZED);
+
+        classementJob = classementJobRepository.save(classementJob);
+
+        ClassementThread classementThread = new ClassementThread(classementJob);
+        classementThread.start();
+
+        return classementJob;
+
+    }
+
+    private class ClassementThread extends Thread {
+
+        private ClassementJob classementJob;
+
+        public ClassementThread(ClassementJob classementJob) {
+            this.classementJob = classementJob;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm:ss");
+            Date startDate = classementJob.getStartDate();
+            Date endDate = classementJob.getEndDate();
+
+            classementJob.setStatus(ClassementJobStatus.WORK_IN_PROGRESS);
+            classementJobRepository.save(classementJob);
+
+            ClassementJobTrace initTrace = new ClassementJobTrace();
+            initTrace.setClassementJob(classementJob);
+            initTrace.setMessage(sdf.format(new Date()) + " : Calcul des nouveaux classements en cours");
+            classementJobTraceRepository.save(initTrace);
+
+            List<Membre> membres = (List<Membre>) membreRepository.findAll();
+
+            for (Membre membre : membres){
+                ClassementCorpo newClassementCorpo = simulationClassement(membre.getId(),startDate,endDate);
+
+                // Le calcul des classements s'effectue avec une date de fin egale a la date du jour --> nouveau classsement = classement actuel du membre
+
+                classementCorpoRepository.save(newClassementCorpo);
+                membreRepository.updateClassementCorpo(membre.getId(),newClassementCorpo);
+
+                // Enregistrement des traces d'execution du job
+                //System.err.println("Nouveau classement pour " + membre.getNumeroAft() + " : " + newClassementCorpo.getPoints());
+                ClassementJobTrace classementJobTrace = new ClassementJobTrace();
+                classementJobTrace.setClassementJob(classementJob);
+                classementJobTrace.setMessage(sdf.format(new Date()) + " : Nouveau classement pour " + (membre.getNumeroAft()==null?"inconnu":membre.getNumeroAft()) + " : " + newClassementCorpo.getPoints() + " points");
+                classementJobTraceRepository.save(classementJobTrace);
+
+            }
+
+            ClassementJobTrace endTrace = new ClassementJobTrace();
+            endTrace.setClassementJob(classementJob);
+            endTrace.setMessage(sdf.format(new Date()) + " : Calcul des nouveaux classements terminé");
+            classementJobTraceRepository.save(endTrace);
+
+            classementJob.setStatus(ClassementJobStatus.FINISHED);
+            classementJobRepository.save(classementJob);
+
+            System.err.println("Calcul des nouveaux classements terminé");
+
+        }
+    }
+
+
+    // Recuperer le job en cours pour afficher les infos sur la page
+    // Recuperer les traces d'un job
+    // Pouvoir supprimer/(arreter) un job en cours (ou qui a pose probleme - arret inopine)
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/classementCorpo/jobs", method= RequestMethod.GET)
+    Iterable<ClassementJob> getClassementJobs(@RequestParam(name = "status", required = false) ClassementJobStatus status) {
+        if (status!=null){
+            return classementJobRepository.findByStatus(status);
+        }else{
+            return classementJobRepository.findAll();
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/classementCorpo/job/{jobId}", method= RequestMethod.GET)
+    ClassementJob getClassementJob(@PathVariable Long jobId) {
+        return classementJobRepository.findOne(jobId);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/classementCorpo/job/{jobId}/traces", method= RequestMethod.GET)
+    Iterable<ClassementJobTrace> getClassementJobTraces(@PathVariable Long jobId) {
+        ClassementJob classementJob = classementJobRepository.findOne(jobId);
+        return classementJobTraceRepository.findByClassementJob(classementJob);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/classementCorpo/job/{jobId}", method= RequestMethod.DELETE)
+    void deleteClassementJob(@PathVariable Long jobId) {
+        classementJobRepository.delete(jobId);
     }
 
     /**
