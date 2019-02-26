@@ -160,13 +160,13 @@ public class RencontreController {
 
     }
 
-    @RequestMapping(value = "/private/rencontre/commentaires", method = RequestMethod.PUT)
-    public Rencontre updateRencontreComments(Authentication authentication, @RequestBody Rencontre rencontre) {
+    @RequestMapping(value = "/private/rencontre/commentairesEncodeur", method = RequestMethod.PUT)
+    public Rencontre updateRencontreCommentairesEncodeur(Authentication authentication, @RequestBody Rencontre rencontre) {
 
         // Verifier les autorisations des joueurs qui tentent de mettre a jour la rencontre (resultats) --> separer les deux methodes...
 
         if (isResultatsRencontreModifiables(authentication,rencontre.getId())) {
-            //TODO : rencontreRepository.updateCommentaires(rencontre.getId(),rencontre.getCommentaires());
+            rencontreRepository.updateCommentairesEncodeur(rencontre.getId(),rencontre.getCommentairesEncodeur());
             return rencontre;
         }else{
             throw new ForbiddenException();

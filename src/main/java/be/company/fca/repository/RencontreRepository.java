@@ -37,6 +37,14 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
                               @Param("pointsVisites") Integer pointsVisites,
                               @Param("pointsVisiteurs") Integer pointsVisiteurs);
 
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Rencontre rencontre " +
+            " set rencontre.commentairesEncodeur =:commentairesEncodeur " +
+            " where rencontre.id = :rencontreId")
+    void updateCommentairesEncodeur(@Param("rencontreId") Long rencontreId,
+                      @Param("commentairesEncodeur") String commentairesEncodeur);
+
     /**
      * Permet de compter le nombre de rencontres par terrain
      * @param terrain

@@ -56,6 +56,9 @@ public class Rencontre {
     @Column( name =  "pointsvisiteurs")
     private Integer pointsVisiteurs;
 
+    @Column (name = "commentaires_encodeur")
+    private String commentairesEncodeur;
+
     @Column( name = "resultats_encodes", nullable = false)
     private boolean resultatsEncodes=false;
 
@@ -148,6 +151,14 @@ public class Rencontre {
 
     public void setPointsVisiteurs(Integer pointsVisiteurs) {
         this.pointsVisiteurs = pointsVisiteurs;
+    }
+
+    public String getCommentairesEncodeur() {
+        return commentairesEncodeur;
+    }
+
+    public void setCommentairesEncodeur(String commentairesEncodeur) {
+        this.commentairesEncodeur = commentairesEncodeur;
     }
 
     public boolean isValide() {
