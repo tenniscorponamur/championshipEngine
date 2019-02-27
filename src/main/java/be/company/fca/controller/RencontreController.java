@@ -99,6 +99,88 @@ public class RencontreController {
         return rencontresDto;
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/private/rencontres/toComplete")
+    public List<Rencontre> getRencontresAEncoder(Authentication authentication){
+        List<Rencontre> rencontresAEncoder = rencontreRepository.findEncodedAndValidatedBefore(false,false,new Date());
+
+        if (userService.isAdmin(authentication)){
+            return rencontresAEncoder;
+        }
+
+        // Recuperer les rencontres en tant que responsable de club ou capitaine d'equipe
+
+        Club myClub = null;
+        List<Rencontre> myRencontres = new ArrayList<>();
+
+        Membre membre = userService.getMembreFromAuthentication(authentication);
+        if (membre!=null){
+            if (membre.isResponsableClub()){
+                myClub = membre.getClub();
+            }
+
+            List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByMembre(membre);
+
+            for (Rencontre rencontre : rencontresAEncoder){
+                if ( (myClub!=null && rencontre.getEquipeVisites().getClub().equals(myClub)) || membre.equals(rencontre.getEquipeVisites().getCapitaine())){
+                    myRencontres.add(rencontre);
+                }else{
+
+                    for (AutorisationRencontre autorisationRencontre : autorisationRencontres) {
+                        if (autorisationRencontre.getRencontreFk().equals(rencontre.getId()) && TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())) {
+                            myRencontres.add(rencontre);
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        return myRencontres;
+
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/private/rencontres/toValidate")
+    public List<Rencontre> getRencontresAValider(Authentication authentication){
+        List<Rencontre> rencontresAValider = rencontreRepository.findEncodedAndValidatedBefore(true,false,new Date());
+
+        if (userService.isAdmin(authentication)){
+            return rencontresAValider;
+        }
+
+        // Recuperer les rencontres en tant que responsable de club ou capitaine d'equipe
+
+        Club myClub = null;
+        List<Rencontre> myRencontres = new ArrayList<>();
+
+        Membre membre = userService.getMembreFromAuthentication(authentication);
+        if (membre!=null){
+            if (membre.isResponsableClub()){
+                myClub = membre.getClub();
+            }
+
+            List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByMembre(membre);
+
+            for (Rencontre rencontre : rencontresAValider){
+                if ( (myClub!=null && rencontre.getEquipeVisiteurs().getClub().equals(myClub)) || membre.equals(rencontre.getEquipeVisiteurs().getCapitaine())){
+                    myRencontres.add(rencontre);
+                }else{
+
+                    for (AutorisationRencontre autorisationRencontre : autorisationRencontres) {
+                        if (autorisationRencontre.getRencontreFk().equals(rencontre.getId()) && TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())) {
+                            myRencontres.add(rencontre);
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        return myRencontres;
+
+    }
+
     /**
      * Permet de recuperer les 5 derniers resultats encodes (rencontres validees) dans le systeme
      *

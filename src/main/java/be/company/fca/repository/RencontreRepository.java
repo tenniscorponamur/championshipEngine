@@ -27,6 +27,16 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
      */
     Iterable<Rencontre> findByPoule(Poule poule);
 
+    /**
+     * Permet de recuperer les rencontres avec ou sans encodage et avec ou sans validation avant une date donnee
+     * @param resultatsEncodes
+     * @param nowDate
+     * @return
+     */
+    @Query(value = "select rencontre from Rencontre rencontre " +
+            " where resultatsEncodes = :resultatsEncodes and valide = :valide and dateHeureRencontre <= :nowDate")
+    List<Rencontre> findEncodedAndValidatedBefore(@Param("resultatsEncodes") boolean resultatsEncodes, @Param("valide") boolean valide, @Param("nowDate") Date nowDate);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Rencontre rencontre " +
