@@ -416,6 +416,8 @@ public class ClassementServiceImpl implements ClassementService {
                     listeRencontresVisiteurs = new ArrayList<>();
                     mapRencontresEquipe.put(interserie.getEquipeVisiteurs(),listeRencontresVisiteurs);
                 }
+                listeRencontresVisites.add(interserie);
+                listeRencontresVisiteurs.add(interserie);
                 maxRencontres = Math.max(maxRencontres,listeRencontresVisites.size());
                 maxRencontres = Math.max(maxRencontres,listeRencontresVisiteurs.size());
             }
@@ -430,9 +432,9 @@ public class ClassementServiceImpl implements ClassementService {
             }
 
             // On va rechercher la rencontre entre les deux equipes
-            if (equipes.size()==2){
-                Equipe equipeA = equipes.get(0);
-                Equipe equipeB = equipes.get(1);
+            if (equipesRetenues.size()==2){
+                Equipe equipeA = equipesRetenues.get(0);
+                Equipe equipeB = equipesRetenues.get(1);
 
                 for (Rencontre interserie : rencontreInterserieList){
                     if (  (interserie.getEquipeVisites().equals(equipeA) && interserie.getEquipeVisiteurs().equals(equipeB))
