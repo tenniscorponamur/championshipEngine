@@ -837,10 +837,10 @@ public class RencontreController {
                                 Equipe equipePerdanteA = null;
                                 Equipe equipePerdanteB = null;
 
-                                List<Rencontre> rencontres = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeA.getId(), adversaireA.getId());
+                                List<Rencontre> rencontresA = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeA.getId(), adversaireA.getId());
                                 // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
-                                if (rencontres.size() > 0) {
-                                    Rencontre interserie = rencontres.get(0);
+                                if (rencontresA.size() > 0) {
+                                    Rencontre interserie = rencontresA.get(0);
                                     if (interserie.isValide()) {
                                         equipeGagnanteA = classementService.getGagnantRencontreInterserie(interserie);
                                         if (interserie.getEquipeVisites().equals(equipeGagnanteA)) {
@@ -854,12 +854,11 @@ public class RencontreController {
                                 System.err.println("Equipe gagnante A : " + equipeGagnanteA.getCodeAlphabetique());
                                 System.err.println("Equipe perdante A : " + equipePerdanteA.getCodeAlphabetique());
 
-                                List<Rencontre> testRencontres = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
-                                System.err.println("Test Rencontres : " + testRencontres.size());
+                                List<Rencontre> rencontresB = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
 
                                 // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
-                                if (rencontres.size() > 0) {
-                                    Rencontre interserie = rencontres.get(0);
+                                if (rencontresB.size() > 0) {
+                                    Rencontre interserie = rencontresB.get(0);
                                     if (interserie.isValide()) {
                                         equipeGagnanteB = classementService.getGagnantRencontreInterserie(interserie);
                                         if (interserie.getEquipeVisites().equals(equipeGagnanteB)) {
