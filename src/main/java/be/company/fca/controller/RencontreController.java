@@ -920,8 +920,8 @@ public class RencontreController {
      * @return
      */
     private boolean isInterserieExists(Rencontre rencontre) {
-        Long nbSameRencontre = rencontreRepository.countByDivisionAndEquipes(rencontre.getDivision().getId(), rencontre.getEquipeVisites().getId(), rencontre.getEquipeVisiteurs().getId());
-        return nbSameRencontre > 0;
+        Long nbSameRencontreInterserie = rencontreRepository.countInterserieByDivisionAndEquipes(rencontre.getDivision().getId(), rencontre.getEquipeVisites().getId(), rencontre.getEquipeVisiteurs().getId());
+        return nbSameRencontreInterserie > 0;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

@@ -108,8 +108,8 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
      * @return Nombre de rencontres dans une division qui oppose deux equipes donnees
      */
     @Query(value = "select count(*) from rencontre " +
-            " where rencontre.division_fk = :divisionId and ((rencontre.visites_fk = :equipe1Id and rencontre.visiteurs_fk = :equipe2Id) or (rencontre.visites_fk = :equipe2Id and rencontre.visiteurs_fk = :equipe1Id))", nativeQuery = true)
-    Long countByDivisionAndEquipes(@Param("divisionId") Long divisionId, @Param("equipe1Id") Long equipe1Id, @Param("equipe2Id") Long equipe2Id);
+            " where rencontre.division_fk = :divisionId and rencontre.poule_fk is null and ((rencontre.visites_fk = :equipe1Id and rencontre.visiteurs_fk = :equipe2Id) or (rencontre.visites_fk = :equipe2Id and rencontre.visiteurs_fk = :equipe1Id))", nativeQuery = true)
+    Long countInterserieByDivisionAndEquipes(@Param("divisionId") Long divisionId, @Param("equipe1Id") Long equipe1Id, @Param("equipe2Id") Long equipe2Id);
 
     /**
      * Permet de recuperer les rencontres dans une division qui oppose deux equipes donnees
