@@ -741,6 +741,8 @@ public class RencontreController {
 
                 List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
 
+                System.err.println("Nombre de poules : " + poules.size());
+
                 // S'il y a deux poules dans la division,
 
                 if (!poules.isEmpty() && poules.size() == 2) {
