@@ -813,6 +813,11 @@ public class RencontreController {
                                 }
                             }
 
+                            System.err.println("Equipe A : " + equipeA.getCodeAlphabetique());
+                            System.err.println("Adversaire A : " + equipeA.getCodeAlphabetique());
+                            System.err.println("Equipe B : " + equipeA.getCodeAlphabetique());
+                            System.err.println("Adversaire B : " + equipeA.getCodeAlphabetique());
+
                             // Le cas echeant, proposer les petites et grandes finales
                             if (division.isWithFinales()) {
                                 // Analyser si les deux rencontres interseries concernes ont ete jouees et validees
