@@ -854,7 +854,9 @@ public class RencontreController {
                                 System.err.println("Equipe gagnante A : " + equipeGagnanteA.getCodeAlphabetique());
                                 System.err.println("Equipe perdante A : " + equipePerdanteA.getCodeAlphabetique());
 
-                                rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
+                                List<Rencontre> testRencontres = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
+                                System.err.println("Test Rencontres : " + testRencontres.size());
+
                                 // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
                                 if (rencontres.size() > 0) {
                                     Rencontre interserie = rencontres.get(0);
