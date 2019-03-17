@@ -740,14 +740,12 @@ public class RencontreController {
             for (Division division : divisions) {
 
                 List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
-//                Collections.sort(poules, new Comparator<Poule>() {
-//                    @Override
-//                    public int compare(Poule o1, Poule o2) {
-//                        return o1.getNumero().compareTo(o2.getNumero());
-//                    }
-//                });
-
-                System.err.println("Nombre de poules : " + poules.size());
+                Collections.sort(poules, new Comparator<Poule>() {
+                    @Override
+                    public int compare(Poule o1, Poule o2) {
+                        return o1.getNumero().compareTo(o2.getNumero());
+                    }
+                });
 
                 // S'il y a deux poules dans la division,
 
