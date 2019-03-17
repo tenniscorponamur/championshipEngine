@@ -814,9 +814,9 @@ public class RencontreController {
                             }
 
                             System.err.println("Equipe A : " + equipeA.getCodeAlphabetique());
-                            System.err.println("Adversaire A : " + equipeA.getCodeAlphabetique());
-                            System.err.println("Equipe B : " + equipeA.getCodeAlphabetique());
-                            System.err.println("Adversaire B : " + equipeA.getCodeAlphabetique());
+                            System.err.println("Adversaire A : " + adversaireA.getCodeAlphabetique());
+                            System.err.println("Equipe B : " + equipeB.getCodeAlphabetique());
+                            System.err.println("Adversaire B : " + adversaireB.getCodeAlphabetique());
 
                             // Le cas echeant, proposer les petites et grandes finales
                             if (division.isWithFinales()) {
