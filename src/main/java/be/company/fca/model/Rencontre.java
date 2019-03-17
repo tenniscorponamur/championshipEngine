@@ -56,6 +56,9 @@ public class Rencontre {
     @Column( name =  "pointsvisiteurs")
     private Integer pointsVisiteurs;
 
+    @Column (name = "informations_interserie")
+    private String informationsInterserie;
+
     @Column (name = "commentaires_encodeur")
     private String commentairesEncodeur;
 
@@ -175,6 +178,14 @@ public class Rencontre {
 
     public void setResultatsEncodes(boolean resultatsEncodes) {
         this.resultatsEncodes = resultatsEncodes;
+    }
+
+    public String getInformationsInterserie() {
+        return informationsInterserie;
+    }
+
+    public void setInformationsInterserie(String informationsInterserie) {
+        this.informationsInterserie = informationsInterserie;
     }
 
     @Override

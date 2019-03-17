@@ -700,7 +700,7 @@ public class RencontreController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(method = RequestMethod.GET, path = "/private/rencontres/interseries")
-    public List<Rencontre> getInterseries(@RequestParam Long championnatId) {
+    public List<RencontreDto> getInterseries(@RequestParam Long championnatId) {
 
         // Dans un premier temps, on ne va creer des interseries qu'avec des divisions comprenant deux poules
 
@@ -810,6 +810,18 @@ public class RencontreController {
                                     adversaireB = equipe2;
                                 }
                                 Rencontre rencontre = new Rencontre();
+                                if (division.isMultiIS() && division.isWithFinales() && (i==0 || i==1)){
+                                    rencontre.setInformationsInterserie("Demi-finale");
+                                }else if (division.isMultiIS() && division.isWithFinales() && i>1){
+                                    rencontre.setInformationsInterserie("Match pour la " + ((i*2)+1) + "eme place");
+                                }else if (division.isMultiIS() && !division.isWithFinales()){
+                                    rencontre.setInformationsInterserie("Match pour la " + ((i*2)+1) + "eme place");
+                                }else if (!division.isMultiIS() && division.isWithFinales()){
+                                    rencontre.setInformationsInterserie("Demi-finale");
+                                }else if (!division.isMultiIS() && !division.isWithFinales()){
+                                    rencontre.setInformationsInterserie("Finale");
+                                }
+
                                 rencontre.setDivision(division);
                                 rencontre.setEquipeVisites(equipe1);
                                 rencontre.setEquipeVisiteurs(equipe2);
@@ -818,11 +830,6 @@ public class RencontreController {
                                     rencontresInterseries.add(rencontre);
                                 }
                             }
-
-                            System.err.println("Equipe A : " + equipeA.getCodeAlphabetique());
-                            System.err.println("Adversaire A : " + adversaireA.getCodeAlphabetique());
-                            System.err.println("Equipe B : " + equipeB.getCodeAlphabetique());
-                            System.err.println("Adversaire B : " + adversaireB.getCodeAlphabetique());
 
                             // Le cas echeant, proposer les petites et grandes finales
                             if (division.isWithFinales()) {
@@ -851,9 +858,6 @@ public class RencontreController {
                                     }
                                 }
 
-                                System.err.println("Equipe gagnante A : " + equipeGagnanteA.getCodeAlphabetique());
-                                System.err.println("Equipe perdante A : " + equipePerdanteA.getCodeAlphabetique());
-
                                 List<Rencontre> rencontresB = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
 
                                 // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
@@ -869,14 +873,12 @@ public class RencontreController {
                                     }
                                 }
 
-                                System.err.println("Equipe gagnante B : " + equipeGagnanteB.getCodeAlphabetique());
-                                System.err.println("Equipe perdante B : " + equipePerdanteB.getCodeAlphabetique());
-
                                 if (equipeGagnanteA != null && equipePerdanteA != null && equipeGagnanteB != null && equipePerdanteB != null) {
 
                                     // Creation de la petite finale
 
                                     Rencontre petiteFinale = new Rencontre();
+                                    petiteFinale.setInformationsInterserie("Petite finale");
                                     petiteFinale.setDivision(division);
                                     petiteFinale.setEquipeVisites(equipePerdanteA);
                                     petiteFinale.setEquipeVisiteurs(equipePerdanteB);
@@ -888,6 +890,7 @@ public class RencontreController {
                                     // Creation de la grande finale
 
                                     Rencontre finale = new Rencontre();
+                                    finale.setInformationsInterserie("Finale");
                                     finale.setDivision(division);
                                     finale.setEquipeVisites(equipeGagnanteA);
                                     finale.setEquipeVisiteurs(equipeGagnanteB);
@@ -909,7 +912,12 @@ public class RencontreController {
             }
         }
 
-        return rencontresInterseries;
+        List<RencontreDto> interseriesDto = new ArrayList<>();
+        for (Rencontre rencontre : rencontresInterseries){
+            interseriesDto.add(new RencontreDto(rencontre));
+        }
+
+        return interseriesDto;
 
     }
 

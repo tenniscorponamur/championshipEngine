@@ -17,6 +17,7 @@ public class RencontreDto {
     private Court court;
     private Integer pointsVisites;
     private Integer pointsVisiteurs;
+    private String informationsInterserie;
     private String commentairesEncodeur;
     private boolean resultatsEncodes;
     private boolean valide;
@@ -37,6 +38,7 @@ public class RencontreDto {
         this.court = rencontre.getCourt();
         this.pointsVisites = rencontre.getPointsVisites();
         this.pointsVisiteurs = rencontre.getPointsVisiteurs();
+        this.informationsInterserie = rencontre.getInformationsInterserie();
         this.commentairesEncodeur = rencontre.getCommentairesEncodeur();
         this.resultatsEncodes = rencontre.isResultatsEncodes();
         this.valide = rencontre.isValide();
@@ -128,6 +130,14 @@ public class RencontreDto {
 
     public void setPointsVisiteurs(Integer pointsVisiteurs) {
         this.pointsVisiteurs = pointsVisiteurs;
+    }
+
+    public String getInformationsInterserie() {
+        return informationsInterserie;
+    }
+
+    public void setInformationsInterserie(String informationsInterserie) {
+        this.informationsInterserie = informationsInterserie;
     }
 
     public String getCommentairesEncodeur() {
