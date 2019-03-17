@@ -740,6 +740,12 @@ public class RencontreController {
             for (Division division : divisions) {
 
                 List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+//                Collections.sort(poules, new Comparator<Poule>() {
+//                    @Override
+//                    public int compare(Poule o1, Poule o2) {
+//                        return o1.getNumero().compareTo(o2.getNumero());
+//                    }
+//                });
 
                 System.err.println("Nombre de poules : " + poules.size());
 
@@ -850,7 +856,7 @@ public class RencontreController {
                                 System.err.println("Equipe gagnante A : " + equipeGagnanteA.getCodeAlphabetique());
                                 System.err.println("Equipe perdante A : " + equipePerdanteA.getCodeAlphabetique());
 
-                                rencontres = rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
+                                rencontreRepository.getRencontresByDivisionAndEquipes(division.getId(), equipeB.getId(), adversaireB.getId());
                                 // On est cense n'avoir qu'une seule rencontre opposant ces deux equipes
                                 if (rencontres.size() > 0) {
                                     Rencontre interserie = rencontres.get(0);
