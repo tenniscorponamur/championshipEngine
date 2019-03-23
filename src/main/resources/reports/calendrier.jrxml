@@ -14,9 +14,9 @@ terrain.nom terrain_nom,
 visites.code_alphabetique visites_nom,
 visiteurs.code_alphabetique visiteurs_nom
 from championnat 
-inner join division on division.championnat_fk = championnat.id 
-left join poule on poule.division_fk = division.id
+inner join division on division.championnat_fk = championnat.id
 inner join rencontre on rencontre.division_fk = division.id
+left join poule on rencontre.poule_fk = poule.id
 left join terrain  on rencontre.terrain_fk = terrain.id
 inner join equipe visites on rencontre.visites_fk=visites.id
 inner join equipe visiteurs on rencontre.visiteurs_fk=visiteurs.id
