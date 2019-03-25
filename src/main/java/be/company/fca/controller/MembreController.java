@@ -487,6 +487,7 @@ public class MembreController {
                         Membre membre = membreRepository.findByNumeroAft(numeroAft);
                         if (membre==null){
                             membre = new Membre();
+                            membre.setPassword(PasswordUtils.DEFAULT_MEMBER_PASSWORD);
                         }
 
                         membre.setNumeroAft(numeroAft);
