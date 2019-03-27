@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -24,6 +25,7 @@ import java.net.URISyntaxException;
 ///@EnableOAuth2Sso
 @SpringBootApplication
 @EnableSwagger2
+@EnableTransactionManagement
 public class App {
 
     public static void main(String[] args) throws Exception{
