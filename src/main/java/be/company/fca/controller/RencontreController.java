@@ -980,6 +980,10 @@ public class RencontreController {
 
         List<Rencontre> rencontresSaved = rencontreService.refreshRencontres(anciennesRencontres, nouvellesRencontres);
 
+//        for (Rencontre rencontre : rencontresSaved){
+//            rencontreRepository.save(rencontre);
+//        }
+
         // Calendrier rafraichi --> false
         championnatRepository.updateCalendrierARafraichir(championnatId, false);
 

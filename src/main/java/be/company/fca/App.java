@@ -25,7 +25,7 @@ import java.net.URISyntaxException;
 ///@EnableOAuth2Sso
 @SpringBootApplication
 @EnableSwagger2
-@EnableTransactionManagement
+//@EnableTransactionManagement
 public class App {
 
     public static void main(String[] args) throws Exception{

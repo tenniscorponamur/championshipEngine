@@ -86,7 +86,7 @@ public class RencontreServiceImpl implements RencontreService{
             newRencontre.setValide(oldRencontre.isValide());
         }
 
-        newRencontre = rencontreRepository.save(newRencontre);
+        newRencontre.setId(rencontreRepository.save(newRencontre).getId());
 
         // Si jamais des matchs ont ete crees pour l'ancienne rencontre, on va les recuperer dans la nouvelle
         if (oldRencontre!=null) {
