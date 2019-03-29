@@ -2,10 +2,7 @@ package be.company.fca.controller;
 
 import be.company.fca.dto.EquipeDto;
 import be.company.fca.model.*;
-import be.company.fca.repository.ChampionnatRepository;
-import be.company.fca.repository.DivisionRepository;
-import be.company.fca.repository.EquipeRepository;
-import be.company.fca.repository.RencontreRepository;
+import be.company.fca.repository.*;
 import be.company.fca.service.DivisionService;
 import be.company.fca.service.EquipeService;
 import io.swagger.annotations.Api;
@@ -26,6 +23,12 @@ public class EquipeController {
 
     @Autowired
     private DivisionRepository divisionRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private SetRepository setRepository;
 
     @Autowired
     private RencontreRepository rencontreRepository;
@@ -103,6 +106,8 @@ public class EquipeController {
         // Supprimer les rencontres associees a cette equipe sinon on ne pourra pas la supprimer :-)
         List<Rencontre> rencontresEquipe = (List<Rencontre>) rencontreRepository.findRencontresByEquipe(equipe);
         for (Rencontre rencontreEquipe : rencontresEquipe){
+            setRepository.deleteByRencontreId(rencontreEquipe.getId());
+            matchRepository.deleteByRencontreId(rencontreEquipe.getId());
             rencontreRepository.delete(rencontreEquipe.getId());
         }
 
