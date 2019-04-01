@@ -3,7 +3,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listeForce" columnCount="4" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="200" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5966513a-5dd6-43cd-b7a2-e82d1037d5e2">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.report.description"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="TennisCorpoAdapter"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tennis Corpo Local"/>
 	<queryString>
 		<![CDATA[SELECT membre.nom nom_membre,
 	membre.prenom prenom_membre,
@@ -144,9 +144,8 @@ ORDER BY nom_club ASC,
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18d9398a-6165-4046-ac6f-23fd9449c984"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="0" rightPadding="0">
-					<pen lineColor="#787878"/>
-					<leftPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
+					<pen lineColor="#ADADAD"/>
+					<bottomPen lineWidth="1.0"/>
 				</box>
 				<textElement>
 					<font size="8"/>
@@ -156,10 +155,11 @@ ORDER BY nom_club ASC,
 			<textField isBlankWhenNull="true">
 				<reportElement stretchType="ElementGroupHeight" x="150" y="0" width="50" height="12" uuid="c22c567a-ba0c-448c-b2b2-7f026e35f26a"/>
 				<box topPadding="1">
-					<pen lineColor="#787878"/>
+					<pen lineColor="#ADADAD"/>
+					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0" lineColor="#787878"/>
 				</box>
-				<textElement verticalAlignment="Middle">
+				<textElement verticalAlignment="Top">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{numero_aft}]]></textFieldExpression>
@@ -169,11 +169,11 @@ ORDER BY nom_club ASC,
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="18d9398a-6165-4046-ac6f-23fd9449c984"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="0" bottomPadding="0" rightPadding="3">
-					<pen lineColor="#787878"/>
-					<leftPen lineWidth="1.0"/>
-					<rightPen lineWidth="0.0"/>
+					<pen lineColor="#ADADAD"/>
+					<leftPen lineWidth="1.0" lineColor="#787878"/>
+					<bottomPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{pointscorpo}]]></textFieldExpression>

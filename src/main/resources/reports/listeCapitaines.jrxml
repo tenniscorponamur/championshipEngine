@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listeCapitaines" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7db9999e-0b7b-4e97-bfce-8b2c69d65a7b">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listeCapitaines" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7db9999e-0b7b-4e97-bfce-8b2c69d65a7b">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tennis Corpo Local"/>
 	<property name="com.jaspersoft.studio.report.description" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="199"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="791"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<parameter name="championnatId" class="java.lang.Long"/>
 	<queryString language="SQL">
 		<![CDATA[select championnat.annee, championnat.type type_championnat, championnat.categorie categorie_championnat, 
 club.nom club_nom,
  equipe.code_alphabetique equipe_code, 
+ division.numero division_numero, poule.numero poule_numero,
+ (select count(*) from poule where division_fk = division.id) nbPoules,
  membre.nom membre_nom, membre.prenom membre_prenom,
 membre.telephone membre_telephone, membre.gsm membre_gsm, membre.mail membre_mail
 from championnat 
 inner join division on division.championnat_fk = championnat.id 
 inner join equipe on equipe.division_fk = division.id
+inner join poule on equipe.poule_fk = poule.id
 inner join club on club.id = equipe.club_fk
 inner join membre on equipe.capitaine_fk = membre.id
 where championnat.id = $P{championnatId}
@@ -33,6 +47,15 @@ order by  club_nom, equipe_code]]>
 	</field>
 	<field name="equipe_code" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="equipe_code"/>
+	</field>
+	<field name="division_numero" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="division_numero"/>
+	</field>
+	<field name="poule_numero" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="poule_numero"/>
+	</field>
+	<field name="nbpoules" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.label" value="nbpoules"/>
 	</field>
 	<field name="membre_nom" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="membre_nom"/>
@@ -54,7 +77,7 @@ order by  club_nom, equipe_code]]>
 		<groupHeader>
 			<band height="20">
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="0" y="0" width="555" height="20" backcolor="#FFAE00" uuid="596215e5-8bf8-4397-bf97-954c4331b8ad">
+					<reportElement mode="Opaque" x="0" y="0" width="802" height="20" backcolor="#FFAE00" uuid="596215e5-8bf8-4397-bf97-954c4331b8ad">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d0fea648-2c47-4b7e-b2ed-1091422fc39e"/>
 					</reportElement>
 					<box leftPadding="5">
@@ -77,7 +100,7 @@ order by  club_nom, equipe_code]]>
 	<title>
 		<band height="60" splitType="Stretch">
 			<staticText>
-				<reportElement mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#C2C2C2" uuid="61dbfdbf-238c-40dc-87fc-10afe0cf5136"/>
+				<reportElement mode="Opaque" x="0" y="0" width="802" height="30" backcolor="#C2C2C2" uuid="61dbfdbf-238c-40dc-87fc-10afe0cf5136"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -89,7 +112,7 @@ order by  club_nom, equipe_code]]>
 				<text><![CDATA[LISTE DES CAPITAINES]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement mode="Opaque" x="0" y="30" width="555" height="30" backcolor="#C2C2C2" uuid="9dfcd034-5f98-48be-85f4-71f0bc5999a3"/>
+				<reportElement mode="Opaque" x="0" y="30" width="802" height="30" backcolor="#C2C2C2" uuid="9dfcd034-5f98-48be-85f4-71f0bc5999a3"/>
 				<box>
 					<leftPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
@@ -98,6 +121,12 @@ order by  club_nom, equipe_code]]>
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{type_championnat} + " " + $F{categorie_championnat} + " " + $F{annee}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="701" y="0" width="100" height="30" uuid="b25f1cdb-a437-4371-8bb1-57cdeca95847"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -110,7 +139,7 @@ order by  club_nom, equipe_code]]>
 	<detail>
 		<band height="30" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="ElementGroupHeight" x="100" y="0" width="180" height="30" uuid="3a10bebc-384c-467d-8161-d55d4cb4bdd7">
+				<reportElement stretchType="ElementGroupHeight" x="270" y="0" width="170" height="30" uuid="3a10bebc-384c-467d-8161-d55d4cb4bdd7">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="954a420f-5e83-4a27-a475-17e5fe5acf5e"/>
 				</reportElement>
 				<box leftPadding="2">
@@ -121,7 +150,7 @@ order by  club_nom, equipe_code]]>
 				<textFieldExpression><![CDATA[$F{membre_nom} + " " + $F{membre_prenom}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="100" height="30" uuid="212b0a44-d638-4159-ab60-5953cb21dc2e">
+				<reportElement stretchType="ElementGroupHeight" x="0" y="0" width="150" height="30" uuid="212b0a44-d638-4159-ab60-5953cb21dc2e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eb7c6cf4-2a98-4d0b-b8c6-2e205f6a39db"/>
 				</reportElement>
 				<box leftPadding="2">
@@ -132,7 +161,7 @@ order by  club_nom, equipe_code]]>
 				<textFieldExpression><![CDATA[$F{equipe_code}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="280" y="0" width="85" height="30" uuid="a2f99815-144b-4fbb-a9e5-aefa0c2c0d7d"/>
+				<reportElement stretchType="ElementGroupHeight" x="440" y="0" width="107" height="30" uuid="a2f99815-144b-4fbb-a9e5-aefa0c2c0d7d"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
@@ -141,7 +170,7 @@ order by  club_nom, equipe_code]]>
 				<textFieldExpression><![CDATA[$F{membre_gsm}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="ElementGroupHeight" x="365" y="0" width="190" height="30" uuid="e351f3b6-4e51-4393-b8cf-bc8e5bd27521"/>
+				<reportElement stretchType="ElementGroupHeight" x="547" y="0" width="254" height="30" uuid="e351f3b6-4e51-4393-b8cf-bc8e5bd27521"/>
 				<box leftPadding="2">
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
@@ -149,6 +178,17 @@ order by  club_nom, equipe_code]]>
 				</box>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{membre_mail}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="ElementGroupHeight" x="150" y="0" width="120" height="30" uuid="633aed7d-9ee1-45a0-96b1-e1556e431ca2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="eb7c6cf4-2a98-4d0b-b8c6-2e205f6a39db"/>
+				</reportElement>
+				<box leftPadding="2">
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Division " + $F{division_numero} + (($F{nbpoules}  > 1)?(" Poule " + $F{poule_numero}):"")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
