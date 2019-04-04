@@ -82,20 +82,23 @@ public class MembreController {
             membres = (List<Membre>) membreRepository.findAll();
         }
 
+        boolean userConnected = authentication!=null;
         boolean adminConnected = userService.isAdmin(authentication);
         Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
 
         /* Les informations privees sont retournes si
             - l'utilisateur connecte est admnistrateur
             - l'utilisateur connecte est responsable du club du membre
+            - il y a un utilisateur connecte et que le membre est capitaine ou responsable de club
 
             Dans un premier temps, les membres inactifs ne seront retournes que pour les administrateurs
         */
 
         for (Membre membre : membres){
             boolean informationsMembreAccessibles = adminConnected || isResponsableMembre(membreConnecte, membre);
+            boolean contactsAccessibles = informationsMembreAccessibles || (userConnected && (membre.isResponsableClub() || membre.isCapitaine()));
             if (adminConnected || membre.isActif()){
-                membresDto.add(new MembreDto(membre,informationsMembreAccessibles));
+                membresDto.add(new MembreDto(membre,informationsMembreAccessibles,contactsAccessibles));
             }
         }
 

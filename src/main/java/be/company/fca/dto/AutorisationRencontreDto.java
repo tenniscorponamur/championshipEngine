@@ -14,7 +14,7 @@ public class AutorisationRencontreDto {
         this.id = autorisationRencontre.getId();
         this.type= autorisationRencontre.getType();
         this.rencontreFk = autorisationRencontre.getRencontreFk();
-        this.membre = new MembreDto(autorisationRencontre.getMembre(),false);
+        this.membre = new MembreDto(autorisationRencontre.getMembre(),false,false);
     }
 
     public Long getId() {

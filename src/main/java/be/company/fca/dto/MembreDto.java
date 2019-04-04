@@ -45,7 +45,7 @@ public class MembreDto {
      * @param membre
      * @param withPrivateInformations true si les informations privees doivent egalement etre communiques
      */
-    public MembreDto(Membre membre,boolean withPrivateInformations){
+    public MembreDto(Membre membre,boolean withPrivateInformations, boolean withContactInformations){
         this.id = membre.getId();
 
         this.prenom = membre.getPrenom();
@@ -62,6 +62,12 @@ public class MembreDto {
         this.classementCorpoActuel = membre.getClassementCorpoActuel();
         this.responsableClub = membre.isResponsableClub();
 
+        if (withContactInformations){
+            this.telephone = membre.getTelephone();
+            this.gsm = membre.getGsm();
+            this.mail = membre.getMail();
+        }
+
         if (withPrivateInformations){
             this.dateAffiliationCorpo = membre.getDateAffiliationCorpo();
             this.dateDesaffiliationCorpo = membre.getDateDesaffiliationCorpo();
@@ -71,9 +77,6 @@ public class MembreDto {
             this.rue = membre.getRue();
             this.rueNumero = membre.getRueNumero();
             this.rueBoite = membre.getRueBoite();
-            this.telephone = membre.getTelephone();
-            this.gsm = membre.getGsm();
-            this.mail = membre.getMail();
         }
     }
 

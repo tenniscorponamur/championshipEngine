@@ -19,7 +19,7 @@ public class EquipeDto {
         this.division = equipe.getDivision();
         this.club = equipe.getClub();
         if (equipe.getCapitaine()!=null){
-            this.capitaine = new MembreDto(equipe.getCapitaine(),false);
+            this.capitaine = new MembreDto(equipe.getCapitaine(),false,true);
         }
         this.poule = equipe.getPoule();
         this.terrain = equipe.getTerrain();

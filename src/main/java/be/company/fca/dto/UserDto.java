@@ -24,7 +24,7 @@ public class UserDto {
         this.nom=user.getNom();
         this.admin=user.isAdmin();
         if (user.getMembre()!=null){
-            this.membre = new MembreDto(user.getMembre(),false);
+            this.membre = new MembreDto(user.getMembre(),false,false);
         }
         this.roles=roles;
     }

@@ -21,16 +21,16 @@ public class MatchDto {
         this.ordre = match.getOrdre();
         this.type = match.getType();
         if (match.getJoueurVisites1()!=null){
-            this.joueurVisites1 = new MembreDto(match.getJoueurVisites1(),false);
+            this.joueurVisites1 = new MembreDto(match.getJoueurVisites1(),false,false);
         }
         if (match.getJoueurVisites2()!=null){
-            this.joueurVisites2 = new MembreDto(match.getJoueurVisites2(),false);
+            this.joueurVisites2 = new MembreDto(match.getJoueurVisites2(),false,false);
         }
         if (match.getJoueurVisiteurs1()!=null){
-            this.joueurVisiteurs1 = new MembreDto(match.getJoueurVisiteurs1(),false);
+            this.joueurVisiteurs1 = new MembreDto(match.getJoueurVisiteurs1(),false,false);
         }
         if (match.getJoueurVisiteurs2()!=null){
-            this.joueurVisiteurs2 = new MembreDto(match.getJoueurVisiteurs2(),false);
+            this.joueurVisiteurs2 = new MembreDto(match.getJoueurVisiteurs2(),false,false);
         }
         this.pointsVisites = match.getPointsVisites();
         this.pointsVisiteurs = match.getPointsVisiteurs();
