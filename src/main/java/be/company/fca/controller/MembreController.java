@@ -301,6 +301,8 @@ public class MembreController {
     @RequestMapping(value = "/private/membre", method = RequestMethod.DELETE)
     public void deleteMembre(@RequestParam Long membreId){
         if (isMembreDeletable(membreId)){
+            membreRepository.updateClassementCorpo(membreId,null);
+            membreRepository.updateClassementAFT(membreId,null);
             classementCorpoRepository.deleteByMembreFk(membreId);
             classementAFTRepository.deleteByMembreFk(membreId);
             membreRepository.delete(membreId);
