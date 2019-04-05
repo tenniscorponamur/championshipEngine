@@ -322,6 +322,18 @@ public class MembreController {
         return response;
     }
 
+    @RequestMapping(path="/public/membres/listeForcePoints", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getListeForceMembresParPoints() throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getListeForcePointsTemplate());
+        Connection conn = datasource.getConnection();
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, new HashMap(), conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
 
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
