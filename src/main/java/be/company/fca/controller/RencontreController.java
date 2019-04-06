@@ -726,7 +726,7 @@ public class RencontreController {
                 if (encoder.matches(password, adversaire.getPassword())) {
 
                     rencontreRepository.updateValiditeRencontre(rencontreId, true);
-                    trace = "Validation des résultats par adversaire (" + adversaire.getNom() + " " + adversaire.getCodePostal() + ")";
+                    trace = "Validation des résultats par adversaire (" + adversaire.getNom() + " " + adversaire.getPrenom() + ")";
 
                     traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
 
