@@ -18,6 +18,7 @@ public class RencontreDto {
     private Integer pointsVisites;
     private Integer pointsVisiteurs;
     private String informationsInterserie;
+    private boolean finaleInterserie;
     private String commentairesEncodeur;
     private boolean resultatsEncodes;
     private boolean valide;
@@ -39,6 +40,7 @@ public class RencontreDto {
         this.pointsVisites = rencontre.getPointsVisites();
         this.pointsVisiteurs = rencontre.getPointsVisiteurs();
         this.informationsInterserie = rencontre.getInformationsInterserie();
+        this.finaleInterserie = rencontre.isFinaleInterserie();
         this.commentairesEncodeur = rencontre.getCommentairesEncodeur();
         this.resultatsEncodes = rencontre.isResultatsEncodes();
         this.valide = rencontre.isValide();
@@ -138,6 +140,14 @@ public class RencontreDto {
 
     public void setInformationsInterserie(String informationsInterserie) {
         this.informationsInterserie = informationsInterserie;
+    }
+
+    public boolean isFinaleInterserie() {
+        return finaleInterserie;
+    }
+
+    public void setFinaleInterserie(boolean finaleInterserie) {
+        this.finaleInterserie = finaleInterserie;
     }
 
     public String getCommentairesEncodeur() {

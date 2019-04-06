@@ -59,6 +59,9 @@ public class Rencontre {
     @Column (name = "informations_interserie")
     private String informationsInterserie;
 
+    @Column (name = "finale_interserie", nullable = false)
+    private boolean finaleInterserie=false;
+
     @Column (name = "commentaires_encodeur")
     private String commentairesEncodeur;
 
@@ -186,6 +189,14 @@ public class Rencontre {
 
     public void setInformationsInterserie(String informationsInterserie) {
         this.informationsInterserie = informationsInterserie;
+    }
+
+    public boolean isFinaleInterserie() {
+        return finaleInterserie;
+    }
+
+    public void setFinaleInterserie(boolean finaleInterserie) {
+        this.finaleInterserie = finaleInterserie;
     }
 
     @Override

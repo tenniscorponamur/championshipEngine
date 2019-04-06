@@ -895,6 +895,7 @@ public class RencontreController {
                                     rencontre.setInformationsInterserie("Demi-finale");
                                 }else if (!division.isMultiIS() && !division.isWithFinales()){
                                     rencontre.setInformationsInterserie("Finale");
+                                    rencontre.setFinaleInterserie(true);
                                 }
 
                                 rencontre.setDivision(division);
@@ -966,6 +967,7 @@ public class RencontreController {
 
                                     Rencontre finale = new Rencontre();
                                     finale.setInformationsInterserie("Finale");
+                                    finale.setFinaleInterserie(true);
                                     finale.setDivision(division);
                                     finale.setEquipeVisites(equipeGagnanteA);
                                     finale.setEquipeVisiteurs(equipeGagnanteB);

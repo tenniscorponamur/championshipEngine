@@ -403,48 +403,17 @@ public class ClassementServiceImpl implements ClassementService {
         // S'il s'agit d'une division avec petite finale et grande finale, on ne doit conserver que l'equipe qui a joue le plus de rencontres et qui a gagne l'ensemble de ceux-ci
         if (division.isWithFinales()){
 
-            Map<Equipe, List<Rencontre>> mapRencontresEquipe = new HashMap<>();
-            int maxRencontres = 0;
+            // Il faut analyser les victoires pour determiner le gagnant final
+            // Comme toutes les rencontres ne sont potentiellement pas encore disputees, on ne peut pas considerer comme gagnant l'equipe qui a
+            // gagne le plus de rencontre interserie sinon meme le match pour la 5eme place consacrera le gagnant...
+            // On va tester le fait qu'il s'agit de la finale via un boolean pour ce type de match
+
+            // Analyser la finale uniquement !!
+
             for (Rencontre interserie : rencontreInterserieList){
-                List<Rencontre> listeRencontresVisites = mapRencontresEquipe.get(interserie.getEquipeVisites());
-                List<Rencontre> listeRencontresVisiteurs = mapRencontresEquipe.get(interserie.getEquipeVisiteurs());
-                if (listeRencontresVisites==null){
-                    listeRencontresVisites = new ArrayList<>();
-                    mapRencontresEquipe.put(interserie.getEquipeVisites(),listeRencontresVisites);
+                if (interserie.isFinaleInterserie()){
+                    equipes.add(getGagnantRencontreInterserie(interserie));
                 }
-                if (listeRencontresVisiteurs==null){
-                    listeRencontresVisiteurs = new ArrayList<>();
-                    mapRencontresEquipe.put(interserie.getEquipeVisiteurs(),listeRencontresVisiteurs);
-                }
-                listeRencontresVisites.add(interserie);
-                listeRencontresVisiteurs.add(interserie);
-                maxRencontres = Math.max(maxRencontres,listeRencontresVisites.size());
-                maxRencontres = Math.max(maxRencontres,listeRencontresVisiteurs.size());
-            }
-
-            // On ne va analyser que les rencontres des equipes qui ont joue le maximum de rencontres (deux selon le principe de creation de rencontres actuel)
-
-            List<Equipe> equipesRetenues = new ArrayList<>();
-            for (Equipe equipe : mapRencontresEquipe.keySet()){
-                if (mapRencontresEquipe.get(equipe).size()==maxRencontres){
-                    equipesRetenues.add(equipe);
-                }
-            }
-
-            //TODO : il faut analyser les victoires pour determiner le gagnant final
-
-            // On va rechercher la rencontre entre les deux equipes
-            if (equipesRetenues.size()==2){
-                Equipe equipeA = equipesRetenues.get(0);
-                Equipe equipeB = equipesRetenues.get(1);
-
-                for (Rencontre interserie : rencontreInterserieList){
-                    if (  (interserie.getEquipeVisites().equals(equipeA) && interserie.getEquipeVisiteurs().equals(equipeB))
-                        || (interserie.getEquipeVisites().equals(equipeB) && interserie.getEquipeVisiteurs().equals(equipeA))){
-                        equipes.add(getGagnantRencontreInterserie(interserie));
-                    }
-                }
-
             }
 
         }else{
