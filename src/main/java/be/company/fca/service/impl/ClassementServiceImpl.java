@@ -431,6 +431,8 @@ public class ClassementServiceImpl implements ClassementService {
                 }
             }
 
+            //TODO : il faut analyser les victoires pour determiner le gagnant final
+
             // On va rechercher la rencontre entre les deux equipes
             if (equipesRetenues.size()==2){
                 Equipe equipeA = equipesRetenues.get(0);

@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
@@ -54,6 +55,8 @@ public class RencontreController {
     private PouleRepository pouleRepository;
     @Autowired
     private ChampionnatRepository championnatRepository;
+    @Autowired
+    private MembreRepository membreRepository;
 
     @Autowired
     private MatchRepository matchRepository;
@@ -555,6 +558,42 @@ public class RencontreController {
         return false;
     }
 
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/isEtatValidable", method = RequestMethod.GET)
+    public boolean isRencontreEtatValidable(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+
+        // Tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin
+
+        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        if (rencontre.isResultatsEncodes() && !rencontre.isValide()) {
+            if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()){
+
+                // Administrateur : OK
+                if (userService.isAdmin(authentication)){
+                    return true;
+                }
+                // Capitaine Equipe visites : OK
+                // Responsable Club visite : OK
+                Membre membre = userService.getMembreFromAuthentication(authentication);
+                boolean capitaineOrResponsableVisites = isCapitaineOrResponsableClub(membre,rencontre.getEquipeVisites());
+                if (capitaineOrResponsableVisites){
+                    return true;
+                }
+
+                // Analyse des autorisations
+
+                List<AutorisationRencontre> autorisationRencontres = autorisationrencontreRepository.findByRencontreFk(rencontreId);
+                for (AutorisationRencontre autorisationRencontre : autorisationRencontres){
+                    if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType()) && autorisationRencontre.getMembre().equals(membre)){
+                        return true;
+                    }
+                }
+
+
+            }
+        }
+        return false;
+    }
+
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isValidable", method = RequestMethod.GET)
     public boolean isRencontreValidable(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
 
@@ -665,6 +704,42 @@ public class RencontreController {
         traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
 
         return validite;
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/validiteParAdversaire", method = RequestMethod.PUT)
+    public boolean updateValiditeRencontreParAdversaire(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long adversaireId, @RequestBody String password) {
+
+        String trace = "";
+
+        // Seul le capitaine visites, responsable club visite et admin peuvent demander une validation par l'adversaire --> via le test "is.."
+        // Tracer qui a validé
+
+        if (isRencontreEtatValidable(authentication,rencontreId)) {
+
+            // Tester la correspondance adversaire/mot de passe
+
+            Membre adversaire = membreRepository.findOne(adversaireId);
+            if (adversaire!=null){
+
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                // On teste si le mot de passe coïncide
+                if (encoder.matches(password, adversaire.getPassword())) {
+
+                    rencontreRepository.updateValiditeRencontre(rencontreId, true);
+                    trace = "Validation des résultats par adversaire (" + adversaire.getNom() + " " + adversaire.getCodePostal() + ")";
+
+                    traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
+
+                    return true;
+
+                }
+
+            }
+
+        }
+
+        return false;
+
     }
 
     /**
