@@ -123,9 +123,23 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     List<Rencontre> getRencontresByDivisionAndEquipes(@Param("divisionId") Long divisionId, @Param("equipe1Id") Long equipe1Id, @Param("equipe2Id") Long equipe2Id);
 
     /**
-     * Permet de recuperer les rencontres validées d'une equipe
+     * Permet de recuperer les rencontres avec une equipe visitee precise
+     * @param equipeVisites Equipe
+     * @return Rencontres avec une equipe visitee precise
+     */
+    List<Rencontre> findByEquipeVisites(Equipe equipeVisites);
+
+    /**
+     * Permet de recuperer les rencontres avec une equipe visiteur precise
+     * @param equipeVisiteurs Equipe
+     * @return Rencontres avec une equipe visiteur precise
+     */
+    List<Rencontre> findByEquipeVisiteurs(Equipe equipeVisiteurs);
+
+    /**
+     * Permet de recuperer les rencontres d'une equipe
      * @param equipe Equipe
-     * @return Rencontres validées d'une equipe
+     * @return Rencontres d'une equipe
      */
     @Query("select distinct rencontre from Rencontre rencontre " +
             " where rencontre.equipeVisites =:equipe or rencontre.equipeVisiteurs = :equipe")

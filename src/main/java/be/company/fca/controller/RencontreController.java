@@ -366,31 +366,107 @@ public class RencontreController {
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.POST)
-    public AutorisationRencontreDto addAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestBody AutorisationRencontre autorisationRencontre){
+    public AutorisationRencontreDto addAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam("allOthersOfTheTeam") boolean allOthersOfTheTeam, @RequestBody AutorisationRencontre autorisationRencontre){
         autorisationRencontre.setRencontreFk(rencontreId);
         if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
             if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
-                return new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
+                AutorisationRencontreDto authorizationDto = new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
+                if (allOthersOfTheTeam){
+                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    // On va egalement creer des autorisations pour toutes les autres rencontres de l'equipe concernee
+                    List<Rencontre> rencontresOfTeam = rencontreRepository.findByEquipeVisites(rencontreInitiale.getEquipeVisites());
+                    for (Rencontre rencontre : rencontresOfTeam){
+                        // On va ajouter l'autorisation pour toutes les autres rencontres
+                        if (!rencontre.getId().equals(rencontreId)){
+                            AutorisationRencontre otherAutorisation = new AutorisationRencontre();
+                            otherAutorisation.setRencontreFk(rencontre.getId());
+                            otherAutorisation.setType(TypeAutorisation.ENCODAGE);
+                            otherAutorisation.setMembre(autorisationRencontre.getMembre());
+                            autorisationrencontreRepository.save(otherAutorisation);
+                        }
+                    }
+
+                }
+                // On va retourner l'autorisation initiale pour la rencontre a partir de laquelle on a fait la demande
+                return authorizationDto;
             }
         }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
             if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
-                return new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
+                AutorisationRencontreDto authorizationDto = new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
+                if (allOthersOfTheTeam){
+                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    // On va egalement creer des autorisations pour toutes les autres rencontres de l'equipe concernee
+                    List<Rencontre> rencontresOfTeam = rencontreRepository.findByEquipeVisiteurs(rencontreInitiale.getEquipeVisiteurs());
+                    for (Rencontre rencontre : rencontresOfTeam){
+                        // On va ajouter l'autorisation pour toutes les autres rencontres
+                        if (!rencontre.getId().equals(rencontreId)){
+                            AutorisationRencontre otherAutorisation = new AutorisationRencontre();
+                            otherAutorisation.setRencontreFk(rencontre.getId());
+                            otherAutorisation.setType(TypeAutorisation.VALIDATION);
+                            otherAutorisation.setMembre(autorisationRencontre.getMembre());
+                            autorisationrencontreRepository.save(otherAutorisation);
+                        }
+                    }
+
+                }
+                // On va retourner l'autorisation initiale pour la rencontre a partir de laquelle on a fait la demande
+                return authorizationDto;
             }
         }
         throw new ForbiddenException();
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.DELETE)
-    public boolean removeAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long autorisationRencontreId){
+    public boolean removeAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long autorisationRencontreId, @RequestParam("allOthersOfTheTeam") boolean allOthersOfTheTeam){
         AutorisationRencontre autorisationRencontre = autorisationrencontreRepository.findOne(autorisationRencontreId);
         if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
             if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
                 autorisationrencontreRepository.delete(autorisationRencontreId);
+                if (allOthersOfTheTeam){
+                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    // Recuperer l'equipe visitee de la rencontre
+                    Equipe equipeVisitee = rencontreInitiale.getEquipeVisites();
+                    // Recuperer les rencontres de cette equipe en tant qu'equipe visitee
+                    List<Rencontre> rencontresOfTeam = rencontreRepository.findByEquipeVisites(equipeVisitee);
+                    // Recuperer les autorisations pour chacune des rencontres differentes de l'initiale
+                    for (Rencontre rencontre : rencontresOfTeam){
+                        if (!rencontre.getId().equals(rencontreId)){
+                            List<AutorisationRencontre> otherAuthorizations = autorisationrencontreRepository.findByRencontreFk(rencontre.getId());
+                            // Pour le membre concerne et le type ENCODAGE, supprimer l'autorisation
+                            for (AutorisationRencontre otherAuthorization : otherAuthorizations){
+                                if (otherAuthorization.getType().equals(TypeAutorisation.ENCODAGE)
+                                        && otherAuthorization.getMembre().getId().equals(autorisationRencontre.getMembre().getId())){
+                                    autorisationrencontreRepository.delete(otherAuthorization.getId());
+                                }
+                            }
+                        }
+                    }
+                }
                 return true;
             }
         }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
             if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
                 autorisationrencontreRepository.delete(autorisationRencontreId);
+                if (allOthersOfTheTeam){
+                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    // Recuperer l'equipe visiteur de la rencontre
+                    Equipe equipeVisiteur = rencontreInitiale.getEquipeVisiteurs();
+                    // Recuperer les rencontres de cette equipe en tant qu'equipe visiteur
+                    List<Rencontre> rencontresOfTeam = rencontreRepository.findByEquipeVisiteurs(equipeVisiteur);
+                    // Recuperer les autorisations pour chacune des rencontres differentes de l'initiale
+                    for (Rencontre rencontre : rencontresOfTeam){
+                        if (!rencontre.getId().equals(rencontreId)){
+                            List<AutorisationRencontre> otherAuthorizations = autorisationrencontreRepository.findByRencontreFk(rencontre.getId());
+                            // Pour le membre concerne et le type VALIDATION, supprimer l'autorisation
+                            for (AutorisationRencontre otherAuthorization : otherAuthorizations){
+                                if (otherAuthorization.getType().equals(TypeAutorisation.VALIDATION)
+                                        && otherAuthorization.getMembre().getId().equals(autorisationRencontre.getMembre().getId())){
+                                    autorisationrencontreRepository.delete(otherAuthorization.getId());
+                                }
+                            }
+                        }
+                    }
+                }
                 return true;
             }
         }
