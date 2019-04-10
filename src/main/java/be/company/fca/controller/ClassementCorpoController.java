@@ -87,12 +87,52 @@ public class ClassementCorpoController {
      */
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/classementCorpo/simulation", method = RequestMethod.GET)
-    public ClassementCorpo simulationClassement(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate){
+    public ClassementCorpo simulationClassement(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate) {
+        ClassementCorpo classementCorpo = new ClassementCorpo();
+        classementCorpo.setDateClassement(endDate);
+        classementCorpo.setMembreFk(membreId);
+        InfosCalculClassement infosCalculClassement = simulationClassementInfos(membreId,startDate,endDate);
+        Integer endPoints = infosCalculClassement.getPointsFin();
+        classementCorpo.setPoints(endPoints);
+        return classementCorpo;
+    }
+
+    /**
+     * Permet de calculer un classement corpo a une date donnee et de recuperer les differentes informations detaillees ayant mene a ce resultat
+     * en partant d'une autre date
+     * Ce classement sera determine en fonction des matchs joues entre les deux dates (3 minimum)
+     * @param membreId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/classementCorpo/simulationWithDetail", method = RequestMethod.GET)
+    public InfosCalculClassement simulationClassementWithInfos(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate) {
+        return simulationClassementInfos(membreId,startDate,endDate);
+    }
+
+    /**
+     * Permet de recuperer les informations du calcul de classement d'un membre
+     * entre deux dates
+     * @param membreId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    private InfosCalculClassement simulationClassementInfos(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate){
+
+        InfosCalculClassement infosCalculClassement = new InfosCalculClassement();
+        infosCalculClassement.setMembreId(membreId);
+        infosCalculClassement.setStartDate(startDate);
+        infosCalculClassement.setEndDate(endDate);
 
         Membre membre = membreRepository.findOne(membreId);
 
         // On enregistre le classement de depart
         Integer startPoints = getPointsCorpoByMembreAndDate(membre,startDate,false);
+
+        infosCalculClassement.setPointsDepart(startPoints);
 
         // Recuperer l'ensemble des matchs joues par le membre entre les deux dates
 
@@ -112,23 +152,13 @@ public class ClassementCorpoController {
 
             for (Match match : matchsValables){
 
-                Integer differencePoints = getDifferencePoints(match,membre);
+                CaracteristiquesMatch caracteristiquesMatch = getCaracteristiquesMatch(match,membre);
 
-                //Si la difference de points est positive, cela signifie que l'adversaire etait mieux classe
-
-                // On recupere le resultat du match
-
-                ResultatMatch resultatMatch = getResultatMatch(match, membre);
-
-                // Limite de difference de points a +/- 15 points
-                Integer differencePointsConsiderable = Math.max(-15,Math.min(15,differencePoints));
-
-                // Utilisation de la table de correspondance
-                Integer pointsGagnesOuPerdus = correspondancePoints.get(match.getRencontre().getDivision().getChampionnat().getType()).get(resultatMatch).get(differencePointsConsiderable);
+                infosCalculClassement.getCaracteristiquesMatchList().add(caracteristiquesMatch);
 
                 // Faire la somme et utiliser a la fin la table de conversion des points en "points corpo"
 
-                totalGagnesPerdus+=pointsGagnesOuPerdus;
+                totalGagnesPerdus+=caracteristiquesMatch.getPointsGagnesOuPerdus();
 
             }
 
@@ -140,12 +170,9 @@ public class ClassementCorpoController {
         // Perte max --> NC --> 5 points
         Integer endPoints = Math.max(5,startPoints + pointsClassementsGagnesPerdus);
 
-        ClassementCorpo classementCorpo = new ClassementCorpo();
-        classementCorpo.setDateClassement(endDate);
-        classementCorpo.setMembreFk(membre.getId());
-        classementCorpo.setPoints(endPoints);
+        infosCalculClassement.setPointsFin(endPoints);
 
-        return classementCorpo;
+        return infosCalculClassement;
 
     }
 
@@ -296,12 +323,6 @@ public class ClassementCorpoController {
         return matchsValables;
     }
 
-    private enum ResultatMatch {
-        victoire,
-        defaite,
-        matchNul
-    }
-
     /**
      * Permet de recuperer le resultat d'un match d'un membre
      * @param match
@@ -375,17 +396,19 @@ public class ClassementCorpoController {
     }
 
     /**
-     * Permet de recuperer la difference de points Corpo entre
+     * Permet de recuperer les caracteristiques d'un match
      * un joueur (ou la paire dont il fait partie) et son/ses adversaires
      *
-     * Le calcul est effectue en soustrayant les points du membre (ou de sa paire) des points de  l'adversaire
+     * Pour la difference de points, le calcul est effectue en soustrayant les points du membre (ou de sa paire) des points de  l'adversaire
      *
      * Ainsi, si le chiffre est positif, cela signifie que l'adversaire etait plus fort
      *
      * @param match
      * @return
      */
-    private Integer getDifferencePoints(Match match, Membre membre){
+    private CaracteristiquesMatch getCaracteristiquesMatch(Match match, Membre membre){
+
+        CaracteristiquesMatch caracteristiquesMatch = new CaracteristiquesMatch();
 
         // On considere que c'est un championnat messieurs pour les championnats hiver/ete
         // afin de prendre en compte la correspondance quand une dame joue avec les messieurs
@@ -395,18 +418,33 @@ public class ClassementCorpoController {
         // Determiner s'il s'agit d'un simple ou d'un double
 
         if (TypeMatch.SIMPLE.equals(match.getType())){
+
+            caracteristiquesMatch.setTypeMatch(TypeMatch.SIMPLE);
+            caracteristiquesMatch.setDate(match.getRencontre().getDateHeureRencontre());
+            caracteristiquesMatch.setJoueur(new MembreLight(membre));
+
             Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            caracteristiquesMatch.setPointsJoueur(pointsMembre);
+
             Membre adversaire = null;
             if (membre.equals(match.getJoueurVisites1())){
                 adversaire = match.getJoueurVisiteurs1();
             }else{
                 adversaire = match.getJoueurVisites1();
             }
+            caracteristiquesMatch.setAdversaire(new MembreLight(adversaire));
             Integer pointsAdversaire = getPointsCorpoByMembreAndDate(adversaire,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
-            return pointsAdversaire - pointsMembre;
+            caracteristiquesMatch.setPointsAdversaire(pointsAdversaire);
+            caracteristiquesMatch.setDifferencePoints(pointsAdversaire - pointsMembre);
+
         }else{
 
+            caracteristiquesMatch.setTypeMatch(TypeMatch.DOUBLE);
+            caracteristiquesMatch.setDate(match.getRencontre().getDateHeureRencontre());
+            caracteristiquesMatch.setJoueur(new MembreLight(membre));
+
             Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            caracteristiquesMatch.setPointsJoueur(pointsMembre);
 
             Membre partenaire = null;
             Membre adversaire1 = null;
@@ -430,13 +468,38 @@ public class ClassementCorpoController {
                 adversaire2 = match.getJoueurVisites2();
             }
 
-            Integer pointsPartenaire = getPointsCorpoByMembreAndDate(partenaire,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
-            Integer pointsAdversaire1 = getPointsCorpoByMembreAndDate(adversaire1,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
-            Integer pointsAdversaire2 = getPointsCorpoByMembreAndDate(adversaire2,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            caracteristiquesMatch.setPartenaire(new MembreLight(partenaire));
+            caracteristiquesMatch.setAdversaire(new MembreLight(adversaire1));
+            caracteristiquesMatch.setPartenaireAdversaire(new MembreLight(adversaire2));
 
-            return getPointsAssimilesSimples(pointsAdversaire1 + pointsAdversaire2) - getPointsAssimilesSimples(pointsMembre + pointsPartenaire);
+            Integer pointsPartenaire = getPointsCorpoByMembreAndDate(partenaire,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            caracteristiquesMatch.setPointsPartenaire(pointsPartenaire);
+            Integer pointsAdversaire1 = getPointsCorpoByMembreAndDate(adversaire1,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            caracteristiquesMatch.setPointsAdversaire(pointsAdversaire1);
+            Integer pointsAdversaire2 = getPointsCorpoByMembreAndDate(adversaire2,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
+            caracteristiquesMatch.setPointsPartenaireAdversaire(pointsAdversaire2);
+
+            caracteristiquesMatch.setDifferencePoints(getPointsAssimilesSimples(pointsAdversaire1 + pointsAdversaire2) - getPointsAssimilesSimples(pointsMembre + pointsPartenaire));
 
         }
+
+        Integer differencePoints = caracteristiquesMatch.getDifferencePoints();
+
+        //Si la difference de points est positive, cela signifie que l'adversaire etait mieux classe
+
+        // On recupere le resultat du match
+
+        ResultatMatch resultatMatch = getResultatMatch(match, membre);
+        caracteristiquesMatch.setResultatMatch(resultatMatch);
+
+        // Limite de difference de points a +/- 15 points
+        Integer differencePointsConsiderable = Math.max(-15,Math.min(15,differencePoints));
+
+        // Utilisation de la table de correspondance
+        Integer pointsGagnesOuPerdus = correspondancePoints.get(match.getRencontre().getDivision().getChampionnat().getType()).get(resultatMatch).get(differencePointsConsiderable);
+        caracteristiquesMatch.setPointsGagnesOuPerdus(pointsGagnesOuPerdus);
+
+        return caracteristiquesMatch;
 
     }
     /**
