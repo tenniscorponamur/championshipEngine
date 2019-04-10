@@ -88,6 +88,7 @@ public class MembreController {
 
         /* Les informations privees sont retournes si
             - l'utilisateur connecte est admnistrateur
+            - l'utilisateur connecte et qu'il s'agit de lui-meme
             - l'utilisateur connecte est responsable du club du membre
             - il y a un utilisateur connecte et que le membre est capitaine ou responsable de club
 
@@ -95,7 +96,7 @@ public class MembreController {
         */
 
         for (Membre membre : membres){
-            boolean informationsMembreAccessibles = adminConnected || isResponsableMembre(membreConnecte, membre);
+            boolean informationsMembreAccessibles = adminConnected || isMe(membreConnecte,membre) || isResponsableMembre(membreConnecte, membre);
             boolean contactsAccessibles = informationsMembreAccessibles || (userConnected && (membre.isResponsableClub() || membre.isCapitaine()));
             if (adminConnected || membre.isActif()){
                 membresDto.add(new MembreDto(membre,informationsMembreAccessibles,contactsAccessibles));
@@ -103,6 +104,17 @@ public class MembreController {
         }
 
         return membresDto;
+    }
+
+
+    /**
+     * Permet de savoir si un membre connecte correspond a un autre membre (en se basant sur l'id)
+     * @param membreConnecte
+     * @param otherMembre
+     * @return true si le membreConnecte est l'autre membre (en se basant sur l'id)
+     */
+    private boolean isMe(Membre membreConnecte, Membre otherMembre){
+        return membreConnecte!=null && membreConnecte.getId().equals(otherMembre.getId());
     }
 
     /**
@@ -145,7 +157,7 @@ public class MembreController {
         return membre;
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
+    //@PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/membre/{membreId}/coordonnees", method = RequestMethod.PUT)
     public Membre updateCoordonnees(Authentication authentication, @PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         boolean autorise = privateInformationsEditables(authentication,membreId);
@@ -169,7 +181,7 @@ public class MembreController {
 
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
+    //@PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/membre/{membreId}/contacts", method = RequestMethod.PUT)
     public Membre updateContacts(Authentication authentication, @PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         boolean autorise = privateInformationsEditables(authentication,membreId);
@@ -195,14 +207,20 @@ public class MembreController {
     private boolean privateInformationsEditables(Authentication authentication, Long membreId){
         boolean autorise = false;
         boolean adminConnected = userService.isAdmin(authentication);
-        if (adminConnected){
+        if (adminConnected) {
             autorise = true;
         }else{
             Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
-            if (membreConnecte!=null && membreConnecte.isResponsableClub() && membreConnecte.getClub()!=null){
-                Membre membreExistant = membreRepository.findOne(membreId);
-                if (membreExistant.getClub()!=null){
-                    autorise = membreExistant.getClub().equals(membreConnecte.getClub());
+            if (membreConnecte!=null) {
+                //S'il s'agit de sa propre personne, on autorise
+                if (membreConnecte.getId().equals(membreId)) {
+                    autorise=true;
+                // S'il s'agit du responsable du club, on autorise egalement
+                }else if (membreConnecte.isResponsableClub() && membreConnecte.getClub()!=null) {
+                    Membre membreExistant = membreRepository.findOne(membreId);
+                    if (membreExistant.getClub() != null) {
+                        autorise = membreExistant.getClub().equals(membreConnecte.getClub());
+                    }
                 }
             }
         }
