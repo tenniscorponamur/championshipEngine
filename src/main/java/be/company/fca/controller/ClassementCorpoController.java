@@ -1,5 +1,8 @@
 package be.company.fca.controller;
 
+import be.company.fca.dto.CaracteristiquesMatchDto;
+import be.company.fca.dto.InfosCalculClassementDto;
+import be.company.fca.dto.MatchDto;
 import be.company.fca.exceptions.ForbiddenException;
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
@@ -91,7 +94,7 @@ public class ClassementCorpoController {
         ClassementCorpo classementCorpo = new ClassementCorpo();
         classementCorpo.setDateClassement(endDate);
         classementCorpo.setMembreFk(membreId);
-        InfosCalculClassement infosCalculClassement = simulationClassementInfos(membreId,startDate,endDate);
+        InfosCalculClassementDto infosCalculClassement = getClassementInfos(membreId,startDate,endDate);
         Integer endPoints = infosCalculClassement.getPointsFin();
         classementCorpo.setPoints(endPoints);
         return classementCorpo;
@@ -108,8 +111,8 @@ public class ClassementCorpoController {
      */
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/classementCorpo/simulationWithDetail", method = RequestMethod.GET)
-    public InfosCalculClassement simulationClassementWithInfos(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate) {
-        return simulationClassementInfos(membreId,startDate,endDate);
+    public InfosCalculClassementDto simulationClassementWithInfos(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate) {
+        return getClassementInfos(membreId,startDate,endDate);
     }
 
     /**
@@ -120,9 +123,9 @@ public class ClassementCorpoController {
      * @param endDate
      * @return
      */
-    private InfosCalculClassement simulationClassementInfos(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate){
+    private InfosCalculClassementDto getClassementInfos(Long membreId, Date startDate, Date endDate){
 
-        InfosCalculClassement infosCalculClassement = new InfosCalculClassement();
+        InfosCalculClassementDto infosCalculClassement = new InfosCalculClassementDto();
         infosCalculClassement.setMembreId(membreId);
         infosCalculClassement.setStartDate(startDate);
         infosCalculClassement.setEndDate(endDate);
@@ -152,7 +155,7 @@ public class ClassementCorpoController {
 
             for (Match match : matchsValables){
 
-                CaracteristiquesMatch caracteristiquesMatch = getCaracteristiquesMatch(match,membre);
+                CaracteristiquesMatchDto caracteristiquesMatch = getCaracteristiquesMatch(match,membre);
 
                 infosCalculClassement.getCaracteristiquesMatchList().add(caracteristiquesMatch);
 
@@ -180,7 +183,7 @@ public class ClassementCorpoController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/classementCorpo/job", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ClassementJob calculClassementsMembres(@RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate) {
+    public ClassementJob calculClassementsMembres(@RequestParam @DateTimeFormat(pattern="yyyyMMdd")  Date startDate, @RequestParam boolean avecSauvegarde) {
 
         // Si un job est en cours d'execution, on ne peut pas en lancer un autre
 
@@ -200,6 +203,7 @@ public class ClassementCorpoController {
         classementJob.setStartDate(startDate);
         classementJob.setEndDate(new Date());
         classementJob.setStatus(ClassementJobStatus.INITIALIZED);
+        classementJob.setAvecSauvegarde(avecSauvegarde);
 
         classementJob = classementJobRepository.save(classementJob);
 
@@ -237,18 +241,33 @@ public class ClassementCorpoController {
             List<Membre> membres = (List<Membre>) membreRepository.findAll();
 
             for (Membre membre : membres){
-                ClassementCorpo newClassementCorpo = simulationClassement(membre.getId(),startDate,endDate);
+                InfosCalculClassementDto infosCalculClassement = getClassementInfos(membre.getId(),startDate,endDate);
 
-                // Le calcul des classements s'effectue avec une date de fin egale a la date du jour --> nouveau classsement = classement actuel du membre
+                // Le calcul des classements s'effectue avec une date de fin egale a la date du jour --> nouveau classement = classement actuel du membre
 
-                classementCorpoRepository.save(newClassementCorpo);
-                membreRepository.updateClassementCorpo(membre.getId(),newClassementCorpo);
+                if (classementJob.isAvecSauvegarde()){
+                    ClassementCorpo newClassementCorpo = new ClassementCorpo();
+                    newClassementCorpo.setDateClassement(endDate);
+                    newClassementCorpo.setMembreFk(membre.getId());
+                    Integer endPoints = infosCalculClassement.getPointsFin();
+                    newClassementCorpo.setPoints(endPoints);
+                    classementCorpoRepository.save(newClassementCorpo);
+                    membreRepository.updateClassementCorpo(membre.getId(),newClassementCorpo);
+                }
+
+                String trace = "";
+                if (infosCalculClassement.getPointsDepart()>infosCalculClassement.getPointsFin()){
+                    trace = "Classement inférieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
+                }else if (infosCalculClassement.getPointsDepart()<infosCalculClassement.getPointsFin()){
+                    trace = "Classement supérieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
+                }else{
+                    trace = "Classement identique pour " + (membre.getPrenom() + " " + membre.getNom());
+                }
 
                 // Enregistrement des traces d'execution du job
-                //System.err.println("Nouveau classement pour " + membre.getNumeroAft() + " : " + newClassementCorpo.getPoints());
                 ClassementJobTrace classementJobTrace = new ClassementJobTrace();
                 classementJobTrace.setClassementJob(classementJob);
-                classementJobTrace.setMessage(sdf.format(new Date()) + " : Nouveau classement pour " + (membre.getNumeroAft()==null?"inconnu":membre.getNumeroAft()) + " : " + newClassementCorpo.getPoints() + " points");
+                classementJobTrace.setMessage(sdf.format(new Date()) + " : " + trace);
                 classementJobTraceRepository.save(classementJobTrace);
 
             }
@@ -261,9 +280,7 @@ public class ClassementCorpoController {
             classementJob.setStatus(ClassementJobStatus.FINISHED);
             classementJobRepository.save(classementJob);
 
-            System.err.println("Calcul des nouveaux classements terminé");
-
-        }
+            }
     }
 
 
@@ -297,6 +314,8 @@ public class ClassementCorpoController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/classementCorpo/job/{jobId}", method= RequestMethod.DELETE)
     void deleteClassementJob(@PathVariable Long jobId) {
+        ClassementJob classementJob = classementJobRepository.findOne(jobId);
+        classementJobTraceRepository.deleteByClassementJob(classementJob);
         classementJobRepository.delete(jobId);
     }
 
@@ -406,9 +425,10 @@ public class ClassementCorpoController {
      * @param match
      * @return
      */
-    private CaracteristiquesMatch getCaracteristiquesMatch(Match match, Membre membre){
+    private CaracteristiquesMatchDto getCaracteristiquesMatch(Match match, Membre membre){
 
-        CaracteristiquesMatch caracteristiquesMatch = new CaracteristiquesMatch();
+        CaracteristiquesMatchDto caracteristiquesMatch = new CaracteristiquesMatchDto();
+        caracteristiquesMatch.setMatch(new MatchDto(match));
 
         // On considere que c'est un championnat messieurs pour les championnats hiver/ete
         // afin de prendre en compte la correspondance quand une dame joue avec les messieurs
@@ -418,9 +438,6 @@ public class ClassementCorpoController {
         // Determiner s'il s'agit d'un simple ou d'un double
 
         if (TypeMatch.SIMPLE.equals(match.getType())){
-
-            caracteristiquesMatch.setTypeMatch(TypeMatch.SIMPLE);
-            caracteristiquesMatch.setDate(match.getRencontre().getDateHeureRencontre());
             caracteristiquesMatch.setJoueur(new MembreLight(membre));
 
             Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);
@@ -439,8 +456,6 @@ public class ClassementCorpoController {
 
         }else{
 
-            caracteristiquesMatch.setTypeMatch(TypeMatch.DOUBLE);
-            caracteristiquesMatch.setDate(match.getRencontre().getDateHeureRencontre());
             caracteristiquesMatch.setJoueur(new MembreLight(membre));
 
             Integer pointsMembre = getPointsCorpoByMembreAndDate(membre,match.getRencontre().getDateHeureRencontre(),isChampionnatHomme);

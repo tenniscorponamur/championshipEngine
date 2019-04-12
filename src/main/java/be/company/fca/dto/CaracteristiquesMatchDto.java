@@ -1,13 +1,15 @@
-package be.company.fca.model;
+package be.company.fca.dto;
 
 import be.company.fca.dto.MembreDto;
+import be.company.fca.model.MembreLight;
+import be.company.fca.model.ResultatMatch;
+import be.company.fca.model.TypeMatch;
 
 import java.util.Date;
 
-public class CaracteristiquesMatch {
+public class CaracteristiquesMatchDto {
 
-    private TypeMatch typeMatch;
-    private Date date;
+    private MatchDto match;
     private MembreLight joueur;
     private Integer pointsJoueur;
     private MembreLight adversaire;
@@ -20,36 +22,12 @@ public class CaracteristiquesMatch {
     private ResultatMatch resultatMatch;
     private Integer pointsGagnesOuPerdus;
 
-    public TypeMatch getTypeMatch() {
-        return typeMatch;
-    }
-
-    public void setTypeMatch(TypeMatch typeMatch) {
-        this.typeMatch = typeMatch;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public MembreLight getJoueur() {
         return joueur;
     }
 
     public void setJoueur(MembreLight joueur) {
         this.joueur = joueur;
-    }
-
-    public Integer getPointsJoueur() {
-        return pointsJoueur;
-    }
-
-    public void setPointsJoueur(Integer pointsJoueur) {
-        this.pointsJoueur = pointsJoueur;
     }
 
     public MembreLight getAdversaire() {
@@ -60,14 +38,6 @@ public class CaracteristiquesMatch {
         this.adversaire = adversaire;
     }
 
-    public Integer getPointsAdversaire() {
-        return pointsAdversaire;
-    }
-
-    public void setPointsAdversaire(Integer pointsAdversaire) {
-        this.pointsAdversaire = pointsAdversaire;
-    }
-
     public MembreLight getPartenaire() {
         return partenaire;
     }
@@ -76,20 +46,44 @@ public class CaracteristiquesMatch {
         this.partenaire = partenaire;
     }
 
-    public Integer getPointsPartenaire() {
-        return pointsPartenaire;
-    }
-
-    public void setPointsPartenaire(Integer pointsPartenaire) {
-        this.pointsPartenaire = pointsPartenaire;
-    }
-
     public MembreLight getPartenaireAdversaire() {
         return partenaireAdversaire;
     }
 
     public void setPartenaireAdversaire(MembreLight partenaireAdversaire) {
         this.partenaireAdversaire = partenaireAdversaire;
+    }
+
+    public MatchDto getMatch() {
+        return match;
+    }
+
+    public void setMatch(MatchDto match) {
+        this.match = match;
+    }
+
+    public Integer getPointsJoueur() {
+        return pointsJoueur;
+    }
+
+    public void setPointsJoueur(Integer pointsJoueur) {
+        this.pointsJoueur = pointsJoueur;
+    }
+
+    public Integer getPointsAdversaire() {
+        return pointsAdversaire;
+    }
+
+    public void setPointsAdversaire(Integer pointsAdversaire) {
+        this.pointsAdversaire = pointsAdversaire;
+    }
+
+    public Integer getPointsPartenaire() {
+        return pointsPartenaire;
+    }
+
+    public void setPointsPartenaire(Integer pointsPartenaire) {
+        this.pointsPartenaire = pointsPartenaire;
     }
 
     public Integer getPointsPartenaireAdversaire() {

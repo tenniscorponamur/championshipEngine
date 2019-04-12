@@ -1,17 +1,17 @@
-package be.company.fca.model;
+package be.company.fca.dto;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class InfosCalculClassement {
+public class InfosCalculClassementDto {
 
     private Long membreId;
     private Date startDate;
     private Date endDate;
     private Integer pointsDepart;
     private Integer pointsFin;
-    private List<CaracteristiquesMatch> caracteristiquesMatchList = new ArrayList<>();
+    private List<CaracteristiquesMatchDto> caracteristiquesMatchList = new ArrayList<>();
 
     public Long getMembreId() {
         return membreId;
@@ -53,11 +53,11 @@ public class InfosCalculClassement {
         this.pointsFin = pointsFin;
     }
 
-    public List<CaracteristiquesMatch> getCaracteristiquesMatchList() {
+    public List<CaracteristiquesMatchDto> getCaracteristiquesMatchList() {
         return caracteristiquesMatchList;
     }
 
-    public void setCaracteristiquesMatchList(List<CaracteristiquesMatch> caracteristiquesMatchList) {
+    public void setCaracteristiquesMatchList(List<CaracteristiquesMatchDto> caracteristiquesMatchList) {
         this.caracteristiquesMatchList = caracteristiquesMatchList;
     }
 }

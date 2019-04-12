@@ -26,10 +26,12 @@ public class ClassementJob {
     @Column( name = "end_date", nullable = false )
     private Date endDate;
 
-
     @Column( name = "status", nullable = false )
     @Enumerated(EnumType.STRING)
     private ClassementJobStatus status;
+
+    @Column (name = "avec_sauvegarde", nullable = false)
+    private boolean avecSauvegarde=false;
 
     public Long getId() {
         return id;
@@ -61,6 +63,14 @@ public class ClassementJob {
 
     public void setStatus(ClassementJobStatus status) {
         this.status = status;
+    }
+
+    public boolean isAvecSauvegarde() {
+        return avecSauvegarde;
+    }
+
+    public void setAvecSauvegarde(boolean avecSauvegarde) {
+        this.avecSauvegarde = avecSauvegarde;
     }
 
     @Override
