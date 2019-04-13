@@ -139,7 +139,7 @@ public class ClassementCorpoController {
 
         // Recuperer l'ensemble des matchs joues par le membre entre les deux dates
 
-        List<Match> matchs = (List<Match>) matchRepository.findValidesByMembreBetweenDates(membre.getId(),DateUtils.shrinkToDay(startDate),DateUtils.shrinkToDay(endDate));
+        List<Match> matchs = matchRepository.findValidesByMembreBetweenDates(membre.getId(),DateUtils.shrinkToDay(startDate),DateUtils.shrinkToDay(endDate));
 
         // On va filtrer la liste des matchs valides en analysant si tous les joueurs sont bien precises pour simple et double
         // Les matchs où des joueurs manquent à l'appel sont comptabilisés pour les points des rencontres mais ne rentrent pas

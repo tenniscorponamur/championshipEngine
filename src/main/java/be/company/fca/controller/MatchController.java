@@ -8,10 +8,12 @@ import be.company.fca.repository.TerrainRepository;
 import be.company.fca.service.MatchService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,12 +30,21 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
+    @RequestMapping(method= RequestMethod.GET, path="/public/matchs/validesByCriteria")
+    public List<MatchDto> findValidesByMembreBetweenDates(@RequestParam("membreId") Long membreId,
+                                                          @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date startDate,
+                                                          @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date endDate
+                                                          ) {
 
-//    @PreAuthorize("hasAuthority('ADMIN_USER')")
-//    @RequestMapping(value = "/private/match", method = RequestMethod.POST)
-//    public Match addMatch(@RequestBody Match match){
-//        return matchRepository.save(match);
-//    }
+        List<MatchDto> matchsDto = new ArrayList<>();
+        List<Match> matchs = matchRepository.findValidesByMembreBetweenDates(membreId,startDate,endDate);
+
+        for (Match match : matchs){
+            matchsDto.add(new MatchDto(match));
+        }
+
+        return matchsDto;
+    }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/match", method = RequestMethod.DELETE)
