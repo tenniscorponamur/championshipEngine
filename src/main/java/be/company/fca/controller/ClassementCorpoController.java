@@ -8,13 +8,23 @@ import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.service.ClassementCorpoService;
 import be.company.fca.utils.DateUtils;
+import be.company.fca.utils.POIUtils;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -167,6 +177,7 @@ public class ClassementCorpoController {
 
         }
 
+        infosCalculClassement.setTotalObtenu(totalGagnesPerdus);
         Integer pointsClassementsGagnesPerdus = getPointsClassement(totalGagnesPerdus);
 
         // Calculer les points du classement resultat en se basant sur les points de depart
@@ -235,7 +246,7 @@ public class ClassementCorpoController {
 
             ClassementJobTrace initTrace = new ClassementJobTrace();
             initTrace.setClassementJob(classementJob);
-            initTrace.setMessage(sdf.format(new Date()) + " : Calcul des nouveaux classements en cours");
+            initTrace.setMessage(sdf.format(new Date()) + " - DEBUT");
             classementJobTraceRepository.save(initTrace);
 
             List<Membre> membres = (List<Membre>) membreRepository.findAll();
@@ -256,25 +267,30 @@ public class ClassementCorpoController {
                 }
 
                 String trace = "";
+
+                trace = membre.getNumeroAft() + "|" + membre.getPrenom() + "|" + membre.getNom() + "|" + membre.getClub().getNom()
+                        + "|" + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu()
+                        + "|" + infosCalculClassement.getPointsDepart() + "|" + infosCalculClassement.getPointsFin();
+
                 if (infosCalculClassement.getPointsDepart()>infosCalculClassement.getPointsFin()){
-                    trace = "Classement inférieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
+                    //trace = "Classement inférieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
                 }else if (infosCalculClassement.getPointsDepart()<infosCalculClassement.getPointsFin()){
-                    trace = "Classement supérieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
+                    //trace = "Classement supérieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
                 }else{
-                    trace = "Classement identique pour " + (membre.getPrenom() + " " + membre.getNom());
+                    //trace = "Classement identique pour " + (membre.getPrenom() + " " + membre.getNom());
                 }
 
                 // Enregistrement des traces d'execution du job
                 ClassementJobTrace classementJobTrace = new ClassementJobTrace();
                 classementJobTrace.setClassementJob(classementJob);
-                classementJobTrace.setMessage(sdf.format(new Date()) + " : " + trace);
+                classementJobTrace.setMessage(sdf.format(new Date()) + " - " + trace);
                 classementJobTraceRepository.save(classementJobTrace);
 
             }
 
             ClassementJobTrace endTrace = new ClassementJobTrace();
             endTrace.setClassementJob(classementJob);
-            endTrace.setMessage(sdf.format(new Date()) + " : Calcul des nouveaux classements terminé");
+            endTrace.setMessage(sdf.format(new Date()) + " - FIN");
             classementJobTraceRepository.save(endTrace);
 
             classementJob.setStatus(ClassementJobStatus.FINISHED);
@@ -309,6 +325,69 @@ public class ClassementCorpoController {
     Iterable<ClassementJobTrace> getClassementJobTraces(@PathVariable Long jobId) {
         ClassementJob classementJob = classementJobRepository.findOne(jobId);
         return classementJobTraceRepository.findByClassementJob(classementJob);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/classementCorpo/job/{jobId}/traces/export", method= RequestMethod.GET)
+    ResponseEntity<byte[]> exportJobTraces(@PathVariable Long jobId) throws IOException {
+        ClassementJob classementJob = classementJobRepository.findOne(jobId);
+        List<ClassementJobTrace> traces = classementJobTraceRepository.findByClassementJob(classementJob);
+
+        Collections.sort(traces, new Comparator<ClassementJobTrace>() {
+            @Override
+            public int compare(ClassementJobTrace o1, ClassementJobTrace o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+
+        // On retire les premieres et dernieres traces qui ne donnent pas d'information sur les joueurs mais des indications de demarrage et fin du job
+        traces.remove(0);
+        traces.remove(traces.size()-1);
+
+        Workbook wb = POIUtils.createWorkbook(true);
+        Sheet sheet = wb.createSheet("Job_" + classementJob.getId());
+
+        POIUtils.write(sheet, 0, 0, "NUMERO AFT", null, null);
+        POIUtils.write(sheet, 0, 1, "NOM", null, null);
+        POIUtils.write(sheet, 0, 2, "PRENOM", null, null);
+        POIUtils.write(sheet, 0, 3, "CLUB", null, null);
+        POIUtils.write(sheet, 0, 4, "MATCHS JOUES", null, null);
+        POIUtils.write(sheet, 0, 5, "TOTAL OBTENU", null, null);
+        POIUtils.write(sheet, 0, 6, "POINTS AVANT", null, null);
+        POIUtils.write(sheet, 0, 7, "POINTS APRES", null, null);
+
+        int nbColumns = 0;
+        int i=1;
+        for (ClassementJobTrace trace : traces){
+            if (!StringUtils.isEmpty(trace.getMessage())){
+                String traceAConsiderer = trace.getMessage().substring(trace.getMessage().indexOf("-")+1);
+                String[] traceParts  = traceAConsiderer.split("\\|");
+                for (int j=0;j<traceParts.length;j++){
+                    POIUtils.write(sheet, i, j, traceParts[j], null, null);
+                }
+                nbColumns = Math.max(nbColumns,traceParts.length);
+                i++;
+            }
+        }
+
+        // Freeze de la premiere ligne
+        sheet.createFreezePane(0, 1);
+
+        // Auto-resize des colonnes
+        for (int k = 0; k < nbColumns; k++) {
+            sheet.autoSizeColumn(k);
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        wb.write(os);
+        wb.close();
+        os.close();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
+        return response;
+
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

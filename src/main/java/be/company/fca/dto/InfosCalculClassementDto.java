@@ -9,6 +9,7 @@ public class InfosCalculClassementDto {
     private Long membreId;
     private Date startDate;
     private Date endDate;
+    private Integer totalObtenu;
     private Integer pointsDepart;
     private Integer pointsFin;
     private List<CaracteristiquesMatchDto> caracteristiquesMatchList = new ArrayList<>();
@@ -35,6 +36,14 @@ public class InfosCalculClassementDto {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Integer getTotalObtenu() {
+        return totalObtenu;
+    }
+
+    public void setTotalObtenu(Integer totalObtenu) {
+        this.totalObtenu = totalObtenu;
     }
 
     public Integer getPointsDepart() {
