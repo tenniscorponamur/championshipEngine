@@ -285,6 +285,17 @@ public class MembreController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/membre/{membreId}/setNewPassword", method = RequestMethod.POST)
+    public String setNewMemberPassword(@PathVariable("membreId") Long membreId){
+        Membre membre = membreRepository.findOne(membreId);
+        String newPassword = PasswordUtils.generatePassword();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        membre.setPassword(encoder.encode(newPassword));
+        membreRepository.save(membre);
+        return "{\"password\":\"" + newPassword + "\"}";
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
