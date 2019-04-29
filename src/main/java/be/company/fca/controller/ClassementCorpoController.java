@@ -11,6 +11,7 @@ import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.POIUtils;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -190,7 +191,6 @@ public class ClassementCorpoController {
 
     }
 
-
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/classementCorpo/job", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -238,6 +238,9 @@ public class ClassementCorpoController {
             super.run();
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy  HH:mm:ss");
+
+            try{
+
             Date startDate = classementJob.getStartDate();
             Date endDate = classementJob.getEndDate();
 
@@ -252,6 +255,12 @@ public class ClassementCorpoController {
             List<Membre> membres = (List<Membre>) membreRepository.findAll();
 
             for (Membre membre : membres){
+
+                ClassementJob classementJobInMemory = classementJobRepository.findOne(classementJob.getId());
+                if (!ClassementJobStatus.WORK_IN_PROGRESS.equals(classementJobInMemory.getStatus())){
+                    throw new RuntimeException("Arrêt forcé par l'administrateur");
+                }
+
                 InfosCalculClassementDto infosCalculClassement = getClassementInfos(membre.getId(),startDate,endDate);
 
                 // Le calcul des classements s'effectue avec une date de fin egale a la date du jour --> nouveau classement = classement actuel du membre
@@ -268,7 +277,7 @@ public class ClassementCorpoController {
 
                 String trace = "";
 
-                trace = membre.getNumeroAft() + "|" + membre.getPrenom() + "|" + membre.getNom() + "|" + membre.getClub().getNom()
+                trace = membre.getNumeroAft() + "|" + membre.getPrenom() + "|" + membre.getNom() + "|" + (membre.getClub()!=null?membre.getClub().getNom():"")
                         + "|" + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu()
                         + "|" + infosCalculClassement.getPointsDepart() + "|" + infosCalculClassement.getPointsFin();
 
@@ -296,7 +305,18 @@ public class ClassementCorpoController {
             classementJob.setStatus(ClassementJobStatus.FINISHED);
             classementJobRepository.save(classementJob);
 
+            }catch(Exception e){
+
+                ClassementJobTrace endTrace = new ClassementJobTrace();
+                endTrace.setClassementJob(classementJob);
+                endTrace.setMessage(sdf.format(new Date()) + " - FIN CAR EXCEPTION : " + ExceptionUtils.getStackTrace(e));
+                classementJobTraceRepository.save(endTrace);
+
+                classementJob.setStatus(ClassementJobStatus.FINISHED);
+                classementJobRepository.save(classementJob);
             }
+
+        }
     }
 
 
@@ -318,6 +338,14 @@ public class ClassementCorpoController {
     @RequestMapping(path="/private/classementCorpo/job/{jobId}", method= RequestMethod.GET)
     ClassementJob getClassementJob(@PathVariable Long jobId) {
         return classementJobRepository.findOne(jobId);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/classementCorpo/job/{jobId}/close", method= RequestMethod.PUT)
+    ClassementJob closeClassementJob(@PathVariable Long jobId) {
+        ClassementJob job = classementJobRepository.findOne(jobId);
+        job.setStatus(ClassementJobStatus.FINISHED);
+        return classementJobRepository.save(job);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
