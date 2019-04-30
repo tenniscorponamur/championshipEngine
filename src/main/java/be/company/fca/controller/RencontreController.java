@@ -738,7 +738,7 @@ public class RencontreController {
             trace += " : " + message;
         }
 
-        traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
+        traceService.addTrace(authentication,"rencontre",rencontreId.toString(),trace);
 
         return resultatsEncodes;
     }
@@ -777,7 +777,7 @@ public class RencontreController {
             trace += " : " + message;
         }
 
-        traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
+        traceService.addTrace(authentication,"rencontre",rencontreId.toString(),trace);
 
         return validite;
     }
@@ -804,7 +804,7 @@ public class RencontreController {
                     rencontreRepository.updateValiditeRencontre(rencontreId, true);
                     trace = "Validation des résultats par adversaire (" + adversaire.getNom() + " " + adversaire.getPrenom() + ")";
 
-                    traceService.addTrace(authentication.getName(),"rencontre",rencontreId.toString(),trace);
+                    traceService.addTrace(authentication,"rencontre",rencontreId.toString(),trace);
 
                     return true;
 
