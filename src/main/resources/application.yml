@@ -13,7 +13,7 @@ security:
   security-realm: Tennis Corpo Engine Realm
   jwt:
     client-id: tenniscorpoclientid
-    client-secret: ABi8u34kPoDo
+    client-secret: '{noop}ABi8u34kPoDo'
     grant-type-password: password
     grant-type-refresh-token: refresh_token
     scope-read: read
