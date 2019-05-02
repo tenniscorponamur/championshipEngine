@@ -1,23 +1,13 @@
 package be.company.fca.utils;
 
-import com.mailjet.client.MailjetClient;
-import com.sendgrid.*;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
 import com.mailjet.client.MailjetResponse;
-import com.mailjet.client.ClientOptions;
 import com.mailjet.client.resource.Emailv31;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.util.*;
-import org.apache.commons.lang.StringUtils;
-
-
-import java.io.IOException;
 
 public class MailUtils {
 
@@ -90,51 +80,51 @@ public class MailUtils {
 
     }
 
-    /**
-     * Permet d'envoyer le nouveau mot de passe a un utilisateur en utilisant SendGrid
-     * @param mailTo
-     * @param password
-     * @return true si le mail est bien parti
-     */
-    private static boolean sendPasswordMailUsingSendGrid(String prenom, String nom, String mailTo, String password){
-
-        // ApiKey a preciser dans l'environnement de production
-        // En test, le mot de passe s'inscrira dans la console
-
-        String apiKey = System.getenv("SENDGRID_API_KEY");
-        String frontEndUrl = System.getenv("FRONT_END_URL");
-
-        String subject = "Votre mot de passe pour Tennis Corpo Namur";
-        String htmlContent = getHtmlContent(frontEndUrl,prenom,nom,password);
-
-        if (!StringUtils.isEmpty(apiKey)){
-
-            Content content = new Content("text/html", htmlContent);
-            Mail mail = new Mail(new Email(MAIL_FROM), subject, new Email(mailTo), content);
-
-            SendGrid sg = new SendGrid(apiKey);
-            Request request = new Request();
-            try {
-                request.setMethod(Method.POST);
-                request.setEndpoint("mail/send");
-                request.setBody(mail.build());
-                Response response = sg.api(request);
-                System.out.println(response.getStatusCode());
-                return true;
-
-            } catch (IOException ex) {
-                ex.printStackTrace(System.err);
-                return false;
-            }
-
-        }else{
-
-            System.err.println("Nouveau mot de passe : " + password);
-            return true;
-
-        }
-
-    }
+//    /**
+//     * Permet d'envoyer le nouveau mot de passe a un utilisateur en utilisant SendGrid
+//     * @param mailTo
+//     * @param password
+//     * @return true si le mail est bien parti
+//     */
+//    private static boolean sendPasswordMailUsingSendGrid(String prenom, String nom, String mailTo, String password){
+//
+//        // ApiKey a preciser dans l'environnement de production
+//        // En test, le mot de passe s'inscrira dans la console
+//
+//        String apiKey = System.getenv("SENDGRID_API_KEY");
+//        String frontEndUrl = System.getenv("FRONT_END_URL");
+//
+//        String subject = "Votre mot de passe pour Tennis Corpo Namur";
+//        String htmlContent = getHtmlContent(frontEndUrl,prenom,nom,password);
+//
+//        if (!StringUtils.isEmpty(apiKey)){
+//
+//            Content content = new Content("text/html", htmlContent);
+//            Mail mail = new Mail(new Email(MAIL_FROM), subject, new Email(mailTo), content);
+//
+//            SendGrid sg = new SendGrid(apiKey);
+//            Request request = new Request();
+//            try {
+//                request.setMethod(Method.POST);
+//                request.setEndpoint("mail/send");
+//                request.setBody(mail.build());
+//                Response response = sg.api(request);
+//                System.out.println(response.getStatusCode());
+//                return true;
+//
+//            } catch (IOException ex) {
+//                ex.printStackTrace(System.err);
+//                return false;
+//            }
+//
+//        }else{
+//
+//            System.err.println("Nouveau mot de passe : " + password);
+//            return true;
+//
+//        }
+//
+//    }
 
     private static String getHtmlContent(String frontEndUrl, String prenom, String nom, String password){
 

@@ -75,7 +75,7 @@ public class EquipeController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.POST)
     public Equipe addEquipe(@RequestParam Long divisionId, @RequestBody Equipe equipe){
-        Division division = divisionRepository.findOne(divisionId);
+        Division division = divisionRepository.findById(divisionId).get();
         equipe.setDivision(division);
 
         // Operation non-permise si le calendrier est valide ou cloture
@@ -96,7 +96,7 @@ public class EquipeController {
     @RequestMapping(value = "/private/equipe", method = RequestMethod.DELETE)
     public void deleteEquipe(@RequestParam Long id){
 
-        Equipe equipe = equipeRepository.findOne(id);
+        Equipe equipe = equipeRepository.findById(id).get();
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
@@ -108,10 +108,10 @@ public class EquipeController {
         for (Rencontre rencontreEquipe : rencontresEquipe){
             setRepository.deleteByRencontreId(rencontreEquipe.getId());
             matchRepository.deleteByRencontreId(rencontreEquipe.getId());
-            rencontreRepository.delete(rencontreEquipe.getId());
+            rencontreRepository.deleteById(rencontreEquipe.getId());
         }
 
-        equipeRepository.delete(id);
+        equipeRepository.deleteById(id);
         // On signale que le calendrier doit etre rafraichi si l'equipe a ete supprimee
         championnatRepository.updateCalendrierARafraichir(equipe.getDivision().getChampionnat().getId(),true);
     }
@@ -126,7 +126,7 @@ public class EquipeController {
     @RequestMapping(value = "/private/equipe/poule", method = RequestMethod.PUT)
     public Equipe updatePouleEquipe(@RequestParam Long equipeId, @RequestBody Poule poule){
 
-        Equipe equipe = equipeRepository.findOne(equipeId);
+        Equipe equipe = equipeRepository.findById(equipeId).get();
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){

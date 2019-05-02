@@ -72,19 +72,19 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user", method= RequestMethod.GET)
     public User getUserById(@RequestParam Long id){
-        return userRepository.findOne(id);
+        return userRepository.findById(id).get();
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user", method = RequestMethod.PUT)
     public UserDto updateUser(@RequestBody UserDto userDto){
-        User user = userRepository.findOne(userDto.getId());
+        User user = userRepository.findById(userDto.getId()).get();
         user.setUsername(userDto.getUsername().toLowerCase());
         user.setPrenom(userDto.getPrenom());
         user.setNom(userDto.getNom());
         user.setAdmin(userDto.isAdmin());
         if (userDto.getMembre()!=null && userDto.getMembre().getId()!=null){
-            Membre membre = membreRepository.findOne(userDto.getMembre().getId());
+            Membre membre = membreRepository.findById(userDto.getMembre().getId()).get();
             user.setMembre(membre);
         }else{
             user.setMembre(null);
@@ -102,7 +102,7 @@ public class UserController {
         user.setNom(userDto.getNom());
         user.setAdmin(userDto.isAdmin());
         if (userDto.getMembre()!=null && userDto.getMembre().getId()!=null){
-            Membre membre = membreRepository.findOne(userDto.getMembre().getId());
+            Membre membre = membreRepository.findById(userDto.getMembre().getId()).get();
             user.setMembre(membre);
         }else{
             user.setMembre(null);
@@ -115,7 +115,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/user", method = RequestMethod.DELETE)
     public void deleteUser(@RequestParam Long userId){
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
 
@@ -147,7 +147,7 @@ public class UserController {
     @RequestMapping(value = "/private/user/resetPassword", method = RequestMethod.POST)
     public boolean resetUserPassword(@RequestParam Long id){
 
-        User user = userRepository.findOne(id);
+        User user = userRepository.findById(id).get();
         user.setPassword(PasswordUtils.DEFAULT_PASSWORD);
         userRepository.save(user);
 

@@ -141,7 +141,7 @@ public class ClassementCorpoController {
         infosCalculClassement.setStartDate(startDate);
         infosCalculClassement.setEndDate(endDate);
 
-        Membre membre = membreRepository.findOne(membreId);
+        Membre membre = membreRepository.findById(membreId).get();
 
         // On enregistre le classement de depart
         Integer startPoints = getPointsCorpoByMembreAndDate(membre,startDate,false);
@@ -256,7 +256,7 @@ public class ClassementCorpoController {
 
             for (Membre membre : membres){
 
-                ClassementJob classementJobInMemory = classementJobRepository.findOne(classementJob.getId());
+                ClassementJob classementJobInMemory = classementJobRepository.findById(classementJob.getId()).get();
                 if (!ClassementJobStatus.WORK_IN_PROGRESS.equals(classementJobInMemory.getStatus())){
                     throw new RuntimeException("Arrêt forcé par l'administrateur");
                 }
@@ -337,13 +337,13 @@ public class ClassementCorpoController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/classementCorpo/job/{jobId}", method= RequestMethod.GET)
     ClassementJob getClassementJob(@PathVariable Long jobId) {
-        return classementJobRepository.findOne(jobId);
+        return classementJobRepository.findById(jobId).get();
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/classementCorpo/job/{jobId}/close", method= RequestMethod.PUT)
     ClassementJob closeClassementJob(@PathVariable Long jobId) {
-        ClassementJob job = classementJobRepository.findOne(jobId);
+        ClassementJob job = classementJobRepository.findById(jobId).get();
         job.setStatus(ClassementJobStatus.FINISHED);
         return classementJobRepository.save(job);
     }
@@ -351,14 +351,14 @@ public class ClassementCorpoController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/classementCorpo/job/{jobId}/traces", method= RequestMethod.GET)
     Iterable<ClassementJobTrace> getClassementJobTraces(@PathVariable Long jobId) {
-        ClassementJob classementJob = classementJobRepository.findOne(jobId);
+        ClassementJob classementJob = classementJobRepository.findById(jobId).get();
         return classementJobTraceRepository.findByClassementJob(classementJob);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/classementCorpo/job/{jobId}/traces/export", method= RequestMethod.GET)
     ResponseEntity<byte[]> exportJobTraces(@PathVariable Long jobId) throws IOException {
-        ClassementJob classementJob = classementJobRepository.findOne(jobId);
+        ClassementJob classementJob = classementJobRepository.findById(jobId).get();
         List<ClassementJobTrace> traces = classementJobTraceRepository.findByClassementJob(classementJob);
 
         Collections.sort(traces, new Comparator<ClassementJobTrace>() {
@@ -421,9 +421,9 @@ public class ClassementCorpoController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/classementCorpo/job/{jobId}", method= RequestMethod.DELETE)
     void deleteClassementJob(@PathVariable Long jobId) {
-        ClassementJob classementJob = classementJobRepository.findOne(jobId);
+        ClassementJob classementJob = classementJobRepository.findById(jobId).get();
         classementJobTraceRepository.deleteByClassementJob(classementJob);
-        classementJobRepository.delete(jobId);
+        classementJobRepository.deleteById(jobId);
     }
 
     /**

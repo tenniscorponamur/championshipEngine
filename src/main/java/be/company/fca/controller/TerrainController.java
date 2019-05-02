@@ -42,7 +42,7 @@ public class TerrainController {
 
     @RequestMapping(path="/public/terrain", method= RequestMethod.GET)
     Terrain getTerrain(@RequestParam Long id) {
-        return terrainRepository.findOne(id);
+        return terrainRepository.findById(id).get();
     }
 
     @RequestMapping(path="/public/terrain/{terrainId}/horaires", method= RequestMethod.GET)
@@ -100,7 +100,7 @@ public class TerrainController {
     @RequestMapping(value = "/private/terrain", method = RequestMethod.DELETE)
     public void deleteTerrain(@RequestParam Long terrainId){
         if (isTerrainDeletable(terrainId)){
-            terrainRepository.delete(terrainId);
+            terrainRepository.deleteById(terrainId);
         }
     }
 
@@ -126,7 +126,7 @@ public class TerrainController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/terrain/{terrainId}/horaire", method = RequestMethod.DELETE)
     public void deleteHoraireTerrain(@PathVariable("terrainId") Long terrainId, @RequestParam Long horaireTerrainId){
-        horaireTerrainRepository.delete(horaireTerrainId);
+        horaireTerrainRepository.deleteById(horaireTerrainId);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -150,6 +150,6 @@ public class TerrainController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/terrain/{terrainId}/court", method = RequestMethod.DELETE)
     public void deleteCourt(@PathVariable("terrainId") Long terrainId, @RequestParam Long courtId){
-        courtRepository.delete(courtId);
+        courtRepository.deleteById(courtId);
     }
 }

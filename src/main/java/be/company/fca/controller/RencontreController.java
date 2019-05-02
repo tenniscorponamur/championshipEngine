@@ -278,7 +278,7 @@ public class RencontreController {
         List<MatchDto> matchsDto = new ArrayList<>();
         List<Match> matchs = new ArrayList<Match>();
 
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
 
         matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
 
@@ -334,7 +334,7 @@ public class RencontreController {
                 return true;
             }
             // On va analyser si l'utilisateur connecte est capitaine de l'equipe visitee ou responsable du club de l'equipe visitee
-            Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+            Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
             return isCapitaineOrResponsableClub(authentication,rencontre.getEquipeVisites());
         }
 
@@ -348,7 +348,7 @@ public class RencontreController {
                 return true;
             }
             // On va analyser si l'utilisateur connecte est capitaine de l'equipe visiteur ou responsable du club de l'equipe visiteur
-            Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+            Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
             return isCapitaineOrResponsableClub(authentication,rencontre.getEquipeVisiteurs());
         }
 
@@ -372,7 +372,7 @@ public class RencontreController {
             if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
                 AutorisationRencontreDto authorizationDto = new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
                 if (allOthersOfTheTeam){
-                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    Rencontre rencontreInitiale = rencontreRepository.findById(rencontreId).get();
                     // On va egalement creer des autorisations pour toutes les autres rencontres de l'equipe concernee
                     List<Rencontre> rencontresOfTeam = rencontreRepository.findByEquipeVisites(rencontreInitiale.getEquipeVisites());
                     for (Rencontre rencontre : rencontresOfTeam){
@@ -394,7 +394,7 @@ public class RencontreController {
             if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
                 AutorisationRencontreDto authorizationDto = new AutorisationRencontreDto(autorisationrencontreRepository.save(autorisationRencontre));
                 if (allOthersOfTheTeam){
-                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    Rencontre rencontreInitiale = rencontreRepository.findById(rencontreId).get();
                     // On va egalement creer des autorisations pour toutes les autres rencontres de l'equipe concernee
                     List<Rencontre> rencontresOfTeam = rencontreRepository.findByEquipeVisiteurs(rencontreInitiale.getEquipeVisiteurs());
                     for (Rencontre rencontre : rencontresOfTeam){
@@ -418,12 +418,12 @@ public class RencontreController {
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/autorisation", method = RequestMethod.DELETE)
     public boolean removeAutorisation(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long autorisationRencontreId, @RequestParam("allOthersOfTheTeam") boolean allOthersOfTheTeam){
-        AutorisationRencontre autorisationRencontre = autorisationrencontreRepository.findOne(autorisationRencontreId);
+        AutorisationRencontre autorisationRencontre = autorisationrencontreRepository.findById(autorisationRencontreId).get();
         if (TypeAutorisation.ENCODAGE.equals(autorisationRencontre.getType())){
             if (canAuthoriseEncodage(authentication,autorisationRencontre.getRencontreFk())){
-                autorisationrencontreRepository.delete(autorisationRencontreId);
+                autorisationrencontreRepository.deleteById(autorisationRencontreId);
                 if (allOthersOfTheTeam){
-                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    Rencontre rencontreInitiale = rencontreRepository.findById(rencontreId).get();
                     // Recuperer l'equipe visitee de la rencontre
                     Equipe equipeVisitee = rencontreInitiale.getEquipeVisites();
                     // Recuperer les rencontres de cette equipe en tant qu'equipe visitee
@@ -436,7 +436,7 @@ public class RencontreController {
                             for (AutorisationRencontre otherAuthorization : otherAuthorizations){
                                 if (otherAuthorization.getType().equals(TypeAutorisation.ENCODAGE)
                                         && otherAuthorization.getMembre().getId().equals(autorisationRencontre.getMembre().getId())){
-                                    autorisationrencontreRepository.delete(otherAuthorization.getId());
+                                    autorisationrencontreRepository.deleteById(otherAuthorization.getId());
                                 }
                             }
                         }
@@ -446,9 +446,9 @@ public class RencontreController {
             }
         }else if (TypeAutorisation.VALIDATION.equals(autorisationRencontre.getType())){
             if (canAuthoriseValidation(authentication,autorisationRencontre.getRencontreFk())){
-                autorisationrencontreRepository.delete(autorisationRencontreId);
+                autorisationrencontreRepository.deleteById(autorisationRencontreId);
                 if (allOthersOfTheTeam){
-                    Rencontre rencontreInitiale = rencontreRepository.findOne(rencontreId);
+                    Rencontre rencontreInitiale = rencontreRepository.findById(rencontreId).get();
                     // Recuperer l'equipe visiteur de la rencontre
                     Equipe equipeVisiteur = rencontreInitiale.getEquipeVisiteurs();
                     // Recuperer les rencontres de cette equipe en tant qu'equipe visiteur
@@ -461,7 +461,7 @@ public class RencontreController {
                             for (AutorisationRencontre otherAuthorization : otherAuthorizations){
                                 if (otherAuthorization.getType().equals(TypeAutorisation.VALIDATION)
                                         && otherAuthorization.getMembre().getId().equals(autorisationRencontre.getMembre().getId())){
-                                    autorisationrencontreRepository.delete(otherAuthorization.getId());
+                                    autorisationrencontreRepository.deleteById(otherAuthorization.getId());
                                 }
                             }
                         }
@@ -481,7 +481,7 @@ public class RencontreController {
 
         // Tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin + analyse des autorisations donnees
 
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
         if (!rencontre.isResultatsEncodes() && !rencontre.isValide()){
             if (rencontre.getDivision().getChampionnat() != null) {
                 if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()) {
@@ -520,7 +520,7 @@ public class RencontreController {
 
         boolean totauxSuffisants = false;
 
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
 
         if (!rencontre.isResultatsEncodes() && !rencontre.isValide()) {
 
@@ -599,7 +599,7 @@ public class RencontreController {
 
         // Tester le fait d'etre capitaine des equipes ou responsables des clubs ou admin
 
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
         if (rencontre.isResultatsEncodes() && !rencontre.isValide()) {
             if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()){
 
@@ -639,7 +639,7 @@ public class RencontreController {
 
         // Tester le fait d'etre capitaine de l'equipe visites ou resp. visites ou admin
 
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
         if (rencontre.isResultatsEncodes() && !rencontre.isValide()) {
             if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()){
 
@@ -675,7 +675,7 @@ public class RencontreController {
 
         // Tester le fait d'etre capitaine de l'equipe visiteurs ou resp. visiteurs ou admin
 
-        Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
         if (rencontre.isResultatsEncodes() && !rencontre.isValide()) {
             if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()){
 
@@ -764,7 +764,7 @@ public class RencontreController {
             // Only admin peut devalider une rencontre tant que le championnat n'est pas cloture
             // Tracer qui a dévalidé
 
-            Rencontre rencontre = rencontreRepository.findOne(rencontreId);
+            Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
             if (!rencontre.getDivision().getChampionnat().isCloture() && (userService.isAdmin(authentication))){
                 rencontreRepository.updateValiditeRencontre(rencontreId, validite);
                 trace = "Dévalidation des résultats";
@@ -794,7 +794,7 @@ public class RencontreController {
 
             // Tester la correspondance adversaire/mot de passe
 
-            Membre adversaire = membreRepository.findOne(adversaireId);
+            Membre adversaire = membreRepository.findById(adversaireId).get();
             if (adversaire!=null){
 
                 BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -878,7 +878,7 @@ public class RencontreController {
 
          */
 
-        Championnat championnat = championnatRepository.findOne(championnatId);
+        Championnat championnat = championnatRepository.findById(championnatId).get();
         if (!championnat.isCalendrierValide() || championnat.isCloture()) {
             throw new RuntimeException("Operation not supported - Championnat cloture");
         }
@@ -1115,7 +1115,7 @@ public class RencontreController {
     public Iterable<Rencontre> refreshCalendrier(@RequestParam Long championnatId) {
 
         // On peut faire un refresh tant que le calendrier n'a pas ete valide
-        Championnat championnat = championnatRepository.findOne(championnatId);
+        Championnat championnat = championnatRepository.findById(championnatId).get();
         if (championnat.isCalendrierValide()) {
             throw new RuntimeException("Operation not supported - Calendrier validé");
         }
@@ -1144,7 +1144,7 @@ public class RencontreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(method = RequestMethod.DELETE, path = "/private/rencontres/calendrier")
     public void deleteCalendrier(@RequestParam Long championnatId) {
-        Championnat championnat = championnatRepository.findOne(championnatId);
+        Championnat championnat = championnatRepository.findById(championnatId).get();
         if (!championnat.isCalendrierValide()) {
             rencontreService.deleteByChampionnat(championnatId);
         }
@@ -1156,7 +1156,7 @@ public class RencontreController {
         TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
 
         if (excel) {
-            Championnat championnat = championnatRepository.findOne(championnatId);
+            Championnat championnat = championnatRepository.findById(championnatId).get();
             List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
             List<Rencontre> rencontres = new ArrayList<>();
             for (Division division : divisions) {

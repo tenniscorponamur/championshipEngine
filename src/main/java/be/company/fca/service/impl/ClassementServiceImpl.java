@@ -155,7 +155,7 @@ public class ClassementServiceImpl implements ClassementService {
         // Ce classement n'est construit que pour le criterium
         // Parcourir les equipes et les classements des poules --> attribuer des points aux clubs concernes
 
-        Championnat championnatSelected = championnatRepository.findOne(championnatId);
+        Championnat championnatSelected = championnatRepository.findById(championnatId).get();
 
         if (TypeChampionnat.CRITERIUM.equals(championnatSelected.getType())) {
             // Boucler sur les championnats CRITERIUM de la saison correspondante

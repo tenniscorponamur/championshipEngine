@@ -47,7 +47,7 @@ public class PouleController {
     @RequestMapping(value = "/private/poule", method = RequestMethod.POST)
     public Poule addPoule(@RequestParam Long divisionId, @RequestBody Poule poule){
 
-        Division division = divisionRepository.findOne(divisionId);
+        Division division = divisionRepository.findById(divisionId).get();
         poule.setDivision(division);
 
         // Operation non-permise si le calendrier est valide ou cloture
@@ -67,7 +67,7 @@ public class PouleController {
     @RequestMapping(value = "/private/poule/allerRetour", method = RequestMethod.PUT)
     public void updateAllerRetour(@RequestParam Long pouleId, @RequestParam boolean allerRetour){
 
-        Poule poule = pouleRepository.findOne(pouleId);
+        Poule poule = pouleRepository.findById(pouleId).get();
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (poule.getDivision().getChampionnat().isCalendrierValide() || poule.getDivision().getChampionnat().isCloture()){
@@ -85,14 +85,14 @@ public class PouleController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/poule", method = RequestMethod.DELETE)
     public void deletePoule(@RequestParam Long id){
-        Poule poule = pouleRepository.findOne(id);
+        Poule poule = pouleRepository.findById(id).get();
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (poule.getDivision().getChampionnat().isCalendrierValide() || poule.getDivision().getChampionnat().isCloture()){
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
-        pouleRepository.delete(id);
+        pouleRepository.deleteById(id);
         // On signale que le calendrier doit etre rafraichi si la poule a ete supprimee
         championnatRepository.updateCalendrierARafraichir(poule.getDivision().getChampionnat().getId(),true);
     }

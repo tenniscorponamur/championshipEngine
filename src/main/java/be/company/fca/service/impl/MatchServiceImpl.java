@@ -26,7 +26,7 @@ public class MatchServiceImpl implements MatchService {
     @Transactional(readOnly = false)
     public Match updateMatchAndSets(Long matchId, List<Set> sets) {
 
-        Match match = matchRepository.findOne(matchId);
+        Match match = matchRepository.findById(matchId).get();
 
         if (match!=null){
 

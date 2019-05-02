@@ -217,7 +217,7 @@ public class MembreController {
                     autorise=true;
                 // S'il s'agit du responsable du club, on autorise egalement
                 }else if (membreConnecte.isResponsableClub() && membreConnecte.getClub()!=null) {
-                    Membre membreExistant = membreRepository.findOne(membreId);
+                    Membre membreExistant = membreRepository.findById(membreId).get();
                     if (membreExistant.getClub() != null) {
                         autorise = membreExistant.getClub().equals(membreConnecte.getClub());
                     }
@@ -246,7 +246,7 @@ public class MembreController {
         // Anonymisation -> nom/prenom = ***
         // suppression de l'adresse, telephone, mail, ...
 
-        Membre membre = membreRepository.findOne(membreId);
+        Membre membre = membreRepository.findById(membreId).get();
         membre.setNom("***");
         membre.setPrenom("***");
         membre.setDateNaissance(null);
@@ -270,7 +270,7 @@ public class MembreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/resetPassword", method = RequestMethod.POST)
     public boolean resetMemberPassword(@PathVariable("membreId") Long membreId){
-        Membre membre = membreRepository.findOne(membreId);
+        Membre membre = membreRepository.findById(membreId).get();
         if (!StringUtils.isEmpty(membre.getMail())){
             String newPassword = PasswordUtils.generatePassword();
             boolean mailSended = MailUtils.sendPasswordMail(membre.getPrenom(),membre.getNom(),membre.getMail(),newPassword);
@@ -287,7 +287,7 @@ public class MembreController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/setNewPassword", method = RequestMethod.POST)
     public String setNewMemberPassword(@PathVariable("membreId") Long membreId){
-        Membre membre = membreRepository.findOne(membreId);
+        Membre membre = membreRepository.findById(membreId).get();
         String newPassword = PasswordUtils.generatePassword();
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         membre.setPassword(encoder.encode(newPassword));
@@ -334,7 +334,7 @@ public class MembreController {
             membreRepository.updateClassementAFT(membreId,null);
             classementCorpoRepository.deleteByMembreFk(membreId);
             classementAFTRepository.deleteByMembreFk(membreId);
-            membreRepository.delete(membreId);
+            membreRepository.deleteById(membreId);
         }
     }
 

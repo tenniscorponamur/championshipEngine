@@ -50,7 +50,7 @@ public class DivisionController {
     @RequestMapping(value = "/private/division", method = RequestMethod.POST)
     public Division addDivision(@RequestParam Long championnatId, @RequestBody Division division){
 
-        Championnat championnat = championnatRepository.findOne(championnatId);
+        Championnat championnat = championnatRepository.findById(championnatId).get();
         division.setChampionnat(championnat);
 
         // Operation non-permise si le calendrier est valide ou cloture
@@ -69,7 +69,7 @@ public class DivisionController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/division", method = RequestMethod.DELETE)
     public void deleteDivision(@RequestParam Long id){
-        Division division = divisionRepository.findOne(id);
+        Division division = divisionRepository.findById(id).get();
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (division.getChampionnat().isCalendrierValide() || division.getChampionnat().isCloture()){
@@ -80,7 +80,7 @@ public class DivisionController {
         // Il ne doit plus y avoir d'equipe
         pouleRepository.deleteByDivision(division);
 
-        divisionRepository.delete(id);
+        divisionRepository.deleteById(id);
         // On signale que le calendrier doit etre rafraichi si la division a ete supprimee
         championnatRepository.updateCalendrierARafraichir(division.getChampionnat().getId(),true);
     }
@@ -89,7 +89,7 @@ public class DivisionController {
     @RequestMapping(value = "/private/divisions", method = RequestMethod.PUT)
     public List<Division> saveDivisionsInChampionship(@RequestParam Long championnatId, @RequestBody List<Division> divisionList){
 
-        Championnat championnat = championnatRepository.findOne(championnatId);
+        Championnat championnat = championnatRepository.findById(championnatId).get();
 
         // Operation non-permise si le calendrier est valide ou cloture
         if (championnat.isCalendrierValide() || championnat.isCloture()){

@@ -49,6 +49,6 @@ public class MatchController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/match", method = RequestMethod.DELETE)
     public void deleteMatch(@RequestParam Long id){
-        matchRepository.delete(id);
+        matchRepository.deleteById(id);
     }
 }
