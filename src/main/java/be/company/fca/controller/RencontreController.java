@@ -191,14 +191,12 @@ public class RencontreController {
      */
     @RequestMapping(method = RequestMethod.GET, path = "/public/rencontres/last")
     public List<Rencontre> getLastTenResults(@RequestParam Integer numberOfResults) {
-        Pageable pageRequest = new PageRequest(0, numberOfResults);
-        return rencontreRepository.getLastResults(pageRequest);
+        return rencontreRepository.getLastResults(PageRequest.of(0,numberOfResults));
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/public/rencontres/next")
     public List<Rencontre> getComingMeetings(@RequestParam Integer numberOfResults) {
-        Pageable pageRequest = new PageRequest(0, numberOfResults);
-        return rencontreRepository.getNextMeetings(DateUtils.shrinkToDay(new Date()), pageRequest);
+        return rencontreRepository.getNextMeetings(DateUtils.shrinkToDay(new Date()), PageRequest.of(0,numberOfResults));
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/public/rencontres/criterium")
