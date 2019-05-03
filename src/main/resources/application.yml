@@ -59,8 +59,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQL94Dialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
-#spring:
 #  datasource:
 #    url: jdbc:postgresql://localhost:5432/tennisCorpo
 #    username: fca
