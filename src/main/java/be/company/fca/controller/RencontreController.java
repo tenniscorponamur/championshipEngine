@@ -257,6 +257,74 @@ public class RencontreController {
 
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/rencontre/forfait", method = RequestMethod.PUT)
+    public Rencontre forfaitRencontre(Authentication authentication, @RequestBody Rencontre rencontre, @RequestParam boolean forfaitVisiteurs){
+
+        if (isForfaitPossible(authentication,rencontre.getId())){
+
+            Integer nbJeux = 5;
+            if (rencontre.getDivision().getChampionnat().getType().equals(TypeChampionnat.ETE)){
+                nbJeux = 6;
+            }
+            rencontre.setPointsVisites(0);
+            rencontre.setPointsVisiteurs(0);
+
+            // Recuperation des matchs et mises à jour des sets
+
+            List<Match> matchs = getOrCreateMatchs(rencontre);
+            for (Match match : matchs){
+
+                List<Set> sets = new ArrayList<>();
+                for (int i=0;i<2;i++){
+                    Set set = new Set();
+                    set.setMatch(match);
+                    set.setOrdre(i+1);
+                    if (forfaitVisiteurs){
+                        set.setJeuxVisites(nbJeux);
+                        set.setJeuxVisiteurs(0);
+                    }else{
+                        set.setJeuxVisites(0);
+                        set.setJeuxVisiteurs(nbJeux);
+                    }
+                    sets.add(set);
+                }
+
+                match = matchService.updateMatchAndSets(match.getId(),sets);
+
+                // mise a jour des points de la rencontre
+                rencontre.setPointsVisites(rencontre.getPointsVisites() + match.getPointsVisites());
+                rencontre.setPointsVisiteurs(rencontre.getPointsVisiteurs() + match.getPointsVisiteurs());
+            }
+
+            // Commentaires de la rencontre
+            String commentaires = "Forfait de l'équipe ";
+            if (forfaitVisiteurs){
+                commentaires+=rencontre.getEquipeVisiteurs().getCodeAlphabetique();
+            }else{
+                commentaires+=rencontre.getEquipeVisites().getCodeAlphabetique();
+            }
+            rencontre.setCommentairesEncodeur(commentaires);
+
+            rencontre.setResultatsEncodes(true);
+            rencontre.setValide(true);
+
+            rencontreRepository.save(rencontre);
+
+            //Ajout d'une trace pour preciser le forfait encode par l'administrateur
+
+            String trace = "";
+            trace = commentaires + " encodé par l'administrateur";
+            traceService.addTrace(authentication,"rencontre",rencontre.getId().toString(),trace);
+
+            return rencontre;
+
+        }else{
+            throw new ForbiddenException();
+        }
+
+    }
+
 
     // DTO pour les membres afin de ne pas recuperer les donnees privees
     // Attention a la rencontre --> rencontreDto
@@ -278,11 +346,7 @@ public class RencontreController {
 
         Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
 
-        matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
-
-        if (matchs.isEmpty()){
-            matchs = matchService.createMatchs(rencontre);
-        }
+        matchs = getOrCreateMatchs(rencontre);
 
         for (Match match : matchs){
             matchsDto.add(new MatchDto(match));
@@ -290,6 +354,22 @@ public class RencontreController {
 
         return matchsDto;
 
+    }
+
+    /**
+     * Permet de recuperer ou de creer les matchs d'une rencontre s'ils n'existent pas encore
+     * @param rencontre
+     * @return
+     */
+    private List<Match> getOrCreateMatchs(Rencontre rencontre){
+
+        List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+
+        if (matchs.isEmpty()){
+            matchs = matchService.createMatchs(rencontre);
+        }
+
+        return matchs;
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/match", method = RequestMethod.PUT)
@@ -509,6 +589,18 @@ public class RencontreController {
             }
         }
         return false;
+    }
+
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/isForfaitPossible", method = RequestMethod.GET)
+    public boolean isForfaitPossible(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+        if (userService.isAdmin(authentication)){
+            Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
+            if ((rencontre.getPointsVisites()==null || rencontre.getPointsVisites()==0) && (rencontre.getPointsVisiteurs()==null || rencontre.getPointsVisiteurs()==0)) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/isResultatsCloturables", method = RequestMethod.GET)
