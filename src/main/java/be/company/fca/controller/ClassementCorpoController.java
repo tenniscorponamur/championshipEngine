@@ -162,7 +162,7 @@ public class ClassementCorpoController {
 
         Integer totalGagnesPerdus = 0;
 
-        if (matchsValables.size()>=3){
+        if (matchsValables.size()>0){
 
             for (Match match : matchsValables){
 
@@ -179,7 +179,12 @@ public class ClassementCorpoController {
         }
 
         infosCalculClassement.setTotalObtenu(totalGagnesPerdus);
-        Integer pointsClassementsGagnesPerdus = getPointsClassement(totalGagnesPerdus);
+
+        // Le classement du membre ne sera adapte que s'il y a au moins 3 matchs joues sur la periode concernee
+        Integer pointsClassementsGagnesPerdus = 0;
+        if (matchsValables.size()>=3){
+            pointsClassementsGagnesPerdus = getPointsClassement(totalGagnesPerdus);
+        }
 
         // Calculer les points du classement resultat en se basant sur les points de depart
         // Perte max --> NC --> 5 points
@@ -277,7 +282,7 @@ public class ClassementCorpoController {
 
                 String trace = "";
 
-                trace = membre.getNumeroAft() + "|" + membre.getPrenom() + "|" + membre.getNom() + "|" + (membre.getClub()!=null?membre.getClub().getNom():"")
+                trace = membre.getNumeroAft() + "|" + membre.getNom() + "|" + membre.getPrenom() + "|" + (membre.getClub()!=null?membre.getClub().getNom():"")
                         + "|" + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu()
                         + "|" + infosCalculClassement.getPointsDepart() + "|" + infosCalculClassement.getPointsFin();
 

@@ -169,7 +169,7 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
      * @return
      */
     @Query(value = "select rencontre from Rencontre rencontre " +
-            " where rencontre.dateHeureRencontre > :startDate order by rencontre.dateHeureRencontre asc ")
+            " where rencontre.valide = '0' and rencontre.dateHeureRencontre > :startDate order by rencontre.dateHeureRencontre asc ")
     List<Rencontre> getNextMeetings(@Param("startDate") Date startDate, Pageable pageable);
 
     /**
