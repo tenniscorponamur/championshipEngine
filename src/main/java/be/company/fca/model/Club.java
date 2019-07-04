@@ -30,6 +30,12 @@ public class Club {
     @Column
     private String description;
 
+    @Column( name =  "numero_tva")
+    private String numeroTVA;
+
+    @Column
+    private String adresse;
+
     @ManyToOne
     @JoinColumn(name = "terrain_fk")
     private Terrain terrain;
@@ -67,6 +73,22 @@ public class Club {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getNumeroTVA() {
+        return numeroTVA;
+    }
+
+    public void setNumeroTVA(String numeroTVA) {
+        this.numeroTVA = numeroTVA;
+    }
+
+    public String getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(String adresse) {
+        this.adresse = adresse;
     }
 
     public Terrain getTerrain() {
