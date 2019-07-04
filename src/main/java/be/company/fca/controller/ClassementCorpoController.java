@@ -282,17 +282,15 @@ public class ClassementCorpoController {
 
                 String trace = "";
 
-                trace = membre.getNumeroAft() + "|" + membre.getNom() + "|" + membre.getPrenom() + "|" + (membre.getClub()!=null?membre.getClub().getNom():"")
-                        + "|" + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu()
-                        + "|" + infosCalculClassement.getPointsDepart() + "|" + infosCalculClassement.getPointsFin();
-
-                if (infosCalculClassement.getPointsDepart()>infosCalculClassement.getPointsFin()){
-                    //trace = "Classement inférieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
-                }else if (infosCalculClassement.getPointsDepart()<infosCalculClassement.getPointsFin()){
-                    //trace = "Classement supérieur pour " + (membre.getPrenom() + " " + membre.getNom()) + " : " + infosCalculClassement.getPointsFin() + " points";
-                }else{
-                    //trace = "Classement identique pour " + (membre.getPrenom() + " " + membre.getNom());
-                }
+                trace = membre.getNumeroAft() + "|"
+                        + membre.getNom() + "|"
+                        + membre.getPrenom() + "|"
+                        + (membre.getDateNaissance()!=null?DateUtils.getYearsDifference(membre.getDateNaissance()):"") + "|"
+                        + (membre.getClassementAFTActuel()!=null?membre.getClassementAFTActuel().getCodeClassement():"") + "|"
+                        + (membre.getClub()!=null?membre.getClub().getNom():"") + "|"
+                        + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu() + "|"
+                        + infosCalculClassement.getPointsDepart() + "|"
+                        + infosCalculClassement.getPointsFin();
 
                 // Enregistrement des traces d'execution du job
                 ClassementJobTrace classementJobTrace = new ClassementJobTrace();
@@ -383,11 +381,13 @@ public class ClassementCorpoController {
         POIUtils.write(sheet, 0, 0, "NUMERO AFT", null, null);
         POIUtils.write(sheet, 0, 1, "NOM", null, null);
         POIUtils.write(sheet, 0, 2, "PRENOM", null, null);
-        POIUtils.write(sheet, 0, 3, "CLUB", null, null);
-        POIUtils.write(sheet, 0, 4, "MATCHS JOUES", null, null);
-        POIUtils.write(sheet, 0, 5, "TOTAL OBTENU", null, null);
-        POIUtils.write(sheet, 0, 6, "POINTS AVANT", null, null);
-        POIUtils.write(sheet, 0, 7, "POINTS APRES", null, null);
+        POIUtils.write(sheet, 0, 3, "AGE", null, null);
+        POIUtils.write(sheet, 0, 4, "AFT", null, null);
+        POIUtils.write(sheet, 0, 5, "CLUB", null, null);
+        POIUtils.write(sheet, 0, 6, "MATCHS JOUES", null, null);
+        POIUtils.write(sheet, 0, 7, "TOTAL OBTENU", null, null);
+        POIUtils.write(sheet, 0, 8, "POINTS AVANT", null, null);
+        POIUtils.write(sheet, 0, 9, "POINTS APRES", null, null);
 
         int nbColumns = 0;
         int i=1;
