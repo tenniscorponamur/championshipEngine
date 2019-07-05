@@ -24,6 +24,16 @@ public interface EquipeRepository extends CrudRepository<Equipe,Long>{
     Iterable<Equipe> findByPoule(Poule poule);
 
     /**
+     * Permet de recuperer les equipes par championnat et par club
+     * @param championnatId Identifiant du championnat
+     * @param clubId Identifiant du club
+     * @return Equipes par championnat et par club
+     */
+    @Query(value = "select equipe from Equipe equipe " +
+            " where equipe.division.championnat.id = :championnatId and equipe.club.id = :clubId")
+    Iterable<Equipe> findByChampionnatAndClub(Long championnatId, Long clubId);
+
+    /**
      * Permet de compter le nombre d'equipes par club
      * @param club
      * @return Nombre d'equipes par club

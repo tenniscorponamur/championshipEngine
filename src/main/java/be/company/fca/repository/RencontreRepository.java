@@ -28,6 +28,16 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     Iterable<Rencontre> findByPoule(Poule poule);
 
     /**
+     * Permet de recuperer les rencontres d'un club sur un championnat
+     * @param championnatId Identifiant du championnat
+     * @param clubId Identifiant du club
+     * @return Rencontres d'un club sur un championnat
+     */
+    @Query(value = "select rencontre from Rencontre rencontre " +
+            " where rencontre.division.championnat.id = :championnatId and (rencontre.equipeVisites.club.id = :clubId OR rencontre.equipeVisiteurs.club.id = :clubId)")
+    Iterable<Rencontre> findRencontresByChampionnatAndClub(Long championnatId, Long clubId);
+
+    /**
      * Permet de recuperer les rencontres avec ou sans encodage et avec ou sans validation avant une date donnee
      * @param resultatsEncodes
      * @param nowDate

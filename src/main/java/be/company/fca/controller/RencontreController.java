@@ -102,6 +102,19 @@ public class RencontreController {
         return rencontresDto;
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/public/rencontresByClub")
+    public List<RencontreDto> getRencontresByClub(@RequestParam Long championnatId, @RequestParam Long clubId) {
+        List<RencontreDto> rencontresDto = new ArrayList<>();
+
+        List<Rencontre> rencontres = (List<Rencontre>) rencontreRepository.findRencontresByChampionnatAndClub(championnatId,clubId);
+
+        for (Rencontre rencontre : rencontres) {
+            rencontresDto.add(new RencontreDto(rencontre));
+        }
+
+        return rencontresDto;
+    }
+
     @RequestMapping(method = RequestMethod.GET, path = "/private/rencontres/toComplete")
     public List<Rencontre> getRencontresAEncoder(Authentication authentication){
         List<Rencontre> rencontresAEncoder = rencontreRepository.findEncodedAndValidatedBefore(false,false,new Date());

@@ -63,6 +63,19 @@ public class EquipeController {
         return equipesDto;
     }
 
+    @RequestMapping(method= RequestMethod.GET, path="/public/equipesByClub")
+    public List<EquipeDto> getEquipesByChampionnatAndClub(@RequestParam Long championnatId, @RequestParam Long clubId) {
+        List<EquipeDto> equipesDto = new ArrayList<>();
+        List<Equipe> equipes = (List<Equipe>) equipeRepository.findByChampionnatAndClub(championnatId,clubId);
+
+        for (Equipe equipe : equipes){
+            equipesDto.add(new EquipeDto(equipe));
+        }
+
+        return equipesDto;
+    }
+
+
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.PUT)
     public Equipe updateEquipe(@RequestParam Long divisionId, @RequestBody Equipe equipe){
