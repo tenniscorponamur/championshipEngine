@@ -179,9 +179,11 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/championnat/tableauCriterium", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTableauCriterium(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumTemplate());
         Connection conn = datasource.getConnection();
         Map params = new HashMap();
+        params.put("REPORT_TIME_ZONE", timeZone);
         params.put("date", date);
         JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
         byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
