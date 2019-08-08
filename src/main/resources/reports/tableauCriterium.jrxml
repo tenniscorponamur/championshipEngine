@@ -130,7 +130,7 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
-							<textField pattern="HH:mm">
+							<textField isStretchWithOverflow="true" pattern="HH:mm">
 								<reportElement x="0" y="0" width="45" height="100" uuid="dbba03d6-3bd6-4c9b-8e27-91de1596792a"/>
 								<box leftPadding="3"/>
 								<textElement verticalAlignment="Middle"/>
@@ -153,8 +153,8 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
-							<textField>
-								<reportElement x="0" y="0" width="100" height="20" uuid="dd3d5989-c41d-45d0-836c-0b2a24c7ff8d"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement x="0" y="0" width="110" height="20" uuid="dd3d5989-c41d-45d0-836c-0b2a24c7ff8d"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{terrainnom}]]></textFieldExpression>
 							</textField>
@@ -175,8 +175,8 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
-							<textField>
-								<reportElement x="0" y="0" width="100" height="20" uuid="f78df70c-93bc-4454-9f87-dedab9feb7be"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement x="0" y="0" width="110" height="20" uuid="f78df70c-93bc-4454-9f87-dedab9feb7be"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{courtcode}]]></textFieldExpression>
 							</textField>
@@ -206,10 +206,10 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 				<measure name="visiteurscode_MEASURE" class="java.lang.String">
 					<measureExpression><![CDATA[$F{visiteurscode}]]></measureExpression>
 				</measure>
-				<crosstabCell width="100" height="100">
+				<crosstabCell width="110" height="100">
 					<cellContents mode="Opaque" style="Crosstab_CD">
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="0" y="0" width="100" height="34" uuid="93af2d11-c402-42f0-8d91-39915ab2137f"/>
+							<reportElement x="0" y="0" width="110" height="34" uuid="93af2d11-c402-42f0-8d91-39915ab2137f"/>
 							<box topPadding="3" leftPadding="3"/>
 							<textFieldExpression><![CDATA[$V{categorie_MEASURE}.equals("SIMPLE_MESSIEURS")?"SM":($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")?"DM":($V{categorie_MEASURE}.equals("SIMPLE_DAMES")?"SD":($V{categorie_MEASURE}.equals("DOUBLE_DAMES")?"DD":($V{categorie_MEASURE}.equals("MIXTES")?"DMX":
 	$V{categorie_MEASURE})
@@ -219,12 +219,12 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 + " " + $V{points_max_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="0" y="34" width="100" height="33" uuid="079c0596-222a-4707-88b1-04b111a92c31"/>
+							<reportElement x="0" y="34" width="110" height="33" uuid="079c0596-222a-4707-88b1-04b111a92c31"/>
 							<box leftPadding="3"/>
 							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement x="0" y="67" width="100" height="33" uuid="14258b29-5234-4b30-b7de-7895fbf1c291"/>
+							<reportElement x="0" y="67" width="110" height="33" uuid="14258b29-5234-4b30-b7de-7895fbf1c291"/>
 							<box leftPadding="3"/>
 							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
