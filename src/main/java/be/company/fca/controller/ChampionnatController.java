@@ -46,14 +46,24 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat", method = RequestMethod.PUT)
     public Championnat updateChampionnat(@RequestBody Championnat championnat){
-        championnatRepository.updateInfosGenerales(championnat.getId(), championnat.getAnnee(),championnat.getType(),championnat.getCategorie());
-        return championnat;
+        try{
+            // On va tenter de sauvegarder et la DB va nous signaler si on essaye de creer un doublon
+            championnatRepository.updateInfosGenerales(championnat.getId(), championnat.getAnnee(),championnat.getType(),championnat.getCategorie());
+            return championnat;
+        }catch (Exception e){
+            return null;
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat", method = RequestMethod.POST)
     public Championnat addChampionnat(@RequestBody Championnat championnat){
-        return championnatRepository.save(championnat);
+        try{
+            // On va tenter de sauvegarder et la DB va nous signaler si on essaye de creer un doublon
+            return championnatRepository.save(championnat);
+        }catch (Exception e){
+            return null;
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
