@@ -66,6 +66,13 @@ public class ClassementCorpoController {
         return classementCorpoRepository.findByMembreFk(membreId);
     }
 
+
+    @RequestMapping(path="/public/membre/{membreId}/pointsCorpoByDate", method= RequestMethod.GET)
+    public Integer getClassementCorpoByMembreAndDate(@PathVariable("membreId") Long membreId, @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date){
+        Membre membre = membreRepository.findById(membreId).get();
+        return getPointsCorpoByMembreAndDate(membre,date,false);
+    }
+
     /**
      * Permet de sauvegarder les classements corpo obtenus par un membre
      * Procede a la suppression des anciens classements avant la sauvegarde effective des nouveaux
