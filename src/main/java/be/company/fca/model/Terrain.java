@@ -30,6 +30,9 @@ public class Terrain {
     @Column( name =  "adresse")
     private String adresse;
 
+    @Column( name = "terrain_criterium_par_defaut", nullable = false)
+    private boolean terrainCriteriumParDefaut=false;
+
     @Column( name = "actif", nullable = false)
     private boolean actif=true;
 
@@ -63,6 +66,14 @@ public class Terrain {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public boolean isTerrainCriteriumParDefaut() {
+        return terrainCriteriumParDefaut;
+    }
+
+    public void setTerrainCriteriumParDefaut(boolean terrainCriteriumParDefaut) {
+        this.terrainCriteriumParDefaut = terrainCriteriumParDefaut;
     }
 
     public boolean isActif() {

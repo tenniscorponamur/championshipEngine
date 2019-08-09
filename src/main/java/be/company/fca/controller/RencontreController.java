@@ -57,6 +57,8 @@ public class RencontreController {
     private ChampionnatRepository championnatRepository;
     @Autowired
     private MembreRepository membreRepository;
+    @Autowired
+    private TerrainRepository terrainRepository;
 
     @Autowired
     private MatchRepository matchRepository;
@@ -1495,6 +1497,15 @@ public class RencontreController {
      */
     private List<Rencontre> generateCalendar(Poule poule) {
 
+        Terrain terrainCriterium = null;
+        // S'il s'agit du criterium, on va recuperer le terrain par defaut a utiliser
+        if (TypeChampionnat.CRITERIUM.equals(poule.getDivision().getChampionnat().getType())){
+            List<Terrain> terrains = (List<Terrain>) terrainRepository.findByTerrainCriteriumParDefaut(true);
+            if (terrains !=null && terrains.size()==1){
+                terrainCriterium = terrains.get(0);
+            }
+        }
+
         List<Rencontre> rencontres = new ArrayList<>();
 
         List<Equipe> equipes = (List<Equipe>) equipeRepository.findByPoule(poule);
@@ -1538,10 +1549,16 @@ public class RencontreController {
                     }
                 }
 
-                // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
-                if (rencontre.getEquipeVisites().getTerrain() != null) {
-                    rencontre.setTerrain(rencontre.getEquipeVisites().getTerrain());
+                // En cas de criterium, recuperer le terrain dedie a ce championnat
+                if (TypeChampionnat.CRITERIUM.equals(poule.getDivision().getChampionnat().getType())){
+                    rencontre.setTerrain(terrainCriterium);
+                }else{
+                    // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
+                    if (rencontre.getEquipeVisites().getTerrain() != null) {
+                        rencontre.setTerrain(rencontre.getEquipeVisites().getTerrain());
+                    }
                 }
+
 
                 //System.err.println(rencontre);
                 rencontres.add(rencontre);
@@ -1563,9 +1580,14 @@ public class RencontreController {
                 rencontreRetour.setEquipeVisites(rencontreAller.getEquipeVisiteurs());
                 rencontreRetour.setEquipeVisiteurs(rencontreAller.getEquipeVisites());
 
-                // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
-                if (rencontreRetour.getEquipeVisites().getTerrain() != null) {
-                    rencontreRetour.setTerrain(rencontreRetour.getEquipeVisites().getTerrain());
+                // En cas de criterium, recuperer le terrain dedie a ce championnat
+                if (TypeChampionnat.CRITERIUM.equals(poule.getDivision().getChampionnat().getType())){
+                    rencontreRetour.setTerrain(terrainCriterium);
+                }else {
+                    // Si l'equipe visitee possede un terrain, on le precise pour la rencontre
+                    if (rencontreRetour.getEquipeVisites().getTerrain() != null) {
+                        rencontreRetour.setTerrain(rencontreRetour.getEquipeVisites().getTerrain());
+                    }
                 }
 
                 rencontresRetour.add(rencontreRetour);
