@@ -1313,9 +1313,10 @@ public class RencontreController {
             Cell firstCell = POIUtils.write(sheet, 0, 0, "Division", null, null);
             POIUtils.write(sheet, 0, 1, "Poule", null, null);
             POIUtils.write(sheet, 0, 2, "Date/Heure", null, null);
-            POIUtils.write(sheet, 0, 3, "Terrain", null, null);
-            POIUtils.write(sheet, 0, 4, "Visites", null, null);
-            Cell lastCell = POIUtils.write(sheet, 0, 5, "Visiteurs", null, null);
+            POIUtils.write(sheet, 0, 3, "Club", null, null);
+            POIUtils.write(sheet, 0, 4, "Court", null, null);
+            POIUtils.write(sheet, 0, 5, "Visites", null, null);
+            Cell lastCell = POIUtils.write(sheet, 0, 6, "Visiteurs", null, null);
 
             for (int i = 0; i < rencontres.size(); i++) {
                 Rencontre rencontre = rencontres.get(i);
@@ -1330,8 +1331,11 @@ public class RencontreController {
                 if (rencontre.getTerrain() != null) {
                     lastCell = POIUtils.write(sheet, i + 1, 3, rencontre.getTerrain().getNom(), null, null);
                 }
-                lastCell = POIUtils.write(sheet, i + 1, 4, rencontre.getEquipeVisites().getCodeAlphabetique(), null, null);
-                lastCell = POIUtils.write(sheet, i + 1, 5, rencontre.getEquipeVisiteurs().getCodeAlphabetique(), null, null);
+                if (rencontre.getCourt()!=null){
+                    lastCell = POIUtils.write(sheet, i + 1, 4, rencontre.getCourt().getCode(), null, null);
+                }
+                lastCell = POIUtils.write(sheet, i + 1, 5, rencontre.getEquipeVisites().getCodeAlphabetique(), null, null);
+                lastCell = POIUtils.write(sheet, i + 1, 6, rencontre.getEquipeVisiteurs().getCodeAlphabetique(), null, null);
 
             }
 
@@ -1339,7 +1343,7 @@ public class RencontreController {
             sheet.createFreezePane(0, 1);
 
             // Auto-resize des colonnes
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 7; i++) {
                 sheet.autoSizeColumn(i);
             }
 

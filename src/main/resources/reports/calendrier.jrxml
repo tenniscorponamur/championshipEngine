@@ -4,6 +4,8 @@
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tennis Corpo Local"/>
 	<property name="com.jaspersoft.studio.report.description" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="0"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="1000"/>
 	<parameter name="championnatId" class="java.lang.Long"/>
 	<queryString language="SQL">
 		<![CDATA[select championnat.annee, championnat.type type_championnat, championnat.categorie categorie_championnat, 
@@ -11,6 +13,7 @@ division.numero division_numero, division.points_min, division.points_max,
 poule.numero poule_numero,
 rencontre.dateheurerencontre,
 terrain.nom terrain_nom,
+court.code court_code,
 visites.code_alphabetique visites_nom,
 visiteurs.code_alphabetique visiteurs_nom
 from championnat 
@@ -18,6 +21,7 @@ inner join division on division.championnat_fk = championnat.id
 inner join rencontre on rencontre.division_fk = division.id
 left join poule on rencontre.poule_fk = poule.id
 left join terrain  on rencontre.terrain_fk = terrain.id
+left join court  on rencontre.court_fk = court.id
 inner join equipe visites on rencontre.visites_fk=visites.id
 inner join equipe visiteurs on rencontre.visiteurs_fk=visiteurs.id
 where championnat.id = $P{championnatId}
@@ -49,6 +53,9 @@ order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre 
 	</field>
 	<field name="terrain_nom" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="terrain_nom"/>
+	</field>
+	<field name="court_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="court_code"/>
 	</field>
 	<field name="visites_nom" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="visites_nom"/>
@@ -188,7 +195,7 @@ order by division_numero, poule_numero nulls last, rencontre.dateheurerencontre 
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{terrain_nom}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{terrain_nom}!=null?$F{terrain_nom}:"") + ($F{court_code}!=null?(" / " + $F{court_code}):"") ]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
