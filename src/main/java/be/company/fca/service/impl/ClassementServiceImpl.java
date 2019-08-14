@@ -204,21 +204,21 @@ public class ClassementServiceImpl implements ClassementService {
                         }
                     }
                 }
-
-                for (Club club : pointsClub.keySet()) {
-                    ClassementClub classementClub = new ClassementClub();
-                    classementClub.setClub(club);
-                    classementClub.setPoints(pointsClub.get(club));
-                    classementClubs.add(classementClub);
-                }
-
-                Collections.sort(classementClubs, new Comparator<ClassementClub>() {
-                    @Override
-                    public int compare(ClassementClub o1, ClassementClub o2) {
-                        return (-1) * Integer.compare(o1.getPoints(), o2.getPoints());
-                    }
-                });
             }
+
+            for (Club club : pointsClub.keySet()) {
+                ClassementClub classementClub = new ClassementClub();
+                classementClub.setClub(club);
+                classementClub.setPoints(pointsClub.get(club));
+                classementClubs.add(classementClub);
+            }
+
+            Collections.sort(classementClubs, new Comparator<ClassementClub>() {
+                @Override
+                public int compare(ClassementClub o1, ClassementClub o2) {
+                    return (-1) * Integer.compare(o1.getPoints(), o2.getPoints());
+                }
+            });
         }
         return classementClubs;
     }
