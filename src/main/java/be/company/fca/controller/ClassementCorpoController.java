@@ -526,7 +526,7 @@ public class ClassementCorpoController {
 
         if (championnatHomme){
             if (Genre.FEMME.equals(membre.getGenre())){
-                points = EchelleCorpo.getCorrespondancePointsHommeFemme().get(points);
+                points = EchelleCorpo.getCorrespondancePointsHommeFemme(date).get(points);
             }
         }
 
@@ -658,10 +658,10 @@ public class ClassementCorpoController {
         Map<ResultatMatch,Map<Integer,Integer>> eteMap = new HashMap<>();
         Map<Integer,Integer> victoireEteMap = new HashMap<>();Map<Integer,Integer> eteDefaiteMap = new HashMap<>();Map<Integer,Integer> eteMatchNulMap = new HashMap<>();
         victoireEteMap.put(-15,0);eteDefaiteMap.put(-15,-50);eteMatchNulMap.put(-15,-25);
-        victoireEteMap.put(-10,5);eteDefaiteMap.put(-10,-50);eteMatchNulMap.put(-10,-25);
-        victoireEteMap.put(-5,10);eteDefaiteMap.put(-5,-25);eteMatchNulMap.put(-5,-25);
-        victoireEteMap.put(0,50);eteDefaiteMap.put(0,-10);eteMatchNulMap.put(0,0);
-        victoireEteMap.put(5,75);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,35);
+        victoireEteMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
+        victoireEteMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
+        victoireEteMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
+        victoireEteMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
         victoireEteMap.put(10,100);eteDefaiteMap.put(10,0);eteMatchNulMap.put(10,50);
         victoireEteMap.put(15,125);eteDefaiteMap.put(15,0);eteMatchNulMap.put(15,60);
         eteMap.put(ResultatMatch.victoire,victoireEteMap);eteMap.put(ResultatMatch.defaite,eteDefaiteMap);eteMap.put(ResultatMatch.matchNul,eteMatchNulMap);
@@ -670,10 +670,10 @@ public class ClassementCorpoController {
         Map<ResultatMatch,Map<Integer,Integer>> hiverMap = new HashMap<>();
         Map<Integer,Integer> hiverVictoireMap = new HashMap<>();Map<Integer,Integer> hiverDefaiteMap = new HashMap<>();Map<Integer,Integer> hiverMatchNulMap = new HashMap<>();
         hiverVictoireMap.put(-15,0);hiverDefaiteMap.put(-15,-50);hiverMatchNulMap.put(-15,-25);
-        hiverVictoireMap.put(-10,5);hiverDefaiteMap.put(-10,-50);hiverMatchNulMap.put(-10,-25);
-        hiverVictoireMap.put(-5,10);hiverDefaiteMap.put(-5,-25);hiverMatchNulMap.put(-5,-25);
-        hiverVictoireMap.put(0,50);hiverDefaiteMap.put(0,-10);hiverMatchNulMap.put(0,0);
-        hiverVictoireMap.put(5,50);hiverDefaiteMap.put(5,0);hiverMatchNulMap.put(5,35);
+        hiverVictoireMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
+        hiverVictoireMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
+        hiverVictoireMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
+        hiverVictoireMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
         hiverVictoireMap.put(10,100);hiverDefaiteMap.put(10,0);hiverMatchNulMap.put(10,50);
         hiverVictoireMap.put(15,125);hiverDefaiteMap.put(15,0);hiverMatchNulMap.put(15,60);
         hiverMap.put(ResultatMatch.victoire,hiverVictoireMap);hiverMap.put(ResultatMatch.defaite,hiverDefaiteMap);hiverMap.put(ResultatMatch.matchNul,hiverMatchNulMap);
@@ -682,10 +682,10 @@ public class ClassementCorpoController {
         Map<ResultatMatch,Map<Integer,Integer>> criteriumMap = new HashMap<>();
         Map<Integer,Integer> criteriumVictoireMap = new HashMap<>();Map<Integer,Integer> criteriumDefaiteMap = new HashMap<>();Map<Integer,Integer> criteriumMatchNulMap = new HashMap<>();
         criteriumVictoireMap.put(-15,0);criteriumDefaiteMap.put(-15,-50);criteriumMatchNulMap.put(-15,-25);
-        criteriumVictoireMap.put(-10,5);criteriumDefaiteMap.put(-10,-50);criteriumMatchNulMap.put(-10,-25);
-        criteriumVictoireMap.put(-5,10);criteriumDefaiteMap.put(-5,-25);criteriumMatchNulMap.put(-5,-25);
-        criteriumVictoireMap.put(0,50);criteriumDefaiteMap.put(0,-10);criteriumMatchNulMap.put(0,0);
-        criteriumVictoireMap.put(5,50);criteriumDefaiteMap.put(5,0);criteriumMatchNulMap.put(5,35);
+        criteriumVictoireMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
+        criteriumVictoireMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
+        criteriumVictoireMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
+        criteriumVictoireMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
         criteriumVictoireMap.put(10,100);criteriumDefaiteMap.put(10,0);criteriumMatchNulMap.put(10,50);
         criteriumVictoireMap.put(15,125);criteriumDefaiteMap.put(15,0);criteriumMatchNulMap.put(15,60);
         criteriumMap.put(ResultatMatch.victoire,criteriumVictoireMap);criteriumMap.put(ResultatMatch.defaite,criteriumDefaiteMap);criteriumMap.put(ResultatMatch.matchNul,criteriumMatchNulMap);
@@ -695,10 +695,10 @@ public class ClassementCorpoController {
         Map<ResultatMatch,Map<Integer,Integer>> coupeHiverMap = new HashMap<>();
         Map<Integer,Integer> coupeHiverVictoireMap = new HashMap<>();Map<Integer,Integer> coupeHiverDefaiteMap = new HashMap<>();Map<Integer,Integer> coupeHiverMatchNulMap = new HashMap<>();
         coupeHiverVictoireMap.put(-15,0);coupeHiverDefaiteMap.put(-15,-50);coupeHiverMatchNulMap.put(-15,-25);
-        coupeHiverVictoireMap.put(-10,5);coupeHiverDefaiteMap.put(-10,-50);coupeHiverMatchNulMap.put(-10,-25);
-        coupeHiverVictoireMap.put(-5,10);coupeHiverDefaiteMap.put(-5,-25);coupeHiverMatchNulMap.put(-5,-25);
-        coupeHiverVictoireMap.put(0,50);coupeHiverDefaiteMap.put(0,-10);coupeHiverMatchNulMap.put(0,0);
-        coupeHiverVictoireMap.put(5,50);coupeHiverDefaiteMap.put(5,0);coupeHiverMatchNulMap.put(5,35);
+        coupeHiverVictoireMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
+        coupeHiverVictoireMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
+        coupeHiverVictoireMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
+        coupeHiverVictoireMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
         coupeHiverVictoireMap.put(10,100);coupeHiverDefaiteMap.put(10,0);coupeHiverMatchNulMap.put(10,50);
         coupeHiverVictoireMap.put(15,125);coupeHiverDefaiteMap.put(15,0);coupeHiverMatchNulMap.put(15,60);
         coupeHiverMap.put(ResultatMatch.victoire,coupeHiverVictoireMap);coupeHiverMap.put(ResultatMatch.defaite,coupeHiverDefaiteMap);coupeHiverMap.put(ResultatMatch.matchNul,coupeHiverMatchNulMap);
@@ -711,19 +711,13 @@ public class ClassementCorpoController {
     }
 
     private Integer getPointsClassement(Integer pointsMatchsObtenus){
-        if (pointsMatchsObtenus<-600){
-            return -20;
-        } else if (pointsMatchsObtenus < -400){
-            return -15;
-        }else if (pointsMatchsObtenus < -200){
-            return -10;
-        }else if (pointsMatchsObtenus < -20){
+        if (pointsMatchsObtenus < -20){
             return -5;
-        }else if (pointsMatchsObtenus < 350){
+        }else if (pointsMatchsObtenus < 101){
             return 0;
-        }else if (pointsMatchsObtenus < 501){
+        }else if (pointsMatchsObtenus < 251){
             return 5;
-        }else if (pointsMatchsObtenus < 751){
+        }else if (pointsMatchsObtenus < 501){
             return 10;
         }else{
             return 15;
@@ -739,14 +733,11 @@ TABLE DE CORRESPONDANCE POUR LE CALCUL DES CLASSEMENTS
 
 
 Points obtenus durant l'année (fourchette min)	Points obtenus durant l'année (fourchette max)	Nombre de classements gagnés (ou perdus)  (* 5 points)
--9 999	-601	-4
--600	-401	-3
--400	-201	-2
--200	-21	    -1
--20	    349	    0
-350	    500	    1
-501	    750	    2
-751	    9 999	3
+-9 999	-21	    -1
+-20	    100	    0
+101	    250	    1
+251	    500	    2
+501	    9 999	3
 
 
 Différence de points par rapport à l'adversaire	Type de championnat	Nombre de points gagnés en cas de victoire	Nombre de points perdus en cas de défaite	Nombre de points gagnés ou perdus en cas de nul
@@ -756,18 +747,18 @@ Différence de points par rapport à l'adversaire	Type de championnat	Nombre de 
 10	Hiver	    100	0	50
 10	Criterium	100	0	50
 10	Eté	        100	0	50
-5	Hiver	    50	0	35
-5	Criterium	50	0	35
-5	Eté	        75	0	35
-0	Hiver   	50	-10	0
-0	Criterium	50	-10	0
-0	Eté	        50	-10	0
--5	Hiver	    10	-25	-15
--5	Criterium	10	-25	-15
--5	Eté     	10	-25	-15
--10	Hiver   	5	-50	-25
--10	Criterium	5	-50	-25
--10	Eté	        5	-50	-25
+5	Hiver	    50	0	25
+5	Criterium	50	0	25
+5	Eté	        50	0	25
+0	Hiver   	25	-5	10
+0	Criterium	25	-5	10
+0	Eté	        25	-5	10
+-5	Hiver	    10	-10	0
+-5	Criterium	10	-10	0
+-5	Eté     	10	-10	0
+-10	Hiver   	5	-25	-10
+-10	Criterium	5	-25	-10
+-10	Eté	        5	-25	-10
 -15	Hiver	    0	-50	-25
 -15	Criterium	0	-50	-25
 -15	Eté	        0	-50	-25
