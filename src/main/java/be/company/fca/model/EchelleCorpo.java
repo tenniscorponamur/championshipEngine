@@ -47,8 +47,8 @@ public class EchelleCorpo {
             // classement dames divisé par 2 puis ajout de 10 pts. On arrondit par le bas (dans mon cas 35 pts soit 17.5 + 10 = 27.5 => 25pts)
             return (((womanPoints/2)+10)/5)*5;
         }else{
-            // classement dames - 25 points
-            return womanPoints-25;
+            // classement dames - 15 points
+            return womanPoints-15;
         }
 
     }

@@ -278,10 +278,6 @@ public class RencontreController {
 
         if (isForfaitPossible(authentication,rencontre.getId())){
 
-            Integer nbJeux = 5;
-            if (rencontre.getDivision().getChampionnat().getType().equals(TypeChampionnat.ETE)){
-                nbJeux = 6;
-            }
             rencontre.setPointsVisites(0);
             rencontre.setPointsVisiteurs(0);
 
@@ -289,6 +285,8 @@ public class RencontreController {
 
             List<Match> matchs = getOrCreateMatchs(rencontre);
             for (Match match : matchs){
+
+                Integer nbJeux = matchService.getNbJeuxMax(match);
 
                 List<Set> sets = new ArrayList<>();
                 for (int i=0;i<2;i++){
@@ -401,7 +399,10 @@ public class RencontreController {
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/match/sets", method = RequestMethod.PUT)
-    public Match updateMatchAndSets(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam Long matchId, @RequestBody List<Set> sets){
+    public Match updateMatchAndSets(Authentication authentication, @PathVariable("rencontreId") Long rencontreId,
+                                    @RequestParam Long matchId,
+                                    @RequestParam(required = false) boolean setUnique,
+                                    @RequestBody List<Set> sets){
 
         //  Verifier les autorisations des joueurs qui tentent de mettre a jour les matchs
 

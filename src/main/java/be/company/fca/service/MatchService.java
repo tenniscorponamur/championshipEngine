@@ -17,6 +17,16 @@ public interface MatchService {
     public Match updateMatchAndSets(Long matchId, List<Set> sets);
 
     /**
+     * Permet de connaitre le nombre de jeux autorises dans un set
+     * lors d'un match
+     * Le nombre de jeux maximal a ete adapte au fil des reglements
+     * et selon les types de championnat, d'où l'existence de cette methode
+     * @param match
+     * @return
+     */
+    public Integer getNbJeuxMax(Match match);
+
+    /**
      * Permet de creer les matchs "vides" d'une rencontre
      * @param rencontre Rencontre
      * @return matchs "vides" pour une rencontre

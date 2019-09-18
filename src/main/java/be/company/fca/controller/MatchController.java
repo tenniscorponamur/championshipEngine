@@ -30,6 +30,12 @@ public class MatchController {
     @Autowired
     private MatchService matchService;
 
+    @RequestMapping(method= RequestMethod.GET, path="/public/match/{matchId}/nbJeuxMax")
+    public Integer getNbJeuxMax(@PathVariable("matchId") Long matchId){
+        Match match = matchRepository.findById(matchId).get();
+        return matchService.getNbJeuxMax(match);
+    }
+
     @RequestMapping(method= RequestMethod.GET, path="/public/matchs/validesByCriteria")
     public List<MatchDto> findValidesByMembreBetweenDates(@RequestParam("membreId") Long membreId,
                                                           @RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date startDate,

@@ -1,6 +1,7 @@
 package be.company.fca.service.impl;
 
 import be.company.fca.model.*;
+import be.company.fca.model.Set;
 import be.company.fca.repository.MatchRepository;
 import be.company.fca.repository.SetRepository;
 import be.company.fca.service.MatchService;
@@ -9,8 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,6 +43,33 @@ public class MatchServiceImpl implements MatchService {
         }
 
         return match;
+    }
+
+    @Override
+    public Integer getNbJeuxMax(Match match) {
+
+        Date date = match.getRencontre().getDateHeureRencontre();
+
+        // Changement de la regle de correspondance le 15 septembre 2019
+
+        Calendar _15septembre2019 = new GregorianCalendar();
+        _15septembre2019.set(Calendar.YEAR,2019);
+        _15septembre2019.set(Calendar.MONTH,Calendar.SEPTEMBER);
+        _15septembre2019.set(Calendar.DAY_OF_MONTH,15);
+        _15septembre2019.set(Calendar.HOUR_OF_DAY,0);
+        _15septembre2019.set(Calendar.MINUTE,0);
+        _15septembre2019.set(Calendar.SECOND,0);
+        _15septembre2019.set(Calendar.MILLISECOND,0);
+
+        if (date!=null && date.before(_15septembre2019.getTime())){
+            Integer nbJeux = 5;
+            if (match.getRencontre().getDivision().getChampionnat().getType().equals(TypeChampionnat.ETE)){
+                nbJeux = 6;
+            }
+            return nbJeux;
+        }else{
+            return 5;
+        }
     }
 
     /**
