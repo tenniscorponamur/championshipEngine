@@ -14,6 +14,7 @@ public class MatchDto {
     private MembreDto joueurVisiteurs2;
     private Integer pointsVisites;
     private Integer pointsVisiteurs;
+    private boolean setUnique;
     private RencontreDto rencontre;
 
     public MatchDto(Match match) {
@@ -34,6 +35,7 @@ public class MatchDto {
         }
         this.pointsVisites = match.getPointsVisites();
         this.pointsVisiteurs = match.getPointsVisiteurs();
+        this.setUnique = match.isSetUnique();
         if (match.getRencontre()!=null){
             this.rencontre = new RencontreDto(match.getRencontre());
         }
@@ -109,6 +111,14 @@ public class MatchDto {
 
     public void setPointsVisiteurs(Integer pointsVisiteurs) {
         this.pointsVisiteurs = pointsVisiteurs;
+    }
+
+    public boolean isSetUnique() {
+        return setUnique;
+    }
+
+    public void setSetUnique(boolean setUnique) {
+        this.setUnique = setUnique;
     }
 
     public RencontreDto getRencontre() {

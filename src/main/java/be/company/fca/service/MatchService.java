@@ -14,7 +14,7 @@ public interface MatchService {
      * @param sets
      * @return
      */
-    public Match updateMatchAndSets(Long matchId, List<Set> sets);
+    public Match updateMatchAndSets(Long matchId,boolean setUnique, List<Set> sets);
 
     /**
      * Permet de connaitre le nombre de jeux autorises dans un set

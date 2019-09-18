@@ -50,6 +50,9 @@ public class Match {
     @Column( name =  "pointsvisiteurs")
     private Integer pointsVisiteurs;
 
+    @Column( name = "set_unique", nullable = false)
+    private boolean setUnique=false;
+
     @ManyToOne
     @JoinColumn(name = "rencontre_fk")
     private Rencontre rencontre;
@@ -124,6 +127,14 @@ public class Match {
 
     public void setPointsVisiteurs(Integer pointsVisiteurs) {
         this.pointsVisiteurs = pointsVisiteurs;
+    }
+
+    public boolean isSetUnique() {
+        return setUnique;
+    }
+
+    public void setSetUnique(boolean setUnique) {
+        this.setUnique = setUnique;
     }
 
     public Rencontre getRencontre() {

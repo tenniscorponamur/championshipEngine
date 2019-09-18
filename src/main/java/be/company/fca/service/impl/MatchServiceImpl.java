@@ -24,7 +24,7 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     @Transactional(readOnly = false)
-    public Match updateMatchAndSets(Long matchId, List<Set> sets) {
+    public Match updateMatchAndSets(Long matchId, boolean setUnique, List<Set> sets) {
 
         Match match = matchRepository.findById(matchId).get();
 
@@ -39,6 +39,7 @@ public class MatchServiceImpl implements MatchService {
 
             calculPoints(match, sets);
 
+            match.setSetUnique(setUnique);
             match = matchRepository.save(match);
         }
 

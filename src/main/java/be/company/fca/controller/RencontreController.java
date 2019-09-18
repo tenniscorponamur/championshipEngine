@@ -303,7 +303,7 @@ public class RencontreController {
                     sets.add(set);
                 }
 
-                match = matchService.updateMatchAndSets(match.getId(),sets);
+                match = matchService.updateMatchAndSets(match.getId(),false,sets);
 
                 // mise a jour des points de la rencontre
                 rencontre.setPointsVisites(rencontre.getPointsVisites() + match.getPointsVisites());
@@ -407,7 +407,7 @@ public class RencontreController {
         //  Verifier les autorisations des joueurs qui tentent de mettre a jour les matchs
 
         if (isResultatsRencontreModifiables(authentication,rencontreId)) {
-            return matchService.updateMatchAndSets(matchId,sets);
+            return matchService.updateMatchAndSets(matchId,setUnique,sets);
         }else{
             throw new ForbiddenException();
         }
