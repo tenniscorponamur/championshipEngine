@@ -470,9 +470,17 @@ public class ClassementCorpoController {
     private ResultatMatch getResultatMatch(Match match, Membre membre){
         boolean visites = membre.equals(match.getJoueurVisites1()) || membre.equals(match.getJoueurVisites2());
         if (match.getPointsVisites() < match.getPointsVisiteurs()){
-            return visites?ResultatMatch.defaite:ResultatMatch.victoire;
+            if (match.isSetUnique()){
+                return visites?ResultatMatch.defaite:ResultatMatch.assimileMatchNul;
+            }else{
+                return visites?ResultatMatch.defaite:ResultatMatch.victoire;
+            }
         }else if (match.getPointsVisites() > match.getPointsVisiteurs()){
-            return visites?ResultatMatch.victoire:ResultatMatch.defaite;
+            if (match.isSetUnique()){
+                return visites?ResultatMatch.assimileMatchNul:ResultatMatch.defaite;
+            }else{
+                return visites?ResultatMatch.victoire:ResultatMatch.defaite;
+            }
         }else{
             return ResultatMatch.matchNul;
         }
@@ -629,6 +637,8 @@ public class ClassementCorpoController {
         // Limite de difference de points a +/- 15 points
         Integer differencePointsConsiderable = Math.max(-15,Math.min(15,differencePoints));
 
+        //TODO : exploiter l'information du set unique sur le match pour savoir si on prend une victoire ou un match nul (tout en ayant une limite a zero points)
+
         // Utilisation de la table de correspondance
         Integer pointsGagnesOuPerdus = correspondancePoints.get(match.getRencontre().getDivision().getChampionnat().getType()).get(resultatMatch).get(differencePointsConsiderable);
         caracteristiquesMatch.setPointsGagnesOuPerdus(pointsGagnesOuPerdus);
@@ -656,52 +666,52 @@ public class ClassementCorpoController {
 
         // ETE
         Map<ResultatMatch,Map<Integer,Integer>> eteMap = new HashMap<>();
-        Map<Integer,Integer> victoireEteMap = new HashMap<>();Map<Integer,Integer> eteDefaiteMap = new HashMap<>();Map<Integer,Integer> eteMatchNulMap = new HashMap<>();
-        victoireEteMap.put(-15,0);eteDefaiteMap.put(-15,-50);eteMatchNulMap.put(-15,-25);
-        victoireEteMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
-        victoireEteMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
-        victoireEteMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
-        victoireEteMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
-        victoireEteMap.put(10,100);eteDefaiteMap.put(10,0);eteMatchNulMap.put(10,50);
-        victoireEteMap.put(15,125);eteDefaiteMap.put(15,0);eteMatchNulMap.put(15,60);
-        eteMap.put(ResultatMatch.victoire,victoireEteMap);eteMap.put(ResultatMatch.defaite,eteDefaiteMap);eteMap.put(ResultatMatch.matchNul,eteMatchNulMap);
+        Map<Integer,Integer> victoireEteMap = new HashMap<>();Map<Integer,Integer> eteDefaiteMap = new HashMap<>();Map<Integer,Integer> eteMatchNulMap = new HashMap<>();Map<Integer,Integer> eteAssimileMatchNulMap = new HashMap<>();
+        victoireEteMap.put(-15,0);eteDefaiteMap.put(-15,-50);eteMatchNulMap.put(-15,-25);eteAssimileMatchNulMap.put(-15,0);
+        victoireEteMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);eteAssimileMatchNulMap.put(-10,0);
+        victoireEteMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);eteAssimileMatchNulMap.put(-5,0);
+        victoireEteMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);eteAssimileMatchNulMap.put(0,10);
+        victoireEteMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);eteAssimileMatchNulMap.put(5,25);
+        victoireEteMap.put(10,100);eteDefaiteMap.put(10,0);eteMatchNulMap.put(10,50);eteAssimileMatchNulMap.put(10,50);
+        victoireEteMap.put(15,125);eteDefaiteMap.put(15,0);eteMatchNulMap.put(15,60);eteAssimileMatchNulMap.put(15,60);
+        eteMap.put(ResultatMatch.victoire,victoireEteMap);eteMap.put(ResultatMatch.defaite,eteDefaiteMap);eteMap.put(ResultatMatch.matchNul,eteMatchNulMap);eteMap.put(ResultatMatch.assimileMatchNul,eteAssimileMatchNulMap);
 
         // HIVER
         Map<ResultatMatch,Map<Integer,Integer>> hiverMap = new HashMap<>();
-        Map<Integer,Integer> hiverVictoireMap = new HashMap<>();Map<Integer,Integer> hiverDefaiteMap = new HashMap<>();Map<Integer,Integer> hiverMatchNulMap = new HashMap<>();
-        hiverVictoireMap.put(-15,0);hiverDefaiteMap.put(-15,-50);hiverMatchNulMap.put(-15,-25);
-        hiverVictoireMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
-        hiverVictoireMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
-        hiverVictoireMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
-        hiverVictoireMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
-        hiverVictoireMap.put(10,100);hiverDefaiteMap.put(10,0);hiverMatchNulMap.put(10,50);
-        hiverVictoireMap.put(15,125);hiverDefaiteMap.put(15,0);hiverMatchNulMap.put(15,60);
-        hiverMap.put(ResultatMatch.victoire,hiverVictoireMap);hiverMap.put(ResultatMatch.defaite,hiverDefaiteMap);hiverMap.put(ResultatMatch.matchNul,hiverMatchNulMap);
+        Map<Integer,Integer> hiverVictoireMap = new HashMap<>();Map<Integer,Integer> hiverDefaiteMap = new HashMap<>();Map<Integer,Integer> hiverMatchNulMap = new HashMap<>();Map<Integer,Integer> hiverAssimileMatchNulMap = new HashMap<>();
+        hiverVictoireMap.put(-15,0);hiverDefaiteMap.put(-15,-50);hiverMatchNulMap.put(-15,-25);hiverAssimileMatchNulMap.put(-15,0);
+        hiverVictoireMap.put(-10,5);hiverDefaiteMap.put(-10,-25);hiverMatchNulMap.put(-10,-10);hiverAssimileMatchNulMap.put(-10,0);
+        hiverVictoireMap.put(-5,10);hiverDefaiteMap.put(-5,-10);hiverMatchNulMap.put(-5,0);hiverAssimileMatchNulMap.put(-5,0);
+        hiverVictoireMap.put(0,25);hiverDefaiteMap.put(0,-5);hiverMatchNulMap.put(0,10);hiverAssimileMatchNulMap.put(0,10);
+        hiverVictoireMap.put(5,50);hiverDefaiteMap.put(5,0);hiverMatchNulMap.put(5,25);hiverAssimileMatchNulMap.put(5,25);
+        hiverVictoireMap.put(10,100);hiverDefaiteMap.put(10,0);hiverMatchNulMap.put(10,50);hiverAssimileMatchNulMap.put(10,50);
+        hiverVictoireMap.put(15,125);hiverDefaiteMap.put(15,0);hiverMatchNulMap.put(15,60);hiverAssimileMatchNulMap.put(15,60);
+        hiverMap.put(ResultatMatch.victoire,hiverVictoireMap);hiverMap.put(ResultatMatch.defaite,hiverDefaiteMap);hiverMap.put(ResultatMatch.matchNul,hiverMatchNulMap);hiverMap.put(ResultatMatch.assimileMatchNul,hiverAssimileMatchNulMap);
 
         // CRITERIUM
         Map<ResultatMatch,Map<Integer,Integer>> criteriumMap = new HashMap<>();
-        Map<Integer,Integer> criteriumVictoireMap = new HashMap<>();Map<Integer,Integer> criteriumDefaiteMap = new HashMap<>();Map<Integer,Integer> criteriumMatchNulMap = new HashMap<>();
-        criteriumVictoireMap.put(-15,0);criteriumDefaiteMap.put(-15,-50);criteriumMatchNulMap.put(-15,-25);
-        criteriumVictoireMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
-        criteriumVictoireMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
-        criteriumVictoireMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
-        criteriumVictoireMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
-        criteriumVictoireMap.put(10,100);criteriumDefaiteMap.put(10,0);criteriumMatchNulMap.put(10,50);
-        criteriumVictoireMap.put(15,125);criteriumDefaiteMap.put(15,0);criteriumMatchNulMap.put(15,60);
-        criteriumMap.put(ResultatMatch.victoire,criteriumVictoireMap);criteriumMap.put(ResultatMatch.defaite,criteriumDefaiteMap);criteriumMap.put(ResultatMatch.matchNul,criteriumMatchNulMap);
+        Map<Integer,Integer> criteriumVictoireMap = new HashMap<>();Map<Integer,Integer> criteriumDefaiteMap = new HashMap<>();Map<Integer,Integer> criteriumMatchNulMap = new HashMap<>();Map<Integer,Integer> criteriumAssimileMatchNulMap = new HashMap<>();
+        criteriumVictoireMap.put(-15,0);criteriumDefaiteMap.put(-15,-50);criteriumMatchNulMap.put(-15,-25);criteriumAssimileMatchNulMap.put(-15,0);
+        criteriumVictoireMap.put(-10,5);criteriumDefaiteMap.put(-10,-25);criteriumMatchNulMap.put(-10,-10);criteriumAssimileMatchNulMap.put(-10,0);
+        criteriumVictoireMap.put(-5,10);criteriumDefaiteMap.put(-5,-10);criteriumMatchNulMap.put(-5,0);criteriumAssimileMatchNulMap.put(-5,0);
+        criteriumVictoireMap.put(0,25);criteriumDefaiteMap.put(0,-5);criteriumMatchNulMap.put(0,10);criteriumAssimileMatchNulMap.put(0,10);
+        criteriumVictoireMap.put(5,50);criteriumDefaiteMap.put(5,0);criteriumMatchNulMap.put(5,25);criteriumAssimileMatchNulMap.put(5,25);
+        criteriumVictoireMap.put(10,100);criteriumDefaiteMap.put(10,0);criteriumMatchNulMap.put(10,50);criteriumAssimileMatchNulMap.put(10,50);
+        criteriumVictoireMap.put(15,125);criteriumDefaiteMap.put(15,0);criteriumMatchNulMap.put(15,60);criteriumAssimileMatchNulMap.put(15,60);
+        criteriumMap.put(ResultatMatch.victoire,criteriumVictoireMap);criteriumMap.put(ResultatMatch.defaite,criteriumDefaiteMap);criteriumMap.put(ResultatMatch.matchNul,criteriumMatchNulMap);criteriumMap.put(ResultatMatch.assimileMatchNul,criteriumAssimileMatchNulMap);
 
 
         // coupeHiver
         Map<ResultatMatch,Map<Integer,Integer>> coupeHiverMap = new HashMap<>();
-        Map<Integer,Integer> coupeHiverVictoireMap = new HashMap<>();Map<Integer,Integer> coupeHiverDefaiteMap = new HashMap<>();Map<Integer,Integer> coupeHiverMatchNulMap = new HashMap<>();
-        coupeHiverVictoireMap.put(-15,0);coupeHiverDefaiteMap.put(-15,-50);coupeHiverMatchNulMap.put(-15,-25);
-        coupeHiverVictoireMap.put(-10,5);eteDefaiteMap.put(-10,-25);eteMatchNulMap.put(-10,-10);
-        coupeHiverVictoireMap.put(-5,10);eteDefaiteMap.put(-5,-10);eteMatchNulMap.put(-5,0);
-        coupeHiverVictoireMap.put(0,25);eteDefaiteMap.put(0,-5);eteMatchNulMap.put(0,10);
-        coupeHiverVictoireMap.put(5,50);eteDefaiteMap.put(5,0);eteMatchNulMap.put(5,25);
-        coupeHiverVictoireMap.put(10,100);coupeHiverDefaiteMap.put(10,0);coupeHiverMatchNulMap.put(10,50);
-        coupeHiverVictoireMap.put(15,125);coupeHiverDefaiteMap.put(15,0);coupeHiverMatchNulMap.put(15,60);
-        coupeHiverMap.put(ResultatMatch.victoire,coupeHiverVictoireMap);coupeHiverMap.put(ResultatMatch.defaite,coupeHiverDefaiteMap);coupeHiverMap.put(ResultatMatch.matchNul,coupeHiverMatchNulMap);
+        Map<Integer,Integer> coupeHiverVictoireMap = new HashMap<>();Map<Integer,Integer> coupeHiverDefaiteMap = new HashMap<>();Map<Integer,Integer> coupeHiverMatchNulMap = new HashMap<>();Map<Integer,Integer> coupeHiverAssimileMatchNulMap = new HashMap<>();
+        coupeHiverVictoireMap.put(-15,0);coupeHiverDefaiteMap.put(-15,-50);coupeHiverMatchNulMap.put(-15,-25);coupeHiverAssimileMatchNulMap.put(-15,0);
+        coupeHiverVictoireMap.put(-10,5);coupeHiverDefaiteMap.put(-10,-25);coupeHiverMatchNulMap.put(-10,-10);coupeHiverAssimileMatchNulMap.put(-10,0);
+        coupeHiverVictoireMap.put(-5,10);coupeHiverDefaiteMap.put(-5,-10);coupeHiverMatchNulMap.put(-5,0);coupeHiverAssimileMatchNulMap.put(-5,0);
+        coupeHiverVictoireMap.put(0,25);coupeHiverDefaiteMap.put(0,-5);coupeHiverMatchNulMap.put(0,10);coupeHiverAssimileMatchNulMap.put(0,10);
+        coupeHiverVictoireMap.put(5,50);coupeHiverDefaiteMap.put(5,0);coupeHiverMatchNulMap.put(5,25);coupeHiverAssimileMatchNulMap.put(5,25);
+        coupeHiverVictoireMap.put(10,100);coupeHiverDefaiteMap.put(10,0);coupeHiverMatchNulMap.put(10,50);coupeHiverAssimileMatchNulMap.put(10,50);
+        coupeHiverVictoireMap.put(15,125);coupeHiverDefaiteMap.put(15,0);coupeHiverMatchNulMap.put(15,60);coupeHiverAssimileMatchNulMap.put(15,60);
+        coupeHiverMap.put(ResultatMatch.victoire,coupeHiverVictoireMap);coupeHiverMap.put(ResultatMatch.defaite,coupeHiverDefaiteMap);coupeHiverMap.put(ResultatMatch.matchNul,coupeHiverMatchNulMap);coupeHiverMap.put(ResultatMatch.assimileMatchNul,coupeHiverAssimileMatchNulMap);
 
         correspondancePoints.put(TypeChampionnat.ETE,eteMap);
         correspondancePoints.put(TypeChampionnat.HIVER,hiverMap);
