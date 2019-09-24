@@ -47,7 +47,7 @@
 championnat.categorie,
 division.points_min,
 division.points_max,
-rencontre.dateheurerencontre,
+to_timestamp(to_char(rencontre.dateheurerencontre,'YYYYMMDDHH24MI'),'YYYYMMDDHH24MI') dateheurerencontre,
 terrain.nom terrainNom, 
 court.code courtCode,
 visites.code_alphabetique visitesCode, 
