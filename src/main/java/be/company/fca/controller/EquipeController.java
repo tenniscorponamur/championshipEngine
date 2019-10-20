@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -73,6 +74,19 @@ public class EquipeController {
         }
 
         return equipesDto;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/public/equipes/criterium")
+    public List<Equipe> getEquipesCriteriumByAnnee(@RequestParam String annee) {
+        List<Equipe> equipes = new ArrayList<>();
+        List<Championnat> championnats = championnatRepository.findByTypeAndAnnee(TypeChampionnat.CRITERIUM,annee);
+        for (Championnat championnat : championnats){
+            List<Division> divisions = (List<Division>) divisionRepository.findByChampionnat(championnat);
+            for (Division division : divisions){
+                equipes.addAll((Collection<? extends Equipe>) equipeRepository.findByDivision(division));
+            }
+        }
+        return equipes;
     }
 
 
