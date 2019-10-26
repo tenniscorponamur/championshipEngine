@@ -205,6 +205,25 @@ public class ChampionnatController {
     }
 
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/championnat/tableauCriteriumWithPlayers", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getTableauCriteriumWithPlayers(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumWithPlayersTemplate());
+        Connection conn = datasource.getConnection();
+        Map params = new HashMap();
+        params.put("REPORT_TIME_ZONE", timeZone);
+        params.put("date", date);
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
+
+
 //    @RequestMapping(method= RequestMethod.GET, path="/public/championnat/createChampionnat")
 //    public Championnat createChampionnat() {
 //        Championnat championnat = new Championnat();

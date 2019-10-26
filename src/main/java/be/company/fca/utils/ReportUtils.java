@@ -29,4 +29,8 @@ public class ReportUtils {
         return ReportUtils.class.getResourceAsStream("/reports/tableauCriterium.jrxml");
     }
 
+    public static InputStream getTableauCriteriumWithPlayersTemplate(){
+        return ReportUtils.class.getResourceAsStream("/reports/tableauCriteriumWithPlayers.jrxml");
+    }
+
 }

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tableauCriterium" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2dbdd2ec-004c-4953-b66d-a5b287d8111c">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="TennisCorpoAdapter"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="162"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="827"/>
+	<style name="Crosstab_CH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CT" mode="Opaque" backcolor="#005FB3">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="date" class="java.util.Date"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+championnat.categorie,
+division.points_min,
+division.points_max,
+to_timestamp(to_char(rencontre.dateheurerencontre,'YYYYMMDDHH24MI'),'YYYYMMDDHH24MI') dateheurerencontre,
+terrain.nom terrainNom, 
+court.code courtCode,
+visites.code_alphabetique visitesCode, 
+visiteurs.code_alphabetique visiteursCode from rencontre 
+inner join division on division.id = rencontre.division_fk 
+inner join terrain on terrain.id = rencontre.terrain_fk
+inner join equipe visites on visites.id = rencontre.visites_fk 
+inner join equipe visiteurs on visiteurs.id = rencontre.visiteurs_fk 
+inner join court on court.id = rencontre.court_fk
+inner join championnat on championnat.id = division.championnat_fk
+where championnat.type = 'CRITERIUM'
+and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} as date),'YYYY-MM-DD')]]>
+	</queryString>
+	<field name="categorie" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="categorie"/>
+	</field>
+	<field name="points_min" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="points_min"/>
+	</field>
+	<field name="points_max" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="points_max"/>
+	</field>
+	<field name="dateheurerencontre" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="dateheurerencontre"/>
+	</field>
+	<field name="terrainnom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="terrainnom"/>
+	</field>
+	<field name="courtcode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="courtcode"/>
+	</field>
+	<field name="visitescode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="visitescode"/>
+	</field>
+	<field name="visiteurscode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="visiteurscode"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="802" height="32" uuid="fc24fb7c-4e41-4a1a-8ebe-8b42a4bcfe6f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Journée Critérium du " + new SimpleDateFormat("dd/MM/yyyy").format($F{dateheurerencontre})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="160" splitType="Stretch">
+			<crosstab>
+				<reportElement x="0" y="0" width="802" height="150" uuid="f1c25eb6-df96-4d64-8ac5-d7df781b3b5f">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.crosstab.style.header" value="Crosstab_CH"/>
+					<property name="com.jaspersoft.studio.crosstab.style.group" value="Crosstab_CG"/>
+					<property name="com.jaspersoft.studio.crosstab.style.total" value="Crosstab_CT"/>
+					<property name="com.jaspersoft.studio.crosstab.style.detail" value="Crosstab_CD"/>
+				</reportElement>
+				<rowGroup name="dateheurerencontre" width="45">
+					<bucket class="java.sql.Timestamp">
+						<bucketExpression><![CDATA[$F{dateheurerencontre}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque" style="Crosstab_CH">
+							<textField isStretchWithOverflow="true" pattern="HH:mm">
+								<reportElement x="0" y="0" width="45" height="85" uuid="dbba03d6-3bd6-4c9b-8e27-91de1596792a"/>
+								<box leftPadding="3"/>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{dateheurerencontre}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents>
+							<staticText>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="a859e6ce-9f71-402a-8032-82f608eaf1f9"/>
+								<text><![CDATA[Total dateheurerencontre]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="terrainnom" height="20">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{terrainnom}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab_CH">
+							<textField isStretchWithOverflow="true">
+								<reportElement x="0" y="0" width="100" height="20" uuid="dd3d5989-c41d-45d0-836c-0b2a24c7ff8d"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{terrainnom}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<staticText>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="cb8b71ce-d14e-4bab-88f7-b83809eec986"/>
+								<text><![CDATA[Total terrainnom]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="courtcode" height="20">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{courtcode}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque" style="Crosstab_CH">
+							<textField isStretchWithOverflow="true">
+								<reportElement x="0" y="0" width="100" height="20" uuid="f78df70c-93bc-4454-9f87-dedab9feb7be"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{courtcode}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents>
+							<staticText>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="63f5e10e-ee6f-4387-9000-87b5dd9b79aa"/>
+								<text><![CDATA[Total courtcode]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="categorie_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{categorie}]]></measureExpression>
+				</measure>
+				<measure name="points_min_MEASURE" class="java.lang.Integer">
+					<measureExpression><![CDATA[$F{points_min}]]></measureExpression>
+				</measure>
+				<measure name="points_max_MEASURE" class="java.lang.Integer">
+					<measureExpression><![CDATA[$F{points_max}]]></measureExpression>
+				</measure>
+				<measure name="visitescode_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{visitescode}]]></measureExpression>
+				</measure>
+				<measure name="visiteurscode_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{visiteurscode}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="85">
+					<cellContents mode="Opaque" style="Crosstab_CD">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement x="0" y="0" width="100" height="29" uuid="93af2d11-c402-42f0-8d91-39915ab2137f"/>
+							<box topPadding="3" leftPadding="3"/>
+							<textElement textAlignment="Center">
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA[($V{categorie_MEASURE}.equals("SIMPLE_MESSIEURS")?"SM":($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")?"DM":($V{categorie_MEASURE}.equals("SIMPLE_DAMES")?"SD":($V{categorie_MEASURE}.equals("DOUBLE_DAMES")?"DD":($V{categorie_MEASURE}.equals("MIXTES")?"DMX":
+	$V{categorie_MEASURE})
+	)
+)
+)
+)
++ " " + $V{points_max_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement x="0" y="29" width="100" height="28" uuid="079c0596-222a-4707-88b1-04b111a92c31"/>
+							<box leftPadding="3"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement x="0" y="57" width="100" height="28" uuid="14258b29-5234-4b30-b7de-7895fbf1c291"/>
+							<box leftPadding="3"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="100" columnTotalGroup="terrainnom">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="fa2a1394-39d0-4a82-99c9-b0aae56805e3"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="4ecaf15f-057c-49ab-b21b-7c3fe7b98d0a"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="5bd99cf2-b8d1-4962-aa2a-b057b171d8db"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="975baaa5-4d78-4a67-9886-12f5dc5e4192"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="8d12dcfe-b3d1-45f5-b82b-14ecf14f78cc"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="100" columnTotalGroup="courtcode">
+					<cellContents mode="Opaque" style="Crosstab_CG">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" uuid="022bb1a4-46e4-4e39-9160-d4a545ed6c80"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="20" width="60" height="20" uuid="42b8e698-1c18-42e2-a639-359e4148bef1"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="40" width="60" height="20" uuid="392e2044-7153-4bd5-b83c-c2dd138d1775"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" uuid="9da34b11-1f86-4f64-a948-7c1f1933d0f7"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" uuid="f8d194b9-99db-48dd-b85c-f10fc085685a"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="100" rowTotalGroup="dateheurerencontre">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="08a06ee5-9bcb-41cc-8e99-75fbdcfdfa4f"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="a585a413-8314-4049-bcc7-70441a768cdd"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="9b7c98b6-c32b-4852-80b8-de33dc9c36ed"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="c714bba0-4138-4d3a-92b0-9227f2a1145a"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="21aebaa4-2875-4f15-a420-d3136e6b9f0e"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="100" rowTotalGroup="dateheurerencontre" columnTotalGroup="terrainnom">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="4150f177-74c8-4a24-90e5-6f5e9b268b52"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="5f45a7ac-2928-4b8c-8aa4-aa60d3aec42b"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="34a2554b-b6c7-497d-a055-0314d42c3512"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="a057f043-2f37-462b-8c3a-d7ff55aa1211"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="9864e212-f5e6-41bd-82c6-c7a985803ca1"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="100" rowTotalGroup="dateheurerencontre" columnTotalGroup="courtcode">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="21b8e972-20c2-47cb-8d22-87dd6722f0b5"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="1683b079-763a-4004-a844-e6326198fc4f"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="20d5018d-507b-44a2-9918-1c59d4198da8"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="f4548e9e-ec1b-463d-9b78-fb6df7149d91"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="175a6095-b213-41ad-ab21-f55181ad33fa"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>
