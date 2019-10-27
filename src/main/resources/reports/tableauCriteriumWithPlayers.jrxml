@@ -240,7 +240,7 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 				</measure>
 				<crosstabCell width="100" height="85">
 					<cellContents mode="Opaque" style="Crosstab_CD">
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement x="0" y="0" width="100" height="29" uuid="95541ff5-27df-4eaf-8550-00320258a61f"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="12"/>
@@ -258,7 +258,7 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 							<textElement verticalAlignment="Top">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{visitescode_MEASURE} + " - " + $V{visiteurscode_MEASURE}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[($V{visitescode_MEASURE}!=null?$V{visitescode_MEASURE}:"") + " - " + ($V{visiteurscode_MEASURE}!=null?$V{visiteurscode_MEASURE}:"")]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement x="0" y="57" width="100" height="28" uuid="d302c811-5841-4376-a102-9256497d4b06"/>
