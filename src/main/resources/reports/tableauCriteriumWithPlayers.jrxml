@@ -2,9 +2,9 @@
 <!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tableauCriterium" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2dbdd2ec-004c-4953-b66d-a5b287d8111c">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="TennisCorpoAdapter"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="162"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="827"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tennis Corpo Local"/>
 	<style name="Crosstab_CH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -44,6 +44,10 @@
 	<parameter name="date" class="java.util.Date"/>
 	<queryString language="SQL">
 		<![CDATA[select 
+joueurvisites1.nom || ' ' || joueurvisites1.prenom playervisites1,
+joueurvisites2.nom || ' ' || joueurvisites2.prenom playervisites2,
+joueurvisiteurs1.nom || ' ' || joueurvisiteurs1.prenom playervisiteurs1,
+joueurvisiteurs2.nom || ' ' || joueurvisiteurs2.prenom playervisiteurs2,
 championnat.categorie,
 division.points_min,
 division.points_max,
@@ -58,9 +62,26 @@ inner join equipe visites on visites.id = rencontre.visites_fk
 inner join equipe visiteurs on visiteurs.id = rencontre.visiteurs_fk 
 inner join court on court.id = rencontre.court_fk
 inner join championnat on championnat.id = division.championnat_fk
+left join match on match.rencontre_fk = rencontre.id
+left join membre joueurvisites1 on joueurvisites1.id = match.joueurvisites1_fk
+left join membre joueurvisites2 on joueurvisites2.id = match.joueurvisites2_fk
+left join membre joueurvisiteurs1 on joueurvisiteurs1.id = match.joueurvisiteurs1_fk
+left join membre joueurvisiteurs2 on joueurvisiteurs2.id = match.joueurvisiteurs2_fk
 where championnat.type = 'CRITERIUM'
 and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} as date),'YYYY-MM-DD')]]>
 	</queryString>
+	<field name="playervisites1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="playervisites1"/>
+	</field>
+	<field name="playervisites2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="playervisites2"/>
+	</field>
+	<field name="playervisiteurs1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="playervisiteurs1"/>
+	</field>
+	<field name="playervisiteurs2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="playervisiteurs2"/>
+	</field>
 	<field name="categorie" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="categorie"/>
 	</field>
@@ -117,7 +138,7 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 	<summary>
 		<band height="160" splitType="Stretch">
 			<crosstab>
-				<reportElement x="0" y="0" width="802" height="150" uuid="f1c25eb6-df96-4d64-8ac5-d7df781b3b5f">
+				<reportElement x="0" y="0" width="802" height="150" uuid="db71009f-5e38-4ff9-803e-6f4bc0a47bbe">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.crosstab.style.header" value="Crosstab_CH"/>
 					<property name="com.jaspersoft.studio.crosstab.style.group" value="Crosstab_CG"/>
@@ -130,9 +151,8 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
-							<textField isStretchWithOverflow="true" pattern="HH:mm">
-								<reportElement x="0" y="0" width="45" height="85" uuid="dbba03d6-3bd6-4c9b-8e27-91de1596792a"/>
-								<box leftPadding="3"/>
+							<textField pattern="HH:mm">
+								<reportElement x="0" y="0" width="45" height="85" uuid="6cc90b53-6c6e-448c-8dc1-62e148d74a2b"/>
 								<textElement verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{dateheurerencontre}]]></textFieldExpression>
 							</textField>
@@ -141,7 +161,7 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					<crosstabTotalRowHeader>
 						<cellContents>
 							<staticText>
-								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="a859e6ce-9f71-402a-8032-82f608eaf1f9"/>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="54ace770-bddb-407c-96ac-aa0a31d78809"/>
 								<text><![CDATA[Total dateheurerencontre]]></text>
 							</staticText>
 						</cellContents>
@@ -153,8 +173,8 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
-							<textField isStretchWithOverflow="true">
-								<reportElement x="0" y="0" width="100" height="20" uuid="dd3d5989-c41d-45d0-836c-0b2a24c7ff8d"/>
+							<textField>
+								<reportElement x="0" y="0" width="100" height="20" uuid="af3c403c-268f-4a61-a3ff-2ce35e74fbf8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{terrainnom}]]></textFieldExpression>
 							</textField>
@@ -163,7 +183,7 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					<crosstabTotalColumnHeader>
 						<cellContents>
 							<staticText>
-								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="cb8b71ce-d14e-4bab-88f7-b83809eec986"/>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="00a1d995-10cd-4106-9ff6-56ab1eacce88"/>
 								<text><![CDATA[Total terrainnom]]></text>
 							</staticText>
 						</cellContents>
@@ -175,8 +195,8 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
-							<textField isStretchWithOverflow="true">
-								<reportElement x="0" y="0" width="100" height="20" uuid="f78df70c-93bc-4454-9f87-dedab9feb7be"/>
+							<textField>
+								<reportElement x="0" y="0" width="100" height="20" uuid="0de2c80d-b5dd-421b-b4a0-773e8a8c7f7b"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{courtcode}]]></textFieldExpression>
 							</textField>
@@ -185,12 +205,30 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 					<crosstabTotalColumnHeader>
 						<cellContents>
 							<staticText>
-								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="63f5e10e-ee6f-4387-9000-87b5dd9b79aa"/>
+								<reportElement x="0" y="0" width="-2147483648" height="-2147483648" uuid="b5c5aef9-dfef-4cfd-8b37-2e4d8f65ce52"/>
 								<text><![CDATA[Total courtcode]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
+				<measure name="visiteurscode_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{visiteurscode}]]></measureExpression>
+				</measure>
+				<measure name="visitescode_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{visitescode}]]></measureExpression>
+				</measure>
+				<measure name="playervisites1_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{playervisites1}]]></measureExpression>
+				</measure>
+				<measure name="playervisites2_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{playervisites2}]]></measureExpression>
+				</measure>
+				<measure name="playervisiteurs1_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{playervisiteurs1}]]></measureExpression>
+				</measure>
+				<measure name="playervisiteurs2_MEASURE" class="java.lang.String">
+					<measureExpression><![CDATA[$F{playervisiteurs2}]]></measureExpression>
+				</measure>
 				<measure name="categorie_MEASURE" class="java.lang.String">
 					<measureExpression><![CDATA[$F{categorie}]]></measureExpression>
 				</measure>
@@ -200,19 +238,12 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 				<measure name="points_max_MEASURE" class="java.lang.Integer">
 					<measureExpression><![CDATA[$F{points_max}]]></measureExpression>
 				</measure>
-				<measure name="visitescode_MEASURE" class="java.lang.String">
-					<measureExpression><![CDATA[$F{visitescode}]]></measureExpression>
-				</measure>
-				<measure name="visiteurscode_MEASURE" class="java.lang.String">
-					<measureExpression><![CDATA[$F{visiteurscode}]]></measureExpression>
-				</measure>
 				<crosstabCell width="100" height="85">
 					<cellContents mode="Opaque" style="Crosstab_CD">
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="0" y="0" width="100" height="29" uuid="93af2d11-c402-42f0-8d91-39915ab2137f"/>
-							<box topPadding="3" leftPadding="3"/>
-							<textElement textAlignment="Center">
-								<font size="14"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement x="0" y="0" width="100" height="29" uuid="95541ff5-27df-4eaf-8550-00320258a61f"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="12"/>
 							</textElement>
 							<textFieldExpression><![CDATA[($V{categorie_MEASURE}.equals("SIMPLE_MESSIEURS")?"SM":($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")?"DM":($V{categorie_MEASURE}.equals("SIMPLE_DAMES")?"SD":($V{categorie_MEASURE}.equals("DOUBLE_DAMES")?"DD":($V{categorie_MEASURE}.equals("MIXTES")?"DMX":
 	$V{categorie_MEASURE})
@@ -222,135 +253,231 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 )
 + " " + $V{points_max_MEASURE}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="0" y="29" width="100" height="28" uuid="079c0596-222a-4707-88b1-04b111a92c31"/>
-							<box leftPadding="3"/>
-							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						<textField isStretchWithOverflow="true">
+							<reportElement x="0" y="29" width="100" height="28" uuid="68edf3de-e801-4433-8f61-f9613247a7a1"/>
+							<textElement verticalAlignment="Top">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE} + " - " + $V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
-						<textField isBlankWhenNull="true">
-							<reportElement x="0" y="57" width="100" height="28" uuid="14258b29-5234-4b30-b7de-7895fbf1c291"/>
-							<box leftPadding="3"/>
-							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement x="0" y="57" width="100" height="28" uuid="d302c811-5841-4376-a102-9256497d4b06"/>
+							<textElement verticalAlignment="Bottom">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[($V{playervisites1_MEASURE}!=null?$V{playervisites1_MEASURE}:"") +
+($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
+	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
+	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES") ?"/":""
+) +
+($V{playervisites2_MEASURE}!=null?$V{playervisites2_MEASURE}:"")
++ " - " + 
+($V{playervisiteurs1_MEASURE}!=null?$V{playervisiteurs1_MEASURE}:"") +
+($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
+	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
+	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES") ?"/":""
+) +
+($V{playervisiteurs2_MEASURE}!=null?$V{playervisiteurs2_MEASURE}:"")]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="60" height="100" columnTotalGroup="terrainnom">
+				<crosstabCell width="60" height="180" columnTotalGroup="terrainnom">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="fa2a1394-39d0-4a82-99c9-b0aae56805e3"/>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="c5ede98f-ec52-4120-8568-f42ccdcdc4c8"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="b2c41548-1c39-4cc1-8c17-cdc1e3ed3ecb"/>
+							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="35177600-37cd-4e80-b29f-10820fb43d3d"/>
+							<textFieldExpression><![CDATA[$V{playervisites1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="3d3f637c-6bd0-434e-a46a-264bc870ed27"/>
+							<textFieldExpression><![CDATA[$V{playervisites2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="74a8d61b-9dc8-439e-990e-6ad1a0dfb4e9"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="100" width="60" height="20" forecolor="#FFFFFF" uuid="80f58c93-ea7a-4cae-8800-af38d29d120a"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="120" width="60" height="20" forecolor="#FFFFFF" uuid="4dfe3269-67be-4c23-b6d7-8351c6b31efd"/>
 							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="4ecaf15f-057c-49ab-b21b-7c3fe7b98d0a"/>
+							<reportElement x="0" y="140" width="60" height="20" forecolor="#FFFFFF" uuid="53333d84-417e-4e10-adcd-a90eb518801c"/>
 							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="5bd99cf2-b8d1-4962-aa2a-b057b171d8db"/>
+							<reportElement x="0" y="160" width="60" height="20" forecolor="#FFFFFF" uuid="d3003926-b443-4100-86e1-255131c8c894"/>
 							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="975baaa5-4d78-4a67-9886-12f5dc5e4192"/>
-							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="8d12dcfe-b3d1-45f5-b82b-14ecf14f78cc"/>
-							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="60" height="100" columnTotalGroup="courtcode">
+				<crosstabCell width="60" height="180" columnTotalGroup="courtcode">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="60" height="20" uuid="022bb1a4-46e4-4e39-9160-d4a545ed6c80"/>
-							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="60" height="20" uuid="30f3b67d-a8da-4bef-b0c8-e26dc5180bd1"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="20" width="60" height="20" uuid="42b8e698-1c18-42e2-a639-359e4148bef1"/>
-							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="40" width="60" height="20" uuid="392e2044-7153-4bd5-b83c-c2dd138d1775"/>
-							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="60" width="60" height="20" uuid="9da34b11-1f86-4f64-a948-7c1f1933d0f7"/>
+							<reportElement x="0" y="20" width="60" height="20" uuid="e74acd85-772f-4452-99b7-d2c5bb8f1139"/>
 							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="80" width="60" height="20" uuid="f8d194b9-99db-48dd-b85c-f10fc085685a"/>
-							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="40" width="60" height="20" uuid="65822769-1dd5-414c-9ade-274f83802e0f"/>
+							<textFieldExpression><![CDATA[$V{playervisites1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" uuid="55875b14-80f2-42e6-a7d0-fe621bc32ee9"/>
+							<textFieldExpression><![CDATA[$V{playervisites2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" uuid="01df61f6-61b0-4338-af96-4b49b18c24ae"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="100" width="60" height="20" uuid="8686a137-7937-4ad6-8d5f-d69f18eb8adf"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="120" width="60" height="20" uuid="a15f38d0-f6e3-4fba-85fc-ce713da7a189"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="140" width="60" height="20" uuid="0d9cbc40-b919-40c3-9c76-6db4726e349c"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="160" width="60" height="20" uuid="b5f6dda0-58c5-4339-8e71-805850cc77c0"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="60" height="100" rowTotalGroup="dateheurerencontre">
+				<crosstabCell width="60" height="180" rowTotalGroup="dateheurerencontre">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="08a06ee5-9bcb-41cc-8e99-75fbdcfdfa4f"/>
-							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="54518ba2-c6ea-4e6f-a5e4-6c2232709754"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="a585a413-8314-4049-bcc7-70441a768cdd"/>
-							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="9b7c98b6-c32b-4852-80b8-de33dc9c36ed"/>
-							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="c714bba0-4138-4d3a-92b0-9227f2a1145a"/>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="7e699558-8f79-422a-8844-701939a04e0f"/>
 							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="21aebaa4-2875-4f15-a420-d3136e6b9f0e"/>
-							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="4ddcdb86-ec45-4631-abce-4c3e2e2c7c4a"/>
+							<textFieldExpression><![CDATA[$V{playervisites1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="133d0fcc-adb2-498a-a26f-4b0a002d55cb"/>
+							<textFieldExpression><![CDATA[$V{playervisites2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="7372ed40-33b9-4137-bf67-01bc6e3627ab"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="100" width="60" height="20" forecolor="#FFFFFF" uuid="e00fd4e3-401b-4ea2-9a79-b2ca4ef34568"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="120" width="60" height="20" forecolor="#FFFFFF" uuid="8bd743e1-ba66-490e-8e7a-dd51a58d15c5"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="140" width="60" height="20" forecolor="#FFFFFF" uuid="10e0afd6-6550-4627-98b1-f5382f91c06b"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="160" width="60" height="20" forecolor="#FFFFFF" uuid="d64047be-798f-41b2-a234-87acf411a95b"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="60" height="100" rowTotalGroup="dateheurerencontre" columnTotalGroup="terrainnom">
+				<crosstabCell width="60" height="180" rowTotalGroup="dateheurerencontre" columnTotalGroup="terrainnom">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="4150f177-74c8-4a24-90e5-6f5e9b268b52"/>
-							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="6032758b-2d69-4f5e-a5bc-9a668cb18230"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="5f45a7ac-2928-4b8c-8aa4-aa60d3aec42b"/>
-							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="34a2554b-b6c7-497d-a055-0314d42c3512"/>
-							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="a057f043-2f37-462b-8c3a-d7ff55aa1211"/>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="8626e76c-b16e-464d-ab2d-7fca39b3c619"/>
 							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="9864e212-f5e6-41bd-82c6-c7a985803ca1"/>
-							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="feafd2e0-31e3-4d9a-84b6-f83e7252f32e"/>
+							<textFieldExpression><![CDATA[$V{playervisites1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="92e27f83-d04d-4083-b8d5-a92f5b96cae0"/>
+							<textFieldExpression><![CDATA[$V{playervisites2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="2e1bff8f-f381-4f20-a27f-7bf5fecff8fa"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="100" width="60" height="20" forecolor="#FFFFFF" uuid="69f6b9d1-a6fe-42cc-91cd-4330eab45e88"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="120" width="60" height="20" forecolor="#FFFFFF" uuid="5b7d40e8-80c4-468c-81fc-b35332bc6832"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="140" width="60" height="20" forecolor="#FFFFFF" uuid="472aca63-a32a-48de-8ce6-3753e79dbc29"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="160" width="60" height="20" forecolor="#FFFFFF" uuid="969a8d80-efc5-415f-8e66-24024a1e02cb"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="60" height="100" rowTotalGroup="dateheurerencontre" columnTotalGroup="courtcode">
+				<crosstabCell width="60" height="180" rowTotalGroup="dateheurerencontre" columnTotalGroup="courtcode">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<textField>
-							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="21b8e972-20c2-47cb-8d22-87dd6722f0b5"/>
-							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#FFFFFF" uuid="a87b61a0-1628-4390-8c8c-9244ce467433"/>
+							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="1683b079-763a-4004-a844-e6326198fc4f"/>
-							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="20d5018d-507b-44a2-9918-1c59d4198da8"/>
-							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="f4548e9e-ec1b-463d-9b78-fb6df7149d91"/>
+							<reportElement x="0" y="20" width="60" height="20" forecolor="#FFFFFF" uuid="0a81447d-9fd7-4b56-9326-ce6f066a5257"/>
 							<textFieldExpression><![CDATA[$V{visitescode_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="175a6095-b213-41ad-ab21-f55181ad33fa"/>
-							<textFieldExpression><![CDATA[$V{visiteurscode_MEASURE}]]></textFieldExpression>
+							<reportElement x="0" y="40" width="60" height="20" forecolor="#FFFFFF" uuid="b5da0427-d2ef-41e8-ae82-1cf15bcee03e"/>
+							<textFieldExpression><![CDATA[$V{playervisites1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="60" width="60" height="20" forecolor="#FFFFFF" uuid="e3a214a2-7796-4653-b6c4-8b38af90e0f8"/>
+							<textFieldExpression><![CDATA[$V{playervisites2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="80" width="60" height="20" forecolor="#FFFFFF" uuid="3aed784c-1d82-4fe5-8aba-da9976161358"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs1_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="100" width="60" height="20" forecolor="#FFFFFF" uuid="5395d19a-00b0-4f07-bcaa-fb526787b25b"/>
+							<textFieldExpression><![CDATA[$V{playervisiteurs2_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="120" width="60" height="20" forecolor="#FFFFFF" uuid="0a69012c-9cdf-4c94-9e0e-0fdc52d09c3d"/>
+							<textFieldExpression><![CDATA[$V{categorie_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="140" width="60" height="20" forecolor="#FFFFFF" uuid="924b3a9e-36eb-4562-a8d6-657d827f6e3a"/>
+							<textFieldExpression><![CDATA[$V{points_min_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="160" width="60" height="20" forecolor="#FFFFFF" uuid="43e0443d-1c69-45c8-9e36-d14c9b4e238e"/>
+							<textFieldExpression><![CDATA[$V{points_max_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
