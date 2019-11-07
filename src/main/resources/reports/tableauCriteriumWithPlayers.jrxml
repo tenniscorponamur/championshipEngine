@@ -268,14 +268,14 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 							<textFieldExpression><![CDATA[($V{playervisites1_MEASURE}!=null?$V{playervisites1_MEASURE}:"") +
 ( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
 	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
-	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES"))?"/":""
+	 ||	$V{categorie_MEASURE}.equals("MIXTES"))?"/":""
 ) +
 ($V{playervisites2_MEASURE}!=null?$V{playervisites2_MEASURE}:"")
 + " - " + 
 ($V{playervisiteurs1_MEASURE}!=null?$V{playervisiteurs1_MEASURE}:"") +
 ( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
 	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
-	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES"))?"/":""
+	 ||	$V{categorie_MEASURE}.equals("MIXTES"))?"/":""
 ) +
 ($V{playervisiteurs2_MEASURE}!=null?$V{playervisiteurs2_MEASURE}:"")]]></textFieldExpression>
 						</textField>
