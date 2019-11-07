@@ -265,19 +265,25 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 							<textElement verticalAlignment="Bottom">
 								<font size="6"/>
 							</textElement>
-							<textFieldExpression><![CDATA[($V{playervisites1_MEASURE}!=null?$V{playervisites1_MEASURE}:"") +
-( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
-	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
-	 ||	$V{categorie_MEASURE}.equals("MIXTES"))?"/":""
-) +
-($V{playervisites2_MEASURE}!=null?$V{playervisites2_MEASURE}:"")
+							<textFieldExpression><![CDATA[($V{playervisites1_MEASURE}!=null?$V{playervisites1_MEASURE}:"\t")
+
++
+( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS") || $V{categorie_MEASURE}.equals("DOUBLE_DAMES") ||	$V{categorie_MEASURE}.equals("MIXTES"))?("/" 
+	
+	+ ($V{playervisites2_MEASURE}!=null?$V{playervisites2_MEASURE}:"\t")
+	
+):"")
+
+
 + " - " + 
-($V{playervisiteurs1_MEASURE}!=null?$V{playervisiteurs1_MEASURE}:"") +
-( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
-	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
-	 ||	$V{categorie_MEASURE}.equals("MIXTES"))?"/":""
-) +
-($V{playervisiteurs2_MEASURE}!=null?$V{playervisiteurs2_MEASURE}:"")]]></textFieldExpression>
+($V{playervisiteurs1_MEASURE}!=null?$V{playervisiteurs1_MEASURE}:"\t")
+
++
+( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS") || $V{categorie_MEASURE}.equals("DOUBLE_DAMES") ||	$V{categorie_MEASURE}.equals("MIXTES"))?("/" 
+	
+	+ ($V{playervisiteurs2_MEASURE}!=null?$V{playervisiteurs2_MEASURE}:"\t")
+	
+):"")]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
