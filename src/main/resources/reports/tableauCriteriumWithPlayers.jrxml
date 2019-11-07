@@ -263,19 +263,19 @@ and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') = to_char(cast($P{date} a
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement x="0" y="57" width="100" height="28" uuid="d302c811-5841-4376-a102-9256497d4b06"/>
 							<textElement verticalAlignment="Bottom">
-								<font size="8"/>
+								<font size="6"/>
 							</textElement>
 							<textFieldExpression><![CDATA[($V{playervisites1_MEASURE}!=null?$V{playervisites1_MEASURE}:"") +
-($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
+( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
 	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
-	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES") ?"/":""
+	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES"))?"/":""
 ) +
 ($V{playervisites2_MEASURE}!=null?$V{playervisites2_MEASURE}:"")
 + " - " + 
 ($V{playervisiteurs1_MEASURE}!=null?$V{playervisiteurs1_MEASURE}:"") +
-($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
+( ($V{categorie_MEASURE}.equals("DOUBLE_MESSIEURS")
 	 || $V{categorie_MEASURE}.equals("DOUBLE_DAMES")
-	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES") ?"/":""
+	 ||	$V{categorie_MEASURE}.equals("DOUBLE_MIXTES"))?"/":""
 ) +
 ($V{playervisiteurs2_MEASURE}!=null?$V{playervisiteurs2_MEASURE}:"")]]></textFieldExpression>
 						</textField>
