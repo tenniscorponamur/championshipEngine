@@ -1,0 +1,1 @@
+alter table club add column date_creation date;

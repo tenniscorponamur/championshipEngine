@@ -420,7 +420,7 @@ public class MembreController {
             if (membre.getDateNaissance()!=null){
                 lastCell = POIUtils.write(sheet,i+1,2,membre.getDateNaissance(),dateCellStyle,null);
                 String formula= "DATEDIF(" + CellReference.convertNumToColString(dateNaissanceIndex) + (i+2)+ "," + CellReference.convertNumToColString(datePivotCell.getColumnIndex())+"1" + ",\"y\")";
-                lastCell = POIUtils.write(sheet,i+1,3,formula);
+                lastCell = POIUtils.writeWithFormula(sheet,i+1,3,formula);
             }
             lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre().toString(),null,null);
             lastCell = POIUtils.write(sheet,i+1,5,membre.isActif(),null,null);

@@ -4,13 +4,28 @@ import be.company.fca.model.Club;
 import be.company.fca.repository.ClubRepository;
 import be.company.fca.repository.EquipeRepository;
 import be.company.fca.repository.MembreRepository;
+import be.company.fca.utils.POIUtils;
+import be.company.fca.utils.TemplateUtils;
 import io.swagger.annotations.Api;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.LocaleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.TimeZone;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
@@ -35,6 +50,32 @@ public class ClubController {
     @RequestMapping(path="/public/club", method= RequestMethod.GET)
     Club getClub(@RequestParam Long id) {
         return clubRepository.findById(id).get();
+    }
+
+    @RequestMapping(path="/public/club/{clubId}", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getClubInfos(@PathVariable("clubId") Long clubId) throws IOException, InvalidFormatException {
+        Club club = clubRepository.findById(clubId).get();
+
+
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        LocaleUtil.setUserTimeZone(timeZone);
+
+        Workbook wb = POIUtils.createWorkbook(TemplateUtils.getTemplateLigue());
+
+        Sheet sheet = wb.getSheetAt(0);
+
+        POIUtils.write(sheet,0,0,"CECI EST UN TEST");
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        wb.write(os);
+        wb.close();
+        os.close();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
+        return response;
+
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")

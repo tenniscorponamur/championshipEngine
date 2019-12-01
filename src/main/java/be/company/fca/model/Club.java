@@ -3,6 +3,7 @@ package be.company.fca.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -29,6 +30,10 @@ public class Club {
 
     @Column
     private String description;
+
+    @Temporal(TemporalType.DATE)
+    @Column( name = "date_creation" )
+    private Date dateCreation;
 
     @Column( name =  "numero_tva")
     private String numeroTVA;
@@ -105,6 +110,14 @@ public class Club {
 
     public void setActif(boolean actif) {
         this.actif = actif;
+    }
+
+    public Date getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(Date dateCreation) {
+        this.dateCreation = dateCreation;
     }
 
     @Override

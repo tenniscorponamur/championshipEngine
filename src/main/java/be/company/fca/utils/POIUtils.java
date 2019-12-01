@@ -348,7 +348,7 @@ public class POIUtils {
      * @param ci colonne
      * @param formula Formule
      */
-    public static Cell write(Sheet sheet, Integer ri, Integer ci, String formula){
+    public static Cell writeWithFormula(Sheet sheet, Integer ri, Integer ci, String formula){
         Row row = sheet.getRow(ri);
         if (row == null){
             row = sheet.createRow(ri);
