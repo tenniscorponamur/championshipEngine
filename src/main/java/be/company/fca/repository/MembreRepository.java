@@ -26,6 +26,14 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
     long countByClub(Club club);
 
     /**
+     * Permet de recuperer les responsables de club
+     * @param club
+     * @param responsableClub
+     * @return Responsables de club
+     */
+    Iterable<Membre> findByClubAndResponsableClub(Club club, boolean responsableClub);
+
+    /**
      * Permet de recuperer les membres d'un club
      * @param club Club du membre
      * @return Membres appartenant au club

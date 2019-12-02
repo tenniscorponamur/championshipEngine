@@ -1,6 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.model.Club;
+import be.company.fca.model.Membre;
 import be.company.fca.repository.ClubRepository;
 import be.company.fca.repository.EquipeRepository;
 import be.company.fca.repository.MembreRepository;
@@ -8,6 +9,8 @@ import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.TemplateUtils;
 import io.swagger.annotations.Api;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.util.LocaleUtil;
@@ -52,7 +55,8 @@ public class ClubController {
         return clubRepository.findById(id).get();
     }
 
-    @RequestMapping(path="/public/club/{clubId}", method= RequestMethod.GET)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/club/{clubId}/export", method= RequestMethod.GET)
     ResponseEntity<byte[]> getClubInfos(@PathVariable("clubId") Long clubId) throws IOException, InvalidFormatException {
         Club club = clubRepository.findById(clubId).get();
 
@@ -62,9 +66,38 @@ public class ClubController {
 
         Workbook wb = POIUtils.createWorkbook(TemplateUtils.getTemplateLigue());
 
+        CreationHelper createHelper = wb.getCreationHelper();
+        CellStyle dateCellStyle = wb.createCellStyle();
+        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+
         Sheet sheet = wb.getSheetAt(0);
 
-        POIUtils.write(sheet,0,0,"CECI EST UN TEST");
+        POIUtils.write(sheet,8,2,club.getNom(),null,null);
+        POIUtils.write(sheet,9,2,club.getAdresse(),null,null);
+
+        List<Membre> responsables = (List<Membre>) membreRepository.findByClubAndResponsableClub(club,true);
+        if (responsables.size()>0){
+            Membre responsable = responsables.get(0);
+            String nomPrenomResponsable = responsable.getNom() + " " + responsable.getPrenom();
+            String adresseResponsable = (responsable.getRue()==null?"":responsable.getRue()) + " " + (responsable.getRueNumero()==null?"":responsable.getRueNumero())
+                    + "," + (responsable.getCodePostal()==null?"":responsable.getCodePostal()) + " " + (responsable.getLocalite()==null?"":responsable.getLocalite());
+
+            POIUtils.write(sheet,15,2,nomPrenomResponsable,null,null);
+            POIUtils.write(sheet,16,2,adresseResponsable,null,null);
+
+            POIUtils.write(sheet,21,2,nomPrenomResponsable,null,null);
+            POIUtils.write(sheet,22,2,adresseResponsable,null,null);
+
+            POIUtils.write(sheet,26,2,nomPrenomResponsable,null,null);
+            POIUtils.write(sheet,27,2,adresseResponsable,null,null);
+
+            POIUtils.write(sheet,43,2,nomPrenomResponsable,null,null);
+            POIUtils.write(sheet,44,2,adresseResponsable,null,null);
+        }
+        Long nbMembresClubs = membreRepository.countByClub(club);
+
+        POIUtils.write(sheet,47,2,club.getDateCreation(),dateCellStyle,null);
+        POIUtils.write(sheet,50,2,nbMembresClubs,null,null);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         wb.write(os);
@@ -72,7 +105,7 @@ public class ClubController {
         os.close();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
         ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
         return response;
 
