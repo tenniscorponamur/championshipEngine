@@ -75,7 +75,7 @@ public class ClubController {
         POIUtils.write(sheet,8,2,club.getNom(),null,null);
         POIUtils.write(sheet,9,2,club.getAdresse(),null,null);
 
-        List<Membre> responsables = (List<Membre>) membreRepository.findByClubAndResponsableClub(club,true);
+        List<Membre> responsables = (List<Membre>) membreRepository.findByClubAndResponsableClubAndActif(club,true,true);
         if (responsables.size()>0){
             Membre responsable = responsables.get(0);
             String nomPrenomResponsable = responsable.getNom() + " " + responsable.getPrenom();
@@ -94,7 +94,7 @@ public class ClubController {
             POIUtils.write(sheet,43,2,nomPrenomResponsable,null,null);
             POIUtils.write(sheet,44,2,adresseResponsable,null,null);
         }
-        Long nbMembresClubs = membreRepository.countByClub(club);
+        Long nbMembresClubs = membreRepository.countByClubAndActif(club,true);
 
         POIUtils.write(sheet,47,2,club.getDateCreation(),dateCellStyle,null);
         POIUtils.write(sheet,50,2,nbMembresClubs,null,null);
