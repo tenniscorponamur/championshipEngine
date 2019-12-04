@@ -5,6 +5,7 @@ import be.company.fca.model.Membre;
 import be.company.fca.repository.ClubRepository;
 import be.company.fca.repository.EquipeRepository;
 import be.company.fca.repository.MembreRepository;
+import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.TemplateUtils;
 import io.swagger.annotations.Api;
@@ -61,7 +62,7 @@ public class ClubController {
         Club club = clubRepository.findById(clubId).get();
 
 
-        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
         LocaleUtil.setUserTimeZone(timeZone);
 
         Workbook wb = POIUtils.createWorkbook(TemplateUtils.getTemplateLigue());

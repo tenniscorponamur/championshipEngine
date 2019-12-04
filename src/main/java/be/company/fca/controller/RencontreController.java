@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -338,6 +339,43 @@ public class RencontreController {
 
     }
 
+    @RequestMapping(value = "/public/rencontre/{rencontreId}/lienGoogleCalendar", method = RequestMethod.GET)
+    public String getLienGoogleCalendar(@PathVariable("rencontreId") Long rencontreId) {
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
+
+        String lienGoogleCalendar = "https://www.google.com/calendar/render?action=TEMPLATE";
+
+        lienGoogleCalendar+= "&text=Tennis Corpo : " + rencontre.getEquipeVisites().getCodeAlphabetique() + " - " + rencontre.getEquipeVisiteurs().getCodeAlphabetique();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmm'00'");
+
+        Calendar endGc = new GregorianCalendar();
+        endGc.setTime(rencontre.getDateHeureRencontre());
+        List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+        int nbHeures = 0;
+        if (matchs.size()>0){
+            // On va d'office bloquer une heure et si le nombre de matchs est superieur a deux, on bloque
+            // une heure pour deux matchs
+            nbHeures = 1;
+            if (matchs.size()>2){
+                nbHeures = matchs.size()/2;
+            }
+        }
+        endGc.add(Calendar.HOUR_OF_DAY,nbHeures);
+
+        lienGoogleCalendar+= "&dates=" + sdf.format(rencontre.getDateHeureRencontre()) + "/" + sdf.format(endGc.getTime());
+
+        lienGoogleCalendar+="&ctz=" + DateUtils.getTimeZone();
+
+        if (rencontre.getTerrain()!=null){
+            lienGoogleCalendar+="&details=" + "Terrain : " + rencontre.getTerrain().getNom();
+            if (rencontre.getTerrain().getAdresse()!=null){
+                lienGoogleCalendar+="&location=" + rencontre.getTerrain().getAdresse();
+            }
+        }
+
+        return lienGoogleCalendar;
+    }
 
     // DTO pour les membres afin de ne pas recuperer les donnees privees
     // Attention a la rencontre --> rencontreDto
@@ -1259,7 +1297,7 @@ public class RencontreController {
     @RequestMapping(path = "/public/rencontres/calendrier", method = RequestMethod.GET)
     ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId, @RequestParam(required = false) boolean excel) throws Exception {
 
-        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
 
         if (excel) {
             Championnat championnat = championnatRepository.findById(championnatId).get();

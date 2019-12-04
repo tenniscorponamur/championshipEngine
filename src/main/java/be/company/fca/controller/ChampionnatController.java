@@ -2,6 +2,7 @@ package be.company.fca.controller;
 
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
+import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
 import net.sf.jasperreports.engine.*;
@@ -189,7 +190,7 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/championnat/tableauCriterium", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTableauCriterium(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
-        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumTemplate());
         Connection conn = datasource.getConnection();
         Map params = new HashMap();
@@ -208,7 +209,7 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/championnat/tableauCriteriumWithPlayers", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTableauCriteriumWithPlayers(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
-        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumWithPlayersTemplate());
         Connection conn = datasource.getConnection();
         Map params = new HashMap();

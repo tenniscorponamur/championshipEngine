@@ -7,6 +7,15 @@ import java.util.GregorianCalendar;
 public class DateUtils {
 
     /**
+     * Permet de recuperer la timeZone a appliquer
+     * dans les contextes ou des heures sont exploitees
+     * @return
+     */
+    public static String getTimeZone(){
+        return "Europe/Paris";
+    }
+
+    /**
      * Permet de recuperer une date en precisant les heures, minutes, secondes et millisecondes a zero
      * @param date
      * @return
