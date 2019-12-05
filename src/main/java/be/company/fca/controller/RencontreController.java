@@ -347,7 +347,7 @@ public class RencontreController {
 
         lienGoogleCalendar+= "&text=Tennis Corpo : " + rencontre.getEquipeVisites().getCodeAlphabetique() + " - " + rencontre.getEquipeVisiteurs().getCodeAlphabetique();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmm'00'");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd'T'HHmm'00Z'");
 
         Calendar endGc = new GregorianCalendar();
         endGc.setTime(rencontre.getDateHeureRencontre());
