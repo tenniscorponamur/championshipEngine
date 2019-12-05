@@ -374,7 +374,7 @@ public class RencontreController {
             }
         }
 
-        return lienGoogleCalendar;
+        return "{\"link\":\"" + lienGoogleCalendar + "\"}";
     }
 
     // DTO pour les membres afin de ne pas recuperer les donnees privees
