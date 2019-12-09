@@ -1,6 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.model.Club;
+import be.company.fca.model.Genre;
 import be.company.fca.model.Membre;
 import be.company.fca.repository.ClubRepository;
 import be.company.fca.repository.EquipeRepository;
@@ -51,7 +52,96 @@ public class ClubController {
         return clubRepository.findAll();
     }
 
-    @RequestMapping(path="/public/club", method= RequestMethod.GET)
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/clubs/export", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getSituationClubs() throws IOException, InvalidFormatException {
+
+        TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
+        LocaleUtil.setUserTimeZone(timeZone);
+
+        Workbook wb = POIUtils.createWorkbook(true);
+        Sheet sheet = wb.createSheet("Situation_clubs");
+
+        POIUtils.write(sheet, 0, 0, "Club", null, null);
+        POIUtils.write(sheet, 0, 1, "Adresse", null, null);
+        POIUtils.write(sheet, 0, 2, "Hommes (<25)", null, null);
+        POIUtils.write(sheet, 0, 3, "Femmes (<25)", null, null);
+        POIUtils.write(sheet, 0, 4, "Hommes (<35)", null, null);
+        POIUtils.write(sheet, 0, 5, "Femmes (<35)", null, null);
+        POIUtils.write(sheet, 0, 6, "Hommes (>=35)", null, null);
+        POIUtils.write(sheet, 0, 7, "Femmes (>=35)", null, null);
+        POIUtils.write(sheet, 0, 8, "Totaux", null, null);
+
+        int rowId = 1;
+        List<Club> clubs = (List<Club>) clubRepository.findAll();
+        for (Club club : clubs){
+            if (club.isActif()){
+                POIUtils.write(sheet, rowId, 0, club.getNumero() + " - " + club.getNom(), null, null);
+                POIUtils.write(sheet, rowId, 1, club.getAdresse(), null, null);
+
+                int nbHommesMoins25 = 0;
+                int nbFemmesMoins25 = 0;
+                int nbHommesMoins35 = 0;
+                int nbFemmesMoins35 = 0;
+                int nbHommes35 = 0;
+                int nbFemmes35 = 0;
+                int total = 0;
+                List<Membre> membres = (List<Membre>) membreRepository.findByClub(club);
+                for (Membre membre : membres){
+                    if (membre.isActif()){
+                        if (membre.getDateNaissance()!=null){
+                            int age = DateUtils.getYearsDifference(membre.getDateNaissance());
+                            if (Genre.HOMME.equals(membre.getGenre())){
+                                if (age<25){
+                                    nbHommesMoins25++;
+                                }else if (age<35){
+                                    nbHommesMoins35++;
+                                }else{
+                                    nbHommes35++;
+                                }
+                            }else{
+                                if (age<25){
+                                    nbFemmesMoins25++;
+                                }else if (age<35){
+                                    nbFemmesMoins35++;
+                                }else{
+                                    nbFemmes35++;
+                                }
+                            }
+                        }
+                        total++;
+                    }
+                }
+
+                POIUtils.write(sheet, rowId, 2, nbHommesMoins25, null, null);
+                POIUtils.write(sheet, rowId, 3, nbFemmesMoins25, null, null);
+                POIUtils.write(sheet, rowId, 4, nbHommesMoins35, null, null);
+                POIUtils.write(sheet, rowId, 5, nbFemmesMoins35, null, null);
+                POIUtils.write(sheet, rowId, 6, nbHommes35, null, null);
+                POIUtils.write(sheet, rowId, 7, nbFemmes35, null, null);
+                POIUtils.write(sheet, rowId, 8, total, null, null);
+
+                rowId++;
+            }
+        }
+
+        // Auto-resize des colonnes
+        for (int i = 0; i < 9; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        wb.write(os);
+        wb.close();
+        os.close();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
+        return response;
+    }
+
+        @RequestMapping(path="/public/club", method= RequestMethod.GET)
     Club getClub(@RequestParam Long id) {
         return clubRepository.findById(id).get();
     }
@@ -59,8 +149,8 @@ public class ClubController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/club/{clubId}/export", method= RequestMethod.GET)
     ResponseEntity<byte[]> getClubInfos(@PathVariable("clubId") Long clubId) throws IOException, InvalidFormatException {
-        Club club = clubRepository.findById(clubId).get();
 
+        Club club = clubRepository.findById(clubId).get();
 
         TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
         LocaleUtil.setUserTimeZone(timeZone);
