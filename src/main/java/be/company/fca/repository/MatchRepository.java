@@ -34,7 +34,8 @@ public interface MatchRepository extends CrudRepository<Match,Long> {
             "    where rencontre.valide = '1' " +
             "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') >= to_char(cast(:startDate AS date),'YYYY-MM-DD') " +
             "    and to_char(rencontre.dateheurerencontre,'YYYY-MM-DD') <= to_char(cast(:endDate AS date),'YYYY-MM-DD') " +
-            "    and (joueurvisites1_fk = :membreId or joueurvisites2_fk = :membreId or joueurvisiteurs1_fk = :membreId or joueurvisiteurs2_fk = :membreId)", nativeQuery = true)
+            "    and (joueurvisites1_fk = :membreId or joueurvisites2_fk = :membreId or joueurvisiteurs1_fk = :membreId or joueurvisiteurs2_fk = :membreId)" +
+            "    order by rencontre.dateheurerencontre", nativeQuery = true)
     List<Match> findValidesByMembreBetweenDates(@Param("membreId") Long membreId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     /**
