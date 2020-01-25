@@ -414,40 +414,43 @@ public class MembreController {
         for (int i=0;i<membres.size();i++){
             Membre membre = membres.get(i);
 
-            lastCell = POIUtils.write(sheet,i+1,0,membre.getNumeroAft(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,1,membre.getNom(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,2,membre.getPrenom(),null,null);
-            if (membre.getDateNaissance()!=null){
-                lastCell = POIUtils.write(sheet,i+1,3,membre.getDateNaissance(),dateCellStyle,null);
+            if (membre.isActif()){
+
+                lastCell = POIUtils.write(sheet,i+1,0,membre.getNumeroAft(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,1,membre.getNom(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,2,membre.getPrenom(),null,null);
+                if (membre.getDateNaissance()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,3,membre.getDateNaissance(),dateCellStyle,null);
+                }
+                lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre()==Genre.FEMME?"F":"M",null,null);
+
+                lastCell = POIUtils.write(sheet,i+1,5,membre.getRue(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,6,membre.getRueNumero(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,7,membre.getRueBoite(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,8,membre.getCodePostal(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,9,membre.getLocalite(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,10,membre.getTelephone(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,11,membre.getGsm(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,12,membre.getMail(),null,null);
+
+                lastCell = POIUtils.write(sheet,i+1,13,membre.isResponsableClub()?"1":"0",null,null);
+
+                if (membre.getClassementAFTActuel()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,14,membre.getClassementAFTActuel().getCodeClassement(),null,null);
+                    lastCell = POIUtils.write(sheet,i+1,15,membre.getClassementAFTActuel().getPoints(),null,null);
+                }
+
+                if (membre.getClassementCorpoActuel()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,16,membre.getClassementCorpoActuel().getPoints(),null,null);
+                }
+
+                if (membre.getClub()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,17,membre.getClub().getNumero(),null,null);
+                }
+                lastCell = POIUtils.write(sheet,i+1,18,membre.getNumeroClubAft(),null,null);
+
+
             }
-            lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre()==Genre.FEMME?"F":"M",null,null);
-
-            lastCell = POIUtils.write(sheet,i+1,5,membre.getRue(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,6,membre.getRueNumero(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,7,membre.getRueBoite(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,8,membre.getCodePostal(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,9,membre.getLocalite(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,10,membre.getTelephone(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,11,membre.getGsm(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,12,membre.getMail(),null,null);
-
-            lastCell = POIUtils.write(sheet,i+1,13,membre.isResponsableClub()?"1":"0",null,null);
-
-            if (membre.getClassementAFTActuel()!=null){
-                lastCell = POIUtils.write(sheet,i+1,14,membre.getClassementAFTActuel().getCodeClassement(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,15,membre.getClassementAFTActuel().getPoints(),null,null);
-            }
-
-            if (membre.getClassementCorpoActuel()!=null){
-                lastCell = POIUtils.write(sheet,i+1,16,membre.getClassementCorpoActuel().getPoints(),null,null);
-            }
-
-            if (membre.getClub()!=null){
-                lastCell = POIUtils.write(sheet,i+1,17,membre.getClub().getNumero(),null,null);
-            }
-            lastCell = POIUtils.write(sheet,i+1,18,membre.getNumeroClubAft(),null,null);
-
-
         }
 
         // Freeze de la premiere ligne
