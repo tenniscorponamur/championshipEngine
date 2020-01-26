@@ -390,6 +390,12 @@ public class MembreController {
         CellStyle dateCellStyle = wb.createCellStyle();
         dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
 
+        CellStyle boldStyle = wb.createCellStyle();
+        Font boldFont = wb.createFont();
+        boldFont.setBold(true);
+        boldFont.setColor(IndexedColors.ORANGE.index);
+        boldStyle.setFont(boldFont);
+
         Cell firstCell = POIUtils.write(sheet,0,0,"Numéro AFT",null,null);
         POIUtils.write(sheet,0,1,"Nom",null,null);
         POIUtils.write(sheet,0,2,"Prénom",null,null);
@@ -448,7 +454,11 @@ public class MembreController {
                     lastCell = POIUtils.write(sheet,i+1,17,membre.getClub().getNumero(),null,null);
                 }
                 lastCell = POIUtils.write(sheet,i+1,18,membre.getNumeroClubAft(),null,null);
-
+                // Mise en evidence des affilies corpo (club AFT = 6045)
+                Cell numClubAFTCell = lastCell;
+                if (membre.getNumeroClubAft()!=null && "6045".equals(membre.getNumeroClubAft().trim())){
+                    numClubAFTCell.setCellStyle(boldStyle);
+                }
 
             }
         }
@@ -487,6 +497,12 @@ public class MembreController {
         CreationHelper createHelper = wb.getCreationHelper();
         CellStyle dateCellStyle = wb.createCellStyle();
         dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+
+        CellStyle boldStyle = wb.createCellStyle();
+        Font boldFont = wb.createFont();
+        boldFont.setBold(true);
+        boldFont.setColor(IndexedColors.ORANGE.index);
+        boldStyle.setFont(boldFont);
 
         Cell firstCell = POIUtils.write(sheet,0,0,"Nom",null,null);
         POIUtils.write(sheet,0,1,"Prénom",null,null);
@@ -543,6 +559,10 @@ public class MembreController {
             }
             lastCell = POIUtils.write(sheet,i+1,11,membre.getDateAffiliationAft(),dateCellStyle,null);
             lastCell = POIUtils.write(sheet,i+1,12,membre.getNumeroClubAft(),null,null);
+            Cell numClubAFTCell = lastCell;
+            if (membre.getNumeroClubAft()!=null && "6045".equals(membre.getNumeroClubAft().trim())){
+                numClubAFTCell.setCellStyle(boldStyle);
+            }
             lastCell = POIUtils.write(sheet,i+1,13,membre.isOnlyCorpo(),null,null);
             lastCell = POIUtils.write(sheet,i+1,14,membre.getDateAffiliationCorpo(),dateCellStyle,null);
             lastCell = POIUtils.write(sheet,i+1,15,membre.getDateDesaffiliationCorpo(),dateCellStyle,null);
