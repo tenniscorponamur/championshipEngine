@@ -649,8 +649,10 @@ public class RencontreController {
     public boolean isForfaitPossible(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
         if (userService.isAdmin(authentication)){
             Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
-            if ((rencontre.getPointsVisites()==null || rencontre.getPointsVisites()==0) && (rencontre.getPointsVisiteurs()==null || rencontre.getPointsVisiteurs()==0)) {
-                return true;
+            if (!rencontre.isValide()){
+                if ((rencontre.getPointsVisites()==null || rencontre.getPointsVisites()==0) && (rencontre.getPointsVisiteurs()==null || rencontre.getPointsVisiteurs()==0)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -888,10 +890,38 @@ public class RencontreController {
     }
 
 
-    // TODO : forceUpdateValidity pour les cas des matchs annules par commission sportive
-    // TODO : resultatsEncodes = true & valide = true
-    // TODO : check impact classement / ecran rencontre / ecran rencontres jouees a partir de classement / ecran derniers resultats sur page d'accueil
+    // ForceUpdateValidity pour les cas des matchs annules par commission sportive (uniquement accessible par administrateur)
+    // resultatsEncodes = true & valide = true
 
+    //  check impact ecran classement --> OK
+    //  check ecran rencontre --> OK
+    //  check ecran rencontres jouees a partir de classement -> OK apd BackEnd
+    //  check ecran derniers resultats sur page d'accueil --> OK
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/forceValidite", method = RequestMethod.PUT)
+    public boolean forceValiditeRencontre(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+
+        String trace = "";
+
+        if (isForfaitPossible(authentication,rencontreId)) {
+
+            Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
+            if (rencontre.getDivision().getChampionnat().isCalendrierValide() && !rencontre.getDivision().getChampionnat().isCloture()) {
+
+                rencontreRepository.updateResultatsEncodes(rencontreId, true);
+                rencontreRepository.updateValiditeRencontre(rencontreId, true);
+                trace = "Validation forcée des résultats";
+
+                traceService.addTrace(authentication, "rencontre", rencontreId.toString(), trace);
+
+                return true;
+
+            }
+        }
+
+        return false;
+    }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/validite", method = RequestMethod.PUT)
     public boolean updateValiditeRencontre(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean validite, @RequestBody(required = false) String message) {

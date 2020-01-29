@@ -93,20 +93,28 @@ public class ClassementEquipe {
         this.points += points;
     }
 
-    public void ajoutSetsGagnes(int setsGagnes){
-        this.setsGagnes += setsGagnes;
+    public void ajoutSetsGagnes(Integer setsGagnes){
+        if (setsGagnes!=null){
+            this.setsGagnes += setsGagnes;
+        }
     }
 
-    public void ajoutSetsPerdus(int setsPerdus){
-        this.setsPerdus += setsPerdus;
+    public void ajoutSetsPerdus(Integer setsPerdus){
+        if (setsPerdus!=null){
+            this.setsPerdus += setsPerdus;
+        }
     }
 
-    public void ajoutJeuxGagnes(int jeuxGagnes){
-        this.jeuxGagnes += jeuxGagnes;
+    public void ajoutJeuxGagnes(Integer jeuxGagnes){
+        if (jeuxGagnes!=null){
+            this.jeuxGagnes += jeuxGagnes;
+        }
     }
 
-    public void ajoutJeuxPerdus(int jeuxPerdus){
-        this.jeuxPerdus += jeuxPerdus;
+    public void ajoutJeuxPerdus(Integer jeuxPerdus){
+        if (jeuxPerdus!=null){
+            this.jeuxPerdus += jeuxPerdus;
+        }
     }
 
     public HashSet<Equipe> getEquipesBattues() {
