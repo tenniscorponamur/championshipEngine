@@ -887,6 +887,12 @@ public class RencontreController {
         return resultatsEncodes;
     }
 
+
+    // TODO : forceUpdateValidity pour les cas des matchs annules par commission sportive
+    // TODO : resultatsEncodes = true & valide = true
+    // TODO : check impact classement / ecran rencontre / ecran rencontres jouees a partir de classement / ecran derniers resultats sur page d'accueil
+
+
     @RequestMapping(value = "/private/rencontre/{rencontreId}/validite", method = RequestMethod.PUT)
     public boolean updateValiditeRencontre(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean validite, @RequestBody(required = false) String message) {
 
