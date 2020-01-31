@@ -30,6 +30,12 @@ public class Terrain {
     @Column( name =  "adresse")
     private String adresse;
 
+    @Column( name = "presence_buvette", nullable = false)
+    private boolean presenceBuvette=false;
+
+    @Column( name = "presence_bancontact", nullable = false)
+    private boolean presenceBancontact=false;
+
     @Column( name = "terrain_criterium_par_defaut", nullable = false)
     private boolean terrainCriteriumParDefaut=false;
 
@@ -66,6 +72,22 @@ public class Terrain {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public boolean isPresenceBuvette() {
+        return presenceBuvette;
+    }
+
+    public void setPresenceBuvette(boolean presenceBuvette) {
+        this.presenceBuvette = presenceBuvette;
+    }
+
+    public boolean isPresenceBancontact() {
+        return presenceBancontact;
+    }
+
+    public void setPresenceBancontact(boolean presenceBancontact) {
+        this.presenceBancontact = presenceBancontact;
     }
 
     public boolean isTerrainCriteriumParDefaut() {
