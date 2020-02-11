@@ -36,6 +36,9 @@ public class Terrain {
     @Column( name = "presence_bancontact", nullable = false)
     private boolean presenceBancontact=false;
 
+    @Column( name = "presence_payconiq", nullable = false)
+    private boolean presencePayconiq=false;
+
     @Column( name = "terrain_criterium_par_defaut", nullable = false)
     private boolean terrainCriteriumParDefaut=false;
 
@@ -88,6 +91,14 @@ public class Terrain {
 
     public void setPresenceBancontact(boolean presenceBancontact) {
         this.presenceBancontact = presenceBancontact;
+    }
+
+    public boolean isPresencePayconiq() {
+        return presencePayconiq;
+    }
+
+    public void setPresencePayconiq(boolean presencePayconiq) {
+        this.presencePayconiq = presencePayconiq;
     }
 
     public boolean isTerrainCriteriumParDefaut() {

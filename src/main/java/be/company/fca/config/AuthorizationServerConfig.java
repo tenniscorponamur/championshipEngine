@@ -59,6 +59,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .withClient(clientId)
                 .secret(clientSecret)
                 .authorizedGrantTypes(grantTypePassword,grantTypeRefreshToken)
+                // Pour les tests relatifs aux jetons
 //                .accessTokenValiditySeconds(10)
 //                .refreshTokenValiditySeconds(20)
                 .scopes(scopeRead, scopeWrite)
