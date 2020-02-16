@@ -525,7 +525,7 @@ public class ClassementCorpoController {
 
                 int i = 0;
                 points = classementsCorpos.get(0).getPoints();
-                while ( (i<classementsCorpos.size()) && (classementsCorpos.get(i).getDateClassement().compareTo(date) <= 0) ) {
+                while ( (i<classementsCorpos.size()) && (date==null || classementsCorpos.get(i).getDateClassement().compareTo(date) <= 0) ) {
                     points = classementsCorpos.get(i).getPoints();
                     i++;
                 }
