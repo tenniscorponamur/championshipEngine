@@ -30,6 +30,9 @@ public class Terrain {
     @Column( name =  "adresse")
     private String adresse;
 
+    @Column( name = "show_drink_details", nullable = false)
+    private boolean showDrinkDetails=false;
+
     @Column( name = "presence_buvette", nullable = false)
     private boolean presenceBuvette=false;
 
@@ -75,6 +78,14 @@ public class Terrain {
 
     public void setAdresse(String adresse) {
         this.adresse = adresse;
+    }
+
+    public boolean isShowDrinkDetails() {
+        return showDrinkDetails;
+    }
+
+    public void setShowDrinkDetails(boolean showDrinkDetails) {
+        this.showDrinkDetails = showDrinkDetails;
     }
 
     public boolean isPresenceBuvette() {
