@@ -41,6 +41,9 @@ public class Championnat {
     @Column( name = "cloture", nullable = false)
     private boolean cloture=false;
 
+    @Column( name =  "ordre")
+    private Long ordre;
+
     public Long getId() {
         return id;
     }
@@ -95,6 +98,14 @@ public class Championnat {
 
     public void setCloture(boolean cloture) {
         this.cloture = cloture;
+    }
+
+    public Long getOrdre() {
+        return ordre;
+    }
+
+    public void setOrdre(Long ordre) {
+        this.ordre = ordre;
     }
 
     @Override

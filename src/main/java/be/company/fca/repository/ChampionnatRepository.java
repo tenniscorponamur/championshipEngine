@@ -38,6 +38,14 @@ public interface ChampionnatRepository extends CrudRepository<Championnat, Long>
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Championnat championnat " +
+            " set championnat.ordre =:ordre" +
+            " where championnat.id =:championnatId")
+    void updateOrdre(@Param("championnatId") Long championnatId,
+                                     @Param("ordre") Long ordre);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Championnat championnat " +
             " set championnat.calendrierARafraichir =:calendrierARafraichir" +
             " where championnat.id =:championnatId")
     void updateCalendrierARafraichir(@Param("championnatId") Long championnatId,

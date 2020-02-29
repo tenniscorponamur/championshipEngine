@@ -79,6 +79,13 @@ public class ChampionnatController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/championnat/ordre", method = RequestMethod.PUT)
+    public boolean updateOrdreChampionnat(@RequestParam Long championnatId,@RequestBody(required = false) Long ordre){
+        championnatRepository.updateOrdre(championnatId, ordre);
+        return true;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat/calendrierARafraichir", method = RequestMethod.PUT)
     public boolean setCalendrierARafraichir(@RequestParam Long championnatId,@RequestBody boolean aRafraichir){
         championnatRepository.updateCalendrierARafraichir(championnatId,aRafraichir);
