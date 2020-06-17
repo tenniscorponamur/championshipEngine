@@ -359,7 +359,7 @@ public class POIUtils {
             cell = row.createCell(ci);
         }
 
-        cell.setCellType(CellType.FORMULA);
+        //cell.setCellType(CellType.FORMULA);
         cell.setCellFormula(formula);
 
         return cell;
