@@ -6,7 +6,7 @@
 
     <groupId>be.company.fca</groupId>
     <artifactId>tennis-corpo-engine</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <name>tennisCorpoEngine</name>
     <description>Tennis Corpo Engine</description>
@@ -80,7 +80,15 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
-            <version>6.7.1</version>
+            <version>6.12.2</version>
+        </dependency>
+
+        <!-- Dependances commons-lang3 retiree de JasperReports -->
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.10</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.mailjet/mailjet-client -->
@@ -88,6 +96,28 @@
             <groupId>com.mailjet</groupId>
             <artifactId>mailjet-client</artifactId>
             <version>4.2.1</version>
+        </dependency>
+
+        <!-- dependances jaxb supprimees a partir de java 9 -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>2.3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.27.0-GA</version>
         </dependency>
 
     </dependencies>
@@ -102,8 +132,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -10,8 +10,8 @@ import be.company.fca.service.ClassementCorpoService;
 import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.POIUtils;
 import io.swagger.annotations.Api;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -654,7 +654,7 @@ public class ClassementCorpoController {
      */
     private Integer getPointsAssimilesSimples(Integer pointsPaireDouble){
         // On somme et on divise par deux en arrondissant au 5 superieur
-        return new Double((Math.ceil(pointsPaireDouble/10.0) /2) * 10).intValue();
+        return Double.valueOf((Math.ceil(pointsPaireDouble/10.0) /2) * 10).intValue();
     }
 
     /**
