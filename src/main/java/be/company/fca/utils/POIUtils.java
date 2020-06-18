@@ -105,13 +105,13 @@ public class POIUtils {
                 return null;
             } else {
 
-                if (cell.getCellTypeEnum() == CellType.BOOLEAN){
+                if (cell.getCellType() == CellType.BOOLEAN){
                     return cell.getBooleanCellValue();
 
-                } else if (cell.getCellTypeEnum() == CellType.STRING){
+                } else if (cell.getCellType() == CellType.STRING){
                     return cell.getStringCellValue();
 
-                } else if (cell.getCellTypeEnum() == CellType.NUMERIC){
+                } else if (cell.getCellType() == CellType.NUMERIC){
                     return cell.getNumericCellValue();
 
                 }
@@ -133,10 +133,10 @@ public class POIUtils {
             if (cell == null){
                 return null;
             } else {
-                if (cell.getCellTypeEnum() == CellType.BOOLEAN){
+                if (cell.getCellType() == CellType.BOOLEAN){
                     return cell.getBooleanCellValue();
 
-                } else if (cell.getCellTypeEnum() == CellType.STRING){
+                } else if (cell.getCellType() == CellType.STRING){
                     String val = cell.getStringCellValue();
                     if (val != null){
                         val = val.toLowerCase().trim();
@@ -149,7 +149,7 @@ public class POIUtils {
                         return false;
                     }
 
-                } else if (cell.getCellTypeEnum() == CellType.NUMERIC){
+                } else if (cell.getCellType() == CellType.NUMERIC){
                     double val = cell.getNumericCellValue();
                     Integer i = Integer.valueOf((int) Math.floor(val));
                     if (i.equals(1)){
@@ -174,13 +174,13 @@ public class POIUtils {
             if (cell == null){
                 return null;
             } else {
-                if (cell.getCellTypeEnum() == CellType.BOOLEAN){
+                if (cell.getCellType() == CellType.BOOLEAN){
                     return Boolean.toString(cell.getBooleanCellValue());
 
-                } else if (cell.getCellTypeEnum() == CellType.STRING){
+                } else if (cell.getCellType() == CellType.STRING){
                     return cell.getStringCellValue();
 
-                } else if (cell.getCellTypeEnum() == CellType.NUMERIC){
+                } else if (cell.getCellType() == CellType.NUMERIC){
                     double val = cell.getNumericCellValue();
                     if (Math.floor(val) < val){
                         return Double.toString(cell.getNumericCellValue());
@@ -214,10 +214,10 @@ public class POIUtils {
                 return null;
             } else {
 
-                if (cell.getCellTypeEnum() == CellType.STRING){
+                if (cell.getCellType() == CellType.STRING){
                     return cell.getStringCellValue();
 
-                } else if (cell.getCellTypeEnum() == CellType.NUMERIC){
+                } else if (cell.getCellType() == CellType.NUMERIC){
                     return cell.getDateCellValue();
 
                 }
@@ -287,7 +287,7 @@ public class POIUtils {
             cell = row.createCell(ci);
 
             if (value instanceof Date){
-                cell.setCellType(CellType.NUMERIC);
+                //cell.setCellType(CellType.NUMERIC);
                 if (dateCellStyle==null){
                     CellStyle cellStyle = createDefaultDateCellStyle(sheet.getWorkbook());
                     cell.setCellStyle(cellStyle);
