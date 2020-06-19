@@ -205,6 +205,14 @@ public interface RencontreRepository extends CrudRepository<Rencontre,Long> {
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Rencontre rencontre " +
+            " set rencontre.dateRappel =:dateRappel" +
+            " where rencontre.id =:rencontreId")
+    void updateDateRappel(@Param("rencontreId") Long rencontreId,
+                                @Param("dateRappel") Date dateRappel);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Rencontre rencontre " +
             " set rencontre.resultatsEncodes =:resultatsEncodes" +
             " where rencontre.id =:rencontreId")
     void updateResultatsEncodes(@Param("rencontreId") Long rencontreId,

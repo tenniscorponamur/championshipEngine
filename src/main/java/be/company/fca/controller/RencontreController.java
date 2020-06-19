@@ -923,6 +923,28 @@ public class RencontreController {
         return false;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/rencontre/{rencontreId}/envoiRappel", method = RequestMethod.PUT)
+    public Date envoiRappel(Authentication authentication, @PathVariable("rencontreId") Long rencontreId) {
+
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
+        if (!rencontre.isResultatsEncodes()) {
+
+            Date dateRappel = new Date();
+
+            //TODO  : envoi d'un mail vers les personnes habilitees a encoder
+            System.err.println(dateRappel + " : Mail vers destinataires");
+
+            // Mise a jour de la date de rappel
+            rencontreRepository.updateDateRappel(rencontreId,dateRappel);
+
+            return dateRappel;
+
+        }
+
+        return null;
+    }
+
     @RequestMapping(value = "/private/rencontre/{rencontreId}/validite", method = RequestMethod.PUT)
     public boolean updateValiditeRencontre(Authentication authentication, @PathVariable("rencontreId") Long rencontreId, @RequestParam boolean validite, @RequestBody(required = false) String message) {
 

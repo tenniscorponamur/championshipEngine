@@ -75,6 +75,9 @@ public class Rencontre {
     @Column( name = "valide", nullable = false)
     private boolean valide=false;
 
+    @Column( name =  "daterappel")
+    private Date dateRappel;
+
     public Long getId() {
         return id;
     }
@@ -177,6 +180,14 @@ public class Rencontre {
 
     public void setValide(boolean valide) {
         this.valide = valide;
+    }
+
+    public Date getDateRappel() {
+        return dateRappel;
+    }
+
+    public void setDateRappel(Date dateRappel) {
+        this.dateRappel = dateRappel;
     }
 
     public boolean isResultatsEncodes() {

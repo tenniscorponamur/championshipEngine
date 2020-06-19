@@ -22,6 +22,7 @@ public class RencontreDto {
     private String commentairesEncodeur;
     private boolean resultatsEncodes;
     private boolean valide;
+    private Date dateRappel;
 
     public RencontreDto(Rencontre rencontre) {
         this.id = rencontre.getId();
@@ -44,6 +45,7 @@ public class RencontreDto {
         this.commentairesEncodeur = rencontre.getCommentairesEncodeur();
         this.resultatsEncodes = rencontre.isResultatsEncodes();
         this.valide = rencontre.isValide();
+        this.dateRappel = rencontre.getDateRappel();
     }
 
     public Long getId() {
@@ -164,6 +166,14 @@ public class RencontreDto {
 
     public void setValide(boolean valide) {
         this.valide = valide;
+    }
+
+    public Date getDateRappel() {
+        return dateRappel;
+    }
+
+    public void setDateRappel(Date dateRappel) {
+        this.dateRappel = dateRappel;
     }
 
     public boolean isResultatsEncodes() {
