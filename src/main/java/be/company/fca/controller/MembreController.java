@@ -358,125 +358,137 @@ public class MembreController {
         return response;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(path="/private/membres/exportByClub", method= RequestMethod.GET)
-    ResponseEntity<byte[]> getExportMembresByClub(@RequestParam Long clubId) throws Exception {
+    ResponseEntity<byte[]> getExportMembresByClub(Authentication authentication, @RequestParam Long clubId) throws Exception {
+        boolean adminConnected = userService.isAdmin(authentication);
 
-        Club club = clubRepository.findById(clubId).get();
-
-        List<Membre> membres = (List<Membre>) membreRepository.findByClub(club);
-
-        Collections.sort(membres, new Comparator<Membre>() {
-            @Override
-            public int compare(Membre o1, Membre o2) {
-                int compareNom = o1.getNom().compareTo(o2.getNom());
-                if (compareNom!=0){
-                    return compareNom;
-                }
-                return o1.getPrenom().compareTo(o2.getPrenom());
-            }
-        });
-
-        Workbook wb = POIUtils.createWorkbook(true);
-        Sheet sheet  = wb.createSheet("Membres_Club_"+club.getNumero() + "_" +new SimpleDateFormat("yyyyMMddhhmm").format(new Date()));
-
-        CreationHelper createHelper = wb.getCreationHelper();
-        CellStyle dateCellStyle = wb.createCellStyle();
-        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
-
-        CellStyle boldStyle = wb.createCellStyle();
-        Font boldFont = wb.createFont();
-        boldFont.setBold(true);
-        boldFont.setColor(IndexedColors.ORANGE.index);
-        boldStyle.setFont(boldFont);
-
-        Cell firstCell = POIUtils.write(sheet,0,0,"Numéro AFT",null,null);
-        POIUtils.write(sheet,0,1,"Nom",null,null);
-        POIUtils.write(sheet,0,2,"Prénom",null,null);
-        POIUtils.write(sheet,0,3,"Date de naissance",null,null);
-        POIUtils.write(sheet,0,4,"Genre",null,null);
-        POIUtils.write(sheet,0,5,"Rue",null,null);
-        POIUtils.write(sheet,0,6,"Numéro",null,null);
-        POIUtils.write(sheet,0,7,"Boite",null,null);
-        POIUtils.write(sheet,0,8,"Code postal",null,null);
-        POIUtils.write(sheet,0,9,"Localite",null,null);
-        POIUtils.write(sheet,0,10,"Téléphone",null,null);
-        POIUtils.write(sheet,0,11,"Gsm",null,null);
-        POIUtils.write(sheet,0,12,"Mail",null,null);
-        POIUtils.write(sheet,0,13,"Responsable de club",null,null);
-        POIUtils.write(sheet,0,14,"Classement AFT",null,null);
-        POIUtils.write(sheet,0,15,"Points AFT",null,null);
-        POIUtils.write(sheet,0,16,"Points Corpo",null,null);
-        POIUtils.write(sheet,0,17,"Numéro Corporation",null,null);
-        Cell lastCell = POIUtils.write(sheet,0,18,"Numéro club AFT",null,null);
-
-
-        for (int i=0;i<membres.size();i++){
-            Membre membre = membres.get(i);
-
-            if (membre.isActif()){
-
-                lastCell = POIUtils.write(sheet,i+1,0,membre.getNumeroAft(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,1,membre.getNom(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,2,membre.getPrenom(),null,null);
-                if (membre.getDateNaissance()!=null){
-                    lastCell = POIUtils.write(sheet,i+1,3,membre.getDateNaissance(),dateCellStyle,null);
-                }
-                lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre()==Genre.FEMME?"F":"M",null,null);
-
-                lastCell = POIUtils.write(sheet,i+1,5,membre.getRue(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,6,membre.getRueNumero(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,7,membre.getRueBoite(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,8,membre.getCodePostal(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,9,membre.getLocalite(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,10,membre.getTelephone(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,11,membre.getGsm(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,12,membre.getMail(),null,null);
-
-                lastCell = POIUtils.write(sheet,i+1,13,membre.isResponsableClub()?"1":"0",null,null);
-
-                if (membre.getClassementAFTActuel()!=null){
-                    lastCell = POIUtils.write(sheet,i+1,14,membre.getClassementAFTActuel().getCodeClassement(),null,null);
-                    lastCell = POIUtils.write(sheet,i+1,15,membre.getClassementAFTActuel().getPoints(),null,null);
-                }
-
-                if (membre.getClassementCorpoActuel()!=null){
-                    lastCell = POIUtils.write(sheet,i+1,16,membre.getClassementCorpoActuel().getPoints(),null,null);
-                }
-
-                if (membre.getClub()!=null){
-                    lastCell = POIUtils.write(sheet,i+1,17,membre.getClub().getNumero(),null,null);
-                }
-                lastCell = POIUtils.write(sheet,i+1,18,membre.getNumeroClubAft(),null,null);
-                // Mise en evidence des affilies corpo (club AFT = 6045)
-                Cell numClubAFTCell = lastCell;
-                if (membre.getNumeroClubAft()!=null && "6045".equals(membre.getNumeroClubAft().trim())){
-                    numClubAFTCell.setCellStyle(boldStyle);
-                }
-
-            }
+        Club club = null;
+        if (adminConnected){
+            club = clubRepository.findById(clubId).get();
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            club = membreConnecte.getClub();
         }
 
-        // Freeze de la premiere ligne
-        sheet.createFreezePane(0, 1);
+        if (club!=null) {
+            List<Membre> membres = (List<Membre>) membreRepository.findByClub(club);
 
-        // Auto-resize des colonnes
-        for (int i=0;i<31;i++){
-            sheet.autoSizeColumn(i);
+            Collections.sort(membres, new Comparator<Membre>() {
+                @Override
+                public int compare(Membre o1, Membre o2) {
+                    int compareNom = o1.getNom().compareTo(o2.getNom());
+                    if (compareNom != 0) {
+                        return compareNom;
+                    }
+                    return o1.getPrenom().compareTo(o2.getPrenom());
+                }
+            });
+
+            Workbook wb = POIUtils.createWorkbook(true);
+            Sheet sheet = wb.createSheet("Membres_Club_" + club.getNumero() + "_" + new SimpleDateFormat("yyyyMMddhhmm").format(new Date()));
+
+            CreationHelper createHelper = wb.getCreationHelper();
+            CellStyle dateCellStyle = wb.createCellStyle();
+            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/mm/yyyy"));
+
+            CellStyle boldStyle = wb.createCellStyle();
+            Font boldFont = wb.createFont();
+            boldFont.setBold(true);
+            boldFont.setColor(IndexedColors.ORANGE.index);
+            boldStyle.setFont(boldFont);
+
+            Cell firstCell = POIUtils.write(sheet, 0, 0, "Numéro AFT", null, null);
+            POIUtils.write(sheet, 0, 1, "Nom", null, null);
+            POIUtils.write(sheet, 0, 2, "Prénom", null, null);
+            POIUtils.write(sheet, 0, 3, "Date de naissance", null, null);
+            POIUtils.write(sheet, 0, 4, "Genre", null, null);
+            POIUtils.write(sheet, 0, 5, "Rue", null, null);
+            POIUtils.write(sheet, 0, 6, "Numéro", null, null);
+            POIUtils.write(sheet, 0, 7, "Boite", null, null);
+            POIUtils.write(sheet, 0, 8, "Code postal", null, null);
+            POIUtils.write(sheet, 0, 9, "Localite", null, null);
+            POIUtils.write(sheet, 0, 10, "Téléphone", null, null);
+            POIUtils.write(sheet, 0, 11, "Gsm", null, null);
+            POIUtils.write(sheet, 0, 12, "Mail", null, null);
+            POIUtils.write(sheet, 0, 13, "Responsable de club", null, null);
+            POIUtils.write(sheet, 0, 14, "Classement AFT", null, null);
+            POIUtils.write(sheet, 0, 15, "Points AFT", null, null);
+            POIUtils.write(sheet, 0, 16, "Points Corpo", null, null);
+            POIUtils.write(sheet, 0, 17, "Numéro Corporation", null, null);
+            Cell lastCell = POIUtils.write(sheet, 0, 18, "Numéro club AFT", null, null);
+
+
+            for (int i = 0; i < membres.size(); i++) {
+                Membre membre = membres.get(i);
+
+                if (membre.isActif()) {
+
+                    lastCell = POIUtils.write(sheet, i + 1, 0, membre.getNumeroAft(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 1, membre.getNom(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 2, membre.getPrenom(), null, null);
+                    if (membre.getDateNaissance() != null) {
+                        lastCell = POIUtils.write(sheet, i + 1, 3, membre.getDateNaissance(), dateCellStyle, null);
+                    }
+                    lastCell = POIUtils.write(sheet, i + 1, 4, membre.getGenre() == Genre.FEMME ? "F" : "M", null, null);
+
+                    lastCell = POIUtils.write(sheet, i + 1, 5, membre.getRue(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 6, membre.getRueNumero(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 7, membre.getRueBoite(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 8, membre.getCodePostal(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 9, membre.getLocalite(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 10, membre.getTelephone(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 11, membre.getGsm(), null, null);
+                    lastCell = POIUtils.write(sheet, i + 1, 12, membre.getMail(), null, null);
+
+                    lastCell = POIUtils.write(sheet, i + 1, 13, membre.isResponsableClub() ? "1" : "0", null, null);
+
+                    if (membre.getClassementAFTActuel() != null) {
+                        lastCell = POIUtils.write(sheet, i + 1, 14, membre.getClassementAFTActuel().getCodeClassement(), null, null);
+                        lastCell = POIUtils.write(sheet, i + 1, 15, membre.getClassementAFTActuel().getPoints(), null, null);
+                    }
+
+                    if (membre.getClassementCorpoActuel() != null) {
+                        lastCell = POIUtils.write(sheet, i + 1, 16, membre.getClassementCorpoActuel().getPoints(), null, null);
+                    }
+
+                    if (membre.getClub() != null) {
+                        lastCell = POIUtils.write(sheet, i + 1, 17, membre.getClub().getNumero(), null, null);
+                    }
+                    lastCell = POIUtils.write(sheet, i + 1, 18, membre.getNumeroClubAft(), null, null);
+                    // Mise en evidence des affilies corpo (club AFT = 6045)
+                    Cell numClubAFTCell = lastCell;
+                    if (membre.getNumeroClubAft() != null && "6045".equals(membre.getNumeroClubAft().trim())) {
+                        numClubAFTCell.setCellStyle(boldStyle);
+                    }
+
+                }
+            }
+
+            // Freeze de la premiere ligne
+            sheet.createFreezePane(0, 1);
+
+            // Auto-resize des colonnes
+            for (int i = 0; i < 31; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Filtre defini pour la plage de cellules remplies
+            sheet.setAutoFilter(new CellRangeAddress(firstCell.getRowIndex(), lastCell.getRowIndex(), firstCell.getColumnIndex(), lastCell.getColumnIndex()));
+
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            wb.write(os);
+            wb.close();
+            os.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
+            return response;
+
         }
 
-        // Filtre defini pour la plage de cellules remplies
-        sheet.setAutoFilter(new CellRangeAddress(firstCell.getRowIndex(), lastCell.getRowIndex(), firstCell.getColumnIndex(), lastCell.getColumnIndex()));
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        wb.write(os);
-        wb.close();
-        os.close();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(os.toByteArray(), headers, HttpStatus.OK);
-        return response;
+        return null;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
