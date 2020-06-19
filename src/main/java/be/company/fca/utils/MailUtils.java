@@ -1,5 +1,6 @@
 package be.company.fca.utils;
 
+import be.company.fca.model.Rencontre;
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
@@ -8,6 +9,9 @@ import com.mailjet.client.resource.Emailv31;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MailUtils {
 
@@ -23,23 +27,78 @@ public class MailUtils {
         return sendPasswordMailUsingMailjet(prenom,nom,mailTo,password);
     }
 
+    public static boolean sendRappelRencontre(Rencontre rencontre){
+
+        // Le systeme ne va s'adresser qu'au capitaine qui pourra relayer dans son equipe
+
+        String frontEndUrl = System.getenv("FRONT_END_URL");
+        String subject = "Encodage rencontre Tennis Corpo Namur";
+
+        if (rencontre.getEquipeVisites()!=null
+                && rencontre.getEquipeVisites().getCapitaine()!=null
+                && !StringUtils.isEmpty(rencontre.getEquipeVisites().getCapitaine().getMail())) {
+
+            String htmlContent = getRappelRencontreHtmlContent(frontEndUrl, rencontre);
+
+            if (isMailJetConfigured()){
+                return sendMailUsingMailjet(rencontre.getEquipeVisites().getCapitaine().getPrenom(),
+                        rencontre.getEquipeVisites().getCapitaine().getNom(),
+                        rencontre.getEquipeVisites().getCapitaine().getMail(),subject,htmlContent);
+            }else{
+                System.err.println("Rappel envoyé : \n" + htmlContent);
+                return true;
+            }
+
+        }
+        return false;
+
+    }
+
     /**
      * Permet d'envoyer le nouveau mot de passe a un utilisateur
      * @param mailTo
      * @param password
      * @return true si le mail est bien parti
      */
-    private static boolean sendPasswordMailUsingMailjet(String prenom, String nom, String mailTo, String password){
+    private static boolean sendPasswordMailUsingMailjet(String prenom, String nom, String mailTo, String password) {
+        String frontEndUrl = System.getenv("FRONT_END_URL");
+        String subject = "Votre mot de passe pour Tennis Corpo Namur";
+        String htmlContent = getPasswordHtmlContent(frontEndUrl, prenom, nom, password);
+        if (isMailJetConfigured()){
+            return sendMailUsingMailjet(prenom,nom,mailTo,subject,htmlContent);
+        }else{
+            System.err.println("Nouveau mot de passe : " + password);
+            return true;
+        }
+    }
+
+    /**
+     * Permet de savoir si MailJet a ete configure dans l'environnement
+     * @return
+     */
+    private static boolean isMailJetConfigured(){
+        String apiPublicKey = System.getenv("MAILJET_APIKEY_PUBLIC");
+        String apiPrivateKey = System.getenv("MAILJET_APIKEY_PRIVATE");
+        if (!StringUtils.isEmpty(apiPublicKey) && !StringUtils.isEmpty(apiPrivateKey)){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Permet d'envoyer le nouveau mot de passe a un utilisateur
+     * @param mailTo
+     * @param subject
+     * @param htmlContent
+     * @return true si le mail est bien parti
+     */
+    private static boolean sendMailUsingMailjet(String prenom, String nom, String mailTo, String subject, String htmlContent){
 
         // ApiKey a preciser dans l'environnement de production
         // En test, le mot de passe s'inscrira dans la console
 
         String apiPublicKey = System.getenv("MAILJET_APIKEY_PUBLIC");
         String apiPrivateKey = System.getenv("MAILJET_APIKEY_PRIVATE");
-        String frontEndUrl = System.getenv("FRONT_END_URL");
-
-        String subject = "Votre mot de passe pour Tennis Corpo Namur";
-        String htmlContent = getHtmlContent(frontEndUrl,prenom,nom,password);
 
         if (!StringUtils.isEmpty(apiPublicKey) && !StringUtils.isEmpty(apiPrivateKey)){
 
@@ -71,12 +130,9 @@ public class MailUtils {
                 return false;
             }
 
-        }else{
-
-            System.err.println("Nouveau mot de passe : " + password);
-            return true;
-
         }
+
+        return false;
 
     }
 
@@ -126,7 +182,40 @@ public class MailUtils {
 //
 //    }
 
-    private static String getHtmlContent(String frontEndUrl, String prenom, String nom, String password){
+    private static String getRappelRencontreHtmlContent(String frontEndUrl, Rencontre rencontre){
+
+        String link = "<strong>Tennis Corpo Namur</strong>";
+        if (!StringUtils.isEmpty(frontEndUrl)){
+            link = "<a href=\"" + frontEndUrl + "\">" + link + "</a>";
+        }
+
+        String prenom = "";
+        String nom = "";
+
+        if (rencontre.getEquipeVisites()!=null && rencontre.getEquipeVisites().getCapitaine()!=null){
+            prenom = rencontre.getEquipeVisites().getCapitaine().getPrenom();
+            nom = rencontre.getEquipeVisites().getCapitaine().getNom();
+
+        }
+
+        String htmlContent = "<p>Bonjour " + prenom + " " + nom + ",</p>\n" +
+                "<p>Pourriez-vous proc&eacute;der à l'encodage des r&eacute;sultats de la rencontre "
+                + rencontre.getEquipeVisites().getCodeAlphabetique() + " - "
+                + rencontre.getEquipeVisiteurs().getCodeAlphabetique()
+                + " dans l'application " + link + " ? </p>\n" +
+                "<p>Cette rencontre devait initialement avoir lieu le " + new SimpleDateFormat("dd/MM/yyyy").format(rencontre.getDateHeureRencontre())
+                + (rencontre.getTerrain()!=null?(" &agrave; " + rencontre.getTerrain()):"")
+                + " dans le cadre du championnat " + rencontre.getDivision().getChampionnat().getType().toString()
+                + " en Division " + rencontre.getDivision().getNumero() + " " + rencontre.getDivision().getChampionnat().getCategorie().toString() + ".</p>\n"
+                + "<p>En cas de probl&egrave;me, prenez contact via l'adresse suivante : " + "<a href=\"mailto:tenniscorponamur@gmail.com\">tenniscorponamur@gmail.com</a>.</p>\n"
+                + "<p>Merci d'avance,</p>\n" +
+                "<p>L'&eacute;quipe Tennis Corpo Namur</p>";
+
+        return htmlContent;
+    }
+
+
+    private static String getPasswordHtmlContent(String frontEndUrl, String prenom, String nom, String password){
 
         String link = "<strong>Tennis Corpo Namur</strong>";
         if (!StringUtils.isEmpty(frontEndUrl)){

@@ -9,6 +9,7 @@ import be.company.fca.model.Set;
 import be.company.fca.repository.*;
 import be.company.fca.service.*;
 import be.company.fca.utils.DateUtils;
+import be.company.fca.utils.MailUtils;
 import be.company.fca.utils.POIUtils;
 import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
@@ -929,19 +930,13 @@ public class RencontreController {
 
         Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
         if (!rencontre.isResultatsEncodes()) {
-
             Date dateRappel = new Date();
-
-            //TODO  : envoi d'un mail vers les personnes habilitees a encoder
-            System.err.println(dateRappel + " : Mail vers destinataires");
-
-            // Mise a jour de la date de rappel
-            rencontreRepository.updateDateRappel(rencontreId,dateRappel);
-
-            return dateRappel;
-
+            if (MailUtils.sendRappelRencontre(rencontre)) {
+                // Mise a jour de la date de rappel
+                rencontreRepository.updateDateRappel(rencontreId,dateRappel);
+                return dateRappel;
+            }
         }
-
         return null;
     }
 
