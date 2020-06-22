@@ -168,6 +168,24 @@ public class EquipeController {
         return equipe;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/equipe/{equipeId}/membres", method = RequestMethod.GET)
+    public List<Membre> getMembresEquipe(@PathVariable("equipeId") Long equipeId){
+        return new ArrayList<Membre>();
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/equipe/{equipeId}/membre/{membreId}", method = RequestMethod.POST)
+    public boolean addMembreEquipe(@PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId){
+        return true;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/equipe/{equipeId}/membre/{membreId}", method = RequestMethod.DELETE)
+    public boolean deleteMembreEquipe(@PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId) {
+        return true;
+    }
+
     //1107, 1113, 1116, 1112: division
     //1093 : club
     //1092 : club
