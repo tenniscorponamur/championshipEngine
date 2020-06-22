@@ -23,6 +23,12 @@ public class EquipeController {
     private EquipeRepository equipeRepository;
 
     @Autowired
+    private MembreRepository membreRepository;
+
+    @Autowired
+    private MembreEquipeRepository membreEquipeRepository;
+
+    @Autowired
     private DivisionRepository divisionRepository;
 
     @Autowired
@@ -114,8 +120,6 @@ public class EquipeController {
         // On signale que le calendrier doit etre rafraichi si l'equipe a ete sauvee
         championnatRepository.updateCalendrierARafraichir(division.getChampionnat().getId(),true);
 
-
-
         return equipeSaved;
     }
 
@@ -171,18 +175,23 @@ public class EquipeController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe/{equipeId}/membres", method = RequestMethod.GET)
     public List<Membre> getMembresEquipe(@PathVariable("equipeId") Long equipeId){
-        return new ArrayList<Membre>();
+        return membreRepository.findMembresByEquipeFk(equipeId);
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe/{equipeId}/membre/{membreId}", method = RequestMethod.POST)
     public boolean addMembreEquipe(@PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId){
+        MembreEquipe membreEquipe = new MembreEquipe();
+        membreEquipe.setEquipeFk(equipeId);
+        membreEquipe.setMembreFk(membreId);
+        membreEquipeRepository.save(membreEquipe);
         return true;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipe/{equipeId}/membre/{membreId}", method = RequestMethod.DELETE)
     public boolean deleteMembreEquipe(@PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId) {
+        membreEquipeRepository.deleteByEquipeFkAndMembreFk(equipeId,membreId);
         return true;
     }
 

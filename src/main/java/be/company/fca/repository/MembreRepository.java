@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 public interface MembreRepository extends PagingAndSortingRepository<Membre,Long> {
 
@@ -41,6 +42,15 @@ public interface MembreRepository extends PagingAndSortingRepository<Membre,Long
      * @return Responsables de club
      */
     Iterable<Membre> findByClubAndResponsableClubAndActif(Club club, boolean responsableClub, boolean actif);
+
+    /**
+     * Permet de recuperer les membres d'une equipe
+     * @param equipeFk Identifiant de l'equipe concernee
+     * @return Membres de l'equipe
+     */
+    @Query(value = "select membre.* from membre inner join membre_equipe on membre.id = membre_equipe.membre_fk " +
+            "    where membre_equipe.equipe_fk = :equipeFk ", nativeQuery = true)
+    List<Membre> findMembresByEquipeFk(@Param("equipeFk") Long equipeFk);
 
     /**
      * Permet de recuperer les membres d'un club
