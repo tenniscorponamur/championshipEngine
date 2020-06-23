@@ -216,6 +216,11 @@ public class ChampionnatController {
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/championnat/tableauCriteriumWithPlayers", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTableauCriteriumWithPlayers(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
+
+        // TODO : charger les joueurs prevus dans la composition
+        // TODO : sur base des rencontres prevues le jour concerne
+        // TODO : factoriser la methode de prechargement pour l'utiliser des deux cotes
+
         TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumWithPlayersTemplate());
         Connection conn = datasource.getConnection();

@@ -11,6 +11,15 @@ public interface MembreEquipeRepository extends CrudRepository<MembreEquipe,Long
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query(value = "delete from membre_equipe where membre_equipe.equipe_fk = :equipeFk and membre_equipe.membre_fk = :membreFk", nativeQuery = true)
-    void deleteByEquipeFkAndMembreFk(@Param("equipeFk") Long equipeFk, @Param("membreFk") Long membreFk);
+    void deleteByEquipeFkAndMembreFk(Long equipeFk, Long membreFk);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    void deleteByEquipeFk(Long equipeFk);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    void deleteByMembreFk(Long membreFk);
+
+
 }

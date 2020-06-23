@@ -49,6 +49,9 @@ public class MembreController {
     private EquipeRepository equipeRepository;
 
     @Autowired
+    private MembreEquipeRepository membreEquipeRepository;
+
+    @Autowired
     private MatchRepository matchRepository;
 
     @Autowired
@@ -324,6 +327,10 @@ public class MembreController {
     @RequestMapping(value = "/private/membre", method = RequestMethod.DELETE)
     public void deleteMembre(@RequestParam Long membreId){
         if (isMembreDeletable(membreId)){
+
+            // Supprimer le membre des compos d'equipe auxquelles il appartient
+            membreEquipeRepository.deleteByMembreFk(membreId);
+
             membreRepository.updateClassementCorpo(membreId,null);
             membreRepository.updateClassementAFT(membreId,null);
             classementCorpoRepository.deleteByMembreFk(membreId);

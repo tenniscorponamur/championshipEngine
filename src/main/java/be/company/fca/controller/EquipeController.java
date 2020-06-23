@@ -134,6 +134,9 @@ public class EquipeController {
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
+        // Supprimer la composition eventuelle
+        membreEquipeRepository.deleteByEquipeFk(id);
+
         // Supprimer les rencontres associees a cette equipe sinon on ne pourra pas la supprimer :-)
         List<Rencontre> rencontresEquipe = (List<Rencontre>) rencontreRepository.findRencontresByEquipe(equipe);
         for (Rencontre rencontreEquipe : rencontresEquipe){
