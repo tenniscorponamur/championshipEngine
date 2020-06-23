@@ -2,6 +2,7 @@ package be.company.fca.service.impl;
 
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
+import be.company.fca.service.MatchService;
 import be.company.fca.service.RencontreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,9 @@ public class RencontreServiceImpl implements RencontreService{
 
     @Autowired
     private SetRepository setRepository;
+
+    @Autowired
+    private MatchService matchService;
 
     @Override
     @Transactional(readOnly = false)
@@ -106,6 +110,39 @@ public class RencontreServiceImpl implements RencontreService{
     }
 
     /**
+     * Permet de recuperer ou de creer les matchs d'une rencontre s'ils n'existent pas encore
+     * @param rencontre
+     * @return
+     */
+    @Transactional(readOnly = false)
+    public List<Match> getOrCreateMatchs(Rencontre rencontre){
+
+        List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+
+        if (matchs.isEmpty()){
+            matchs = matchService.createMatchs(rencontre);
+        }
+
+        return matchs;
+    }
+
+    /**
+     * Permet de recuperer ou de creer/remplir les matchs d'une rencontre s'ils n'existent pas encore
+     * @param rencontre
+     * @return
+     */
+    @Transactional(readOnly = false)
+    public List<Match> getAndFillMatchs(Rencontre rencontre){
+
+        List<Match> matchs = getOrCreateMatchs(rencontre);
+
+        // on va analyser les compositions d'equipe pour precharger les joueurs le cas echeant (sous conditions)
+        loadCompositions(rencontre,matchs);
+
+        return matchs;
+    }
+
+    /**
      * Permet de charger les joueurs/joueuses definis dans la composition des equipes
      * des matchs de la rencontre concerne
      * @param rencontre Rencontre concernee
@@ -113,69 +150,70 @@ public class RencontreServiceImpl implements RencontreService{
      *
      */
     @Transactional(readOnly = false)
-    public void loadCompositions(Rencontre rencontre, List<Match> matchs){
+    private void loadCompositions(Rencontre rencontre, List<Match> matchs){
+        if (!rencontre.isResultatsEncodes()){
+            // Dans le cas d'un criterium
+            // Si les matchs sont charges mais qu'aucun joueur/joueuse n'a ete precise,
+            if (TypeChampionnat.CRITERIUM.equals(rencontre.getDivision().getChampionnat().getType())) {
 
-        // Dans le cas d'un criterium
-        // Si les matchs sont charges mais qu'aucun joueur/joueuse n'a ete precise,
-        if (TypeChampionnat.CRITERIUM.equals(rencontre.getDivision().getChampionnat().getType())) {
-
-            boolean joueursVisitesCharges = false;
-            boolean joueursVisiteursCharges = false;
-            // On verifie d'abord si des joueurs ont ete charges pour
-            // chaque equipe dans les matchs concernes
-            for (Match match : matchs){
-                if (match.getJoueurVisites1()!=null){
-                    joueursVisitesCharges=true;
-                }
-                if (match.getJoueurVisiteurs1()!=null){
-                    joueursVisiteursCharges=true;
-                }
-                if (TypeMatch.DOUBLE.equals(match.getType())){
-                    if (match.getJoueurVisites2()!=null){
+                boolean joueursVisitesCharges = false;
+                boolean joueursVisiteursCharges = false;
+                // On verifie d'abord si des joueurs ont ete charges pour
+                // chaque equipe dans les matchs concernes
+                for (Match match : matchs){
+                    if (match.getJoueurVisites1()!=null){
                         joueursVisitesCharges=true;
                     }
-                    if (match.getJoueurVisiteurs2()!=null){
+                    if (match.getJoueurVisiteurs1()!=null){
                         joueursVisiteursCharges=true;
                     }
+                    if (TypeMatch.DOUBLE.equals(match.getType())){
+                        if (match.getJoueurVisites2()!=null){
+                            joueursVisitesCharges=true;
+                        }
+                        if (match.getJoueurVisiteurs2()!=null){
+                            joueursVisiteursCharges=true;
+                        }
+                    }
                 }
-            }
-            if (!joueursVisitesCharges){
-                // On va charger les joueurs definis dans la composition
-                List<Membre> membresEquipeVisitee = membreRepository.findMembresByEquipeFk(rencontre.getEquipeVisites().getId());
-                // Comme nous sommes en criterium, un seul match par rencontre et pas de choix de composition pour les doubles
-                // On peut donc prendre directement la composition telle qu'elle est definie
-                // TODO : voir s'il est possible de mettre en place une mecanique si on etend le mecanisme aux autres types de championnat
-                if (membresEquipeVisitee.size()>0){
-                    for (Match match : matchs){
-                        match.setJoueurVisites1(membresEquipeVisitee.get(0));
-                        // enregistrer ce joueur
-                        matchRepository.save(match);
-                        if (TypeMatch.DOUBLE.equals(match.getType())){
-                            if (membresEquipeVisitee.size()>1){
-                                match.setJoueurVisites2(membresEquipeVisitee.get(1));
-                                // enregistrer ce joueur
-                                matchRepository.save(match);
+                if (!joueursVisitesCharges){
+                    // On va charger les joueurs definis dans la composition
+                    List<Membre> membresEquipeVisitee = membreRepository.findMembresByEquipeFk(rencontre.getEquipeVisites().getId());
+                    // Comme nous sommes en criterium, un seul match par rencontre et pas de choix de composition pour les doubles
+                    // On peut donc prendre directement la composition telle qu'elle est definie
+                    // TODO : voir s'il est possible de mettre en place une mecanique si on etend le mecanisme aux autres types de championnat
+                    if (membresEquipeVisitee.size()>0){
+                        for (Match match : matchs){
+                            match.setJoueurVisites1(membresEquipeVisitee.get(0));
+                            // enregistrer ce joueur
+                            matchRepository.save(match);
+                            if (TypeMatch.DOUBLE.equals(match.getType())){
+                                if (membresEquipeVisitee.size()>1){
+                                    match.setJoueurVisites2(membresEquipeVisitee.get(1));
+                                    // enregistrer ce joueur
+                                    matchRepository.save(match);
+                                }
                             }
                         }
                     }
                 }
-            }
-            if (!joueursVisiteursCharges){
-                // On va charger les joueurs definis dans la composition
-                List<Membre> membresEquipeVisiteur = membreRepository.findMembresByEquipeFk(rencontre.getEquipeVisiteurs().getId());
-                // Comme nous sommes en criterium, un seul match par rencontre et pas de choix de composition pour les doubles
-                // On peut donc prendre directement la composition telle qu'elle est definie
-                // TODO : voir s'il est possible de mettre en place une mecanique si on etend le mecanisme aux autres types de championnat
-                if (membresEquipeVisiteur.size()>0){
-                    for (Match match : matchs){
-                        match.setJoueurVisiteurs1(membresEquipeVisiteur.get(0));
-                        // enregistrer ce joueur
-                        matchRepository.save(match);
-                        if (TypeMatch.DOUBLE.equals(match.getType())){
-                            if (membresEquipeVisiteur.size()>1){
-                                match.setJoueurVisiteurs2(membresEquipeVisiteur.get(1));
-                                // enregistrer ce joueur
-                                matchRepository.save(match);
+                if (!joueursVisiteursCharges){
+                    // On va charger les joueurs definis dans la composition
+                    List<Membre> membresEquipeVisiteur = membreRepository.findMembresByEquipeFk(rencontre.getEquipeVisiteurs().getId());
+                    // Comme nous sommes en criterium, un seul match par rencontre et pas de choix de composition pour les doubles
+                    // On peut donc prendre directement la composition telle qu'elle est definie
+                    // TODO : voir s'il est possible de mettre en place une mecanique si on etend le mecanisme aux autres types de championnat
+                    if (membresEquipeVisiteur.size()>0){
+                        for (Match match : matchs){
+                            match.setJoueurVisiteurs1(membresEquipeVisiteur.get(0));
+                            // enregistrer ce joueur
+                            matchRepository.save(match);
+                            if (TypeMatch.DOUBLE.equals(match.getType())){
+                                if (membresEquipeVisiteur.size()>1){
+                                    match.setJoueurVisiteurs2(membresEquipeVisiteur.get(1));
+                                    // enregistrer ce joueur
+                                    matchRepository.save(match);
+                                }
                             }
                         }
                     }

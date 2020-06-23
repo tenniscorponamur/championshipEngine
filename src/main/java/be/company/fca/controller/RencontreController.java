@@ -285,7 +285,7 @@ public class RencontreController {
 
             // Recuperation des matchs et mises à jour des sets
 
-            List<Match> matchs = getOrCreateMatchs(rencontre);
+            List<Match> matchs = rencontreService.getOrCreateMatchs(rencontre);
             for (Match match : matchs){
 
                 Integer nbJeux = matchService.getNbJeuxMax(match);
@@ -398,7 +398,7 @@ public class RencontreController {
 
         Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
 
-        matchs = getOrCreateMatchs(rencontre);
+        matchs = rencontreService.getAndFillMatchs(rencontre);
 
         for (Match match : matchs){
             matchsDto.add(new MatchDto(match));
@@ -406,25 +406,6 @@ public class RencontreController {
 
         return matchsDto;
 
-    }
-
-    /**
-     * Permet de recuperer ou de creer les matchs d'une rencontre s'ils n'existent pas encore
-     * @param rencontre
-     * @return
-     */
-    private List<Match> getOrCreateMatchs(Rencontre rencontre){
-
-        List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
-
-        if (matchs.isEmpty()){
-            matchs = matchService.createMatchs(rencontre);
-        }
-
-        // on va analyser les compositions d'equipe pour precharger les joueurs le cas echeant (sous conditions)
-        rencontreService.loadCompositions(rencontre,matchs);
-
-        return matchs;
     }
 
     @RequestMapping(value = "/private/rencontre/{rencontreId}/match", method = RequestMethod.PUT)

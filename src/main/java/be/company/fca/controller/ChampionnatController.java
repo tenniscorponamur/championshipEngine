@@ -229,8 +229,7 @@ public class ChampionnatController {
 
         List<Rencontre> rencontres = rencontreRepository.getRencontresByDate(date);
         for (Rencontre rencontre : rencontres){
-            List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
-            rencontreService.loadCompositions(rencontre,matchs);
+            rencontreService.getAndFillMatchs(rencontre);
         }
 
         TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());

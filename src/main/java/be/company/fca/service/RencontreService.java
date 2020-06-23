@@ -2,6 +2,7 @@ package be.company.fca.service;
 
 import be.company.fca.model.Match;
 import be.company.fca.model.Rencontre;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,13 +27,18 @@ public interface RencontreService {
     public List<Rencontre> refreshRencontres(List<Rencontre> oldRencontreList, List<Rencontre> newRencontreList);
 
     /**
-     * Permet de charger les joueurs/joueuses definis dans la composition des equipes
-     * des matchs de la rencontre concerne
-     * @param rencontre Rencontre concernee
-     * @param matchs Matchs de la rencontre
-     *
+     * Permet de recuperer ou de creer les matchs d'une rencontre s'ils n'existent pas encore
+     * @param rencontre
+     * @return
      */
-    public void loadCompositions(Rencontre rencontre, List<Match> matchs);
+    public List<Match> getOrCreateMatchs(Rencontre rencontre);
+
+    /**
+     * Permet de recuperer et de creer et remplir les matchs d'une rencontre s'ils n'existent pas encore
+     * @param rencontre
+     * @return
+     */
+    public List<Match> getAndFillMatchs(Rencontre rencontre);
 
     /**
      * Permet de supprimer toutes les rencontres d'un championnat
