@@ -1,5 +1,6 @@
 package be.company.fca.service;
 
+import be.company.fca.model.Match;
 import be.company.fca.model.Rencontre;
 
 import java.util.List;
@@ -23,6 +24,15 @@ public interface RencontreService {
      * @return Liste des rencontres sauvegardees
      */
     public List<Rencontre> refreshRencontres(List<Rencontre> oldRencontreList, List<Rencontre> newRencontreList);
+
+    /**
+     * Permet de charger les joueurs/joueuses definis dans la composition des equipes
+     * des matchs de la rencontre concerne
+     * @param rencontre Rencontre concernee
+     * @param matchs Matchs de la rencontre
+     *
+     */
+    public void loadCompositions(Rencontre rencontre, List<Match> matchs);
 
     /**
      * Permet de supprimer toutes les rencontres d'un championnat

@@ -2,6 +2,7 @@ package be.company.fca.controller;
 
 import be.company.fca.model.*;
 import be.company.fca.repository.*;
+import be.company.fca.service.RencontreService;
 import be.company.fca.utils.DateUtils;
 import be.company.fca.utils.ReportUtils;
 import io.swagger.annotations.Api;
@@ -37,7 +38,13 @@ public class ChampionnatController {
     private RencontreRepository rencontreRepository;
 
     @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
     private SetRepository setRepository;
+
+    @Autowired
+    private RencontreService rencontreService;
 
     @RequestMapping(method= RequestMethod.GET, path="/public/championnats")
     public Iterable<Championnat> getChampionnats() {
@@ -217,9 +224,14 @@ public class ChampionnatController {
     @RequestMapping(path="/private/championnat/tableauCriteriumWithPlayers", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTableauCriteriumWithPlayers(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
 
-        // TODO : charger les joueurs prevus dans la composition
-        // TODO : sur base des rencontres prevues le jour concerne
-        // TODO : factoriser la methode de prechargement pour l'utiliser des deux cotes
+        // sur base des rencontres prevues le jour concerne
+        // Charger les joueurs prevus dans la composition si aucun n'est precise pour l'equipe dans la rencontre
+
+        List<Rencontre> rencontres = rencontreRepository.getRencontresByDate(date);
+        for (Rencontre rencontre : rencontres){
+            List<Match> matchs = (List<Match>) matchRepository.findByRencontre(rencontre);
+            rencontreService.loadCompositions(rencontre,matchs);
+        }
 
         TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getTableauCriteriumWithPlayersTemplate());
