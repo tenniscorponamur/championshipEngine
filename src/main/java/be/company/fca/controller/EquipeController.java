@@ -5,14 +5,14 @@ import be.company.fca.model.*;
 import be.company.fca.repository.*;
 import be.company.fca.service.DivisionService;
 import be.company.fca.service.EquipeService;
+import be.company.fca.service.UserService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -21,6 +21,9 @@ public class EquipeController {
 
     @Autowired
     private EquipeRepository equipeRepository;
+
+    @Autowired
+    private ClubRepository clubRepository;
 
     @Autowired
     private MembreRepository membreRepository;
@@ -45,6 +48,9 @@ public class EquipeController {
 
     @Autowired
     private EquipeService equipeService;
+
+    @Autowired
+    private UserService userService;
 
     // DTO pour les capitaines d'equipe afin de ne pas recuperer les donnees privees
 
@@ -95,19 +101,63 @@ public class EquipeController {
         return equipes;
     }
 
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.PUT)
-    public Equipe updateEquipe(@RequestParam Long divisionId, @RequestBody Equipe equipe){
+    public Equipe updateEquipeDetails(Authentication authentication, @RequestParam Long divisionId, @RequestBody Equipe equipe){
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean updatable = false;
+        if (adminConnected){
+            updatable = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                updatable=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!updatable){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
         Division division = new Division();
         division.setId(divisionId);
         equipe.setDivision(division);
-        return equipeRepository.save(equipe);
+
+        // Terrain, capitaine et hybride uniquement !!
+
+        equipeRepository.updateDetails(equipe.getId(),equipe.getCapitaine(),equipe.getTerrain(),equipe.isHybride());
+
+        return equipe;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.POST)
-    public Equipe addEquipe(@RequestParam Long divisionId, @RequestBody Equipe equipe){
+    public Equipe addEquipe(Authentication authentication, @RequestParam Long divisionId, @RequestBody Equipe equipe){
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean addable = false;
+        if (adminConnected){
+            addable = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                addable=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!addable){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
         Division division = divisionRepository.findById(divisionId).get();
         equipe.setDivision(division);
 
@@ -116,16 +166,30 @@ public class EquipeController {
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
+        Club club = equipe.getClub();
+        Championnat championnat = equipe.getDivision().getChampionnat();
+
         Equipe equipeSaved = equipeRepository.save(equipe);
         // On signale que le calendrier doit etre rafraichi si l'equipe a ete sauvee
         championnatRepository.updateCalendrierARafraichir(division.getChampionnat().getId(),true);
 
+        // Renommage des equipes de ce club afin que les choses soient correctes en sortie de cet appel
+        List<Equipe> equipeList = renommageEquipesSansSauvegarde(championnat.getId(),club);
+        updateEquipeNamesOnly(equipeList);
+
+        // Nom de l'equipe sauvee a populer
+        for (Equipe team : equipeList){
+            if (team.getId().equals(equipeSaved.getId())){
+                equipeSaved.setCodeAlphabetique(team.getCodeAlphabetique());
+            }
+        }
+
         return equipeSaved;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/equipe", method = RequestMethod.DELETE)
-    public void deleteEquipe(@RequestParam Long id){
+    public void deleteEquipe(Authentication authentication, @RequestParam Long id){
 
         Equipe equipe = equipeRepository.findById(id).get();
 
@@ -133,6 +197,28 @@ public class EquipeController {
         if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean deletable = false;
+        if (adminConnected){
+            deletable = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                deletable=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!deletable){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
+        Club club = equipe.getClub();
+        Championnat championnat = equipe.getDivision().getChampionnat();
 
         // Supprimer la composition eventuelle
         membreEquipeRepository.deleteByEquipeFk(id);
@@ -148,12 +234,59 @@ public class EquipeController {
         equipeRepository.deleteById(id);
         // On signale que le calendrier doit etre rafraichi si l'equipe a ete supprimee
         championnatRepository.updateCalendrierARafraichir(equipe.getDivision().getChampionnat().getId(),true);
+
+        // Renommage des equipes de ce club afin que les choses soient correctes en sortie de cet appel
+        updateEquipeNamesOnly(renommageEquipesSansSauvegarde(championnat.getId(),club));
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/equipes/names", method = RequestMethod.PUT)
-    public List<Equipe> updateEquipeNames(@RequestBody List<Equipe> equipeList){
+    public List<Equipe> updateEquipeNamesOnly(@RequestBody List<Equipe> equipeList){
         return equipeService.updateEquipeNames(equipeList);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
+    @RequestMapping(value = "/private/equipes/changeNames", method = RequestMethod.PUT)
+    public List<Equipe> setAndUpdateEquipeNames(Authentication authentication, @RequestParam Long championnatId, @RequestParam Long clubId){
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        Club club = null;
+        if (adminConnected){
+            club = clubRepository.findById(clubId).get();
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            club = membreConnecte.getClub();
+        }
+
+        List<Equipe> equipeList = renommageEquipesSansSauvegarde(championnatId,club);
+
+        return equipeService.updateEquipeNames(equipeList);
+    }
+
+    /**
+     * Permet de renommer les equipes dans un championnat pour un club donne
+     * @param championnatId
+     * @param club
+     * @return
+     */
+    private List<Equipe> renommageEquipesSansSauvegarde(Long championnatId, Club club){
+        List<Equipe> equipeList = (List<Equipe>) equipeRepository.findByChampionnatAndClub(championnatId,club.getId());
+
+        // Changer les noms d'equipes apres tri par division
+        Collections.sort(equipeList, new Comparator<Equipe>() {
+            @Override
+            public int compare(Equipe o1, Equipe o2) {
+                return o1.getDivision().getNumero().compareTo(o2.getDivision().getNumero());
+            }
+        });
+        for (int i=0;i<equipeList.size();i++){
+            Equipe equipe = equipeList.get(i);
+            equipe.setCodeAlphabetique(club.getNom() + " " + String.valueOf((char) (97 + i)).toUpperCase());
+        }
+
+        return equipeList;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
@@ -214,4 +347,11 @@ public class EquipeController {
 //        equipe.setClub(club);
 //        return equipeRepository.save(equipe);
 //    }
+
+    public static void main(String[] args) {
+        for (int i=0;i<10;i++){
+        System.err.println(String.valueOf((char) (97 + i)));
+
+        }
+    }
 }
