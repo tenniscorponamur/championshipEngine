@@ -35,6 +35,9 @@ public class EquipeController {
     private DivisionRepository divisionRepository;
 
     @Autowired
+    private PouleRepository pouleRepository;
+
+    @Autowired
     private MatchRepository matchRepository;
 
     @Autowired
@@ -166,6 +169,24 @@ public class EquipeController {
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
+        List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+        Poule firstPoule = null;
+        if (poules.size()==0){
+            Poule poule = new Poule();
+            poule.setDivision(division);
+            poule.setNumero(1);
+            firstPoule = pouleRepository.save(poule);
+        }else{
+            Collections.sort(poules, new Comparator<Poule>() {
+                @Override
+                public int compare(Poule o1, Poule o2) {
+                    return o1.getNumero().compareTo(o2.getNumero());
+                }
+            });
+            firstPoule = poules.get(0);
+        }
+        equipe.setPoule(firstPoule);
+
         Club club = equipe.getClub();
         Championnat championnat = equipe.getDivision().getChampionnat();
 
@@ -218,6 +239,7 @@ public class EquipeController {
         }
 
         Club club = equipe.getClub();
+        Division division = equipe.getDivision();
         Championnat championnat = equipe.getDivision().getChampionnat();
 
         // Supprimer la composition eventuelle
@@ -237,6 +259,11 @@ public class EquipeController {
 
         // Renommage des equipes de ce club afin que les choses soient correctes en sortie de cet appel
         updateEquipeNamesOnly(renommageEquipesSansSauvegarde(championnat.getId(),club));
+
+        List<Equipe> equipes = (List<Equipe>) equipeRepository.findByDivision(division);
+        if (equipes.size()==0){
+            pouleRepository.deleteByDivision(division);
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
