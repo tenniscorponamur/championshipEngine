@@ -319,7 +319,8 @@ public class ClassementCorpoController {
 
                 ClassementJobTrace endTrace = new ClassementJobTrace();
                 endTrace.setClassementJob(classementJob);
-                endTrace.setMessage(sdf.format(new Date()) + " - FIN CAR EXCEPTION : " + ExceptionUtils.getStackTrace(e));
+                e.printStackTrace(System.err);
+                endTrace.setMessage(sdf.format(new Date()) + " - FIN CAR EXCEPTION : " + e.getMessage());
                 classementJobTraceRepository.save(endTrace);
 
                 classementJob.setStatus(ClassementJobStatus.FINISHED);
