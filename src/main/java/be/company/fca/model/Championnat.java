@@ -35,6 +35,9 @@ public class Championnat {
     @Column( name = "calendrier_a_rafraichir", nullable = false)
     private boolean calendrierARafraichir=false;
 
+    @Column( name = "autoriser_responsables", nullable = false)
+    private boolean autoriserResponsables=false;
+
     @Column( name = "calendrier_valide", nullable = false)
     private boolean calendrierValide=false;
 
@@ -82,6 +85,14 @@ public class Championnat {
 
     public void setCalendrierARafraichir(boolean calendrierARafraichir) {
         this.calendrierARafraichir = calendrierARafraichir;
+    }
+
+    public boolean isAutoriserResponsables() {
+        return autoriserResponsables;
+    }
+
+    public void setAutoriserResponsables(boolean autoriserResponsables) {
+        this.autoriserResponsables = autoriserResponsables;
     }
 
     public boolean isCalendrierValide() {

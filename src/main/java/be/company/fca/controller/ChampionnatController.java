@@ -100,9 +100,21 @@ public class ChampionnatController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(value = "/private/championnat/autoriserResponsables", method = RequestMethod.PUT)
+    public boolean setAutorisationResponsables(@RequestParam Long championnatId,@RequestBody boolean autoriserResponsables){
+        Championnat championnat = championnatRepository.findById(championnatId).get();
+        if (!championnat.isCalendrierValide() && !championnat.isCloture()){
+            championnatRepository.updateAutorisationResponsables(championnatId,autoriserResponsables);
+            return autoriserResponsables;
+        }
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/championnat/calendrierValide", method = RequestMethod.PUT)
     public boolean setCalendrierValide(@RequestParam Long championnatId,@RequestBody boolean validite){
         if (validite&&isCalendrierValidable(championnatId)){
+            championnatRepository.updateAutorisationResponsables(championnatId,false);
             championnatRepository.updateCalendrierValide(championnatId,validite);
             return true;
         }else if (!validite && isCalendrierInvalidable(championnatId)){
@@ -116,6 +128,7 @@ public class ChampionnatController {
     @RequestMapping(value = "/private/championnat/cloture", method = RequestMethod.PUT)
     public boolean setCloture(@RequestParam Long championnatId,@RequestBody boolean cloture){
         if (cloture && isCloturable(championnatId)){
+            championnatRepository.updateAutorisationResponsables(championnatId,false);
             championnatRepository.updateChampionnatCloture(championnatId,cloture);
             return true;
         }

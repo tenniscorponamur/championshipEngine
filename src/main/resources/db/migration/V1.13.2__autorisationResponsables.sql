@@ -1,0 +1,1 @@
+alter table championnat add column autoriser_responsables boolean NOT NULL default false;

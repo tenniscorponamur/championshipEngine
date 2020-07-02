@@ -1285,6 +1285,8 @@ public class RencontreController {
 
         List<Rencontre> rencontresSaved = rencontreService.saveRencontres(rencontres);
 
+        //Autorisation des responsables -> false
+        championnatRepository.updateAutorisationResponsables(championnatId,false);
         // Calendrier rafraichi --> false
         championnatRepository.updateCalendrierARafraichir(championnatId, false);
 
@@ -1316,6 +1318,8 @@ public class RencontreController {
 
         List<Rencontre> rencontresSaved = rencontreService.saveRencontres(newRencontres);
 
+        //Autorisation des responsables -> false
+        championnatRepository.updateAutorisationResponsables(championnatId,false);
         // Calendrier rafraichi --> false
         championnatRepository.updateCalendrierARafraichir(championnatId, false);
 
