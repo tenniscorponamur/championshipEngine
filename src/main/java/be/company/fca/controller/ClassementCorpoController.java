@@ -470,6 +470,14 @@ public class ClassementCorpoController {
      */
     private ResultatMatch getResultatMatch(Match match, Membre membre){
         boolean visites = membre.equals(match.getJoueurVisites1()) || membre.equals(match.getJoueurVisites2());
+
+        System.err.println(match.getRencontre().getEquipeVisites().getCodeAlphabetique());
+        System.err.println(match.getRencontre().getEquipeVisiteurs().getCodeAlphabetique());
+        System.err.println(match.getJoueurVisites1().getNom());
+        System.err.println(match.getJoueurVisiteurs1().getNom());
+        System.err.println(match.getPointsVisites());
+        System.err.println(match.getPointsVisiteurs());
+
         if (match.getPointsVisites() < match.getPointsVisiteurs()){
             if (match.isSetUnique()){
                 return visites?ResultatMatch.defaite:ResultatMatch.assimileMatchNul;
