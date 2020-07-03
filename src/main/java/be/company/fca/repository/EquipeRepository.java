@@ -75,6 +75,15 @@ public interface EquipeRepository extends CrudRepository<Equipe,Long>{
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("update Equipe equipe " +
+            " set equipe.division = :division, equipe.poule =:poule " +
+            " where equipe.id =:equipeId")
+    void updateDivisionAndPoule(@Param("equipeId") Long equipeId,
+                     @Param("division") Division division,
+                     @Param("poule") Poule poule);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("update Equipe equipe " +
             " set equipe.poule =:poule " +
             " where equipe.id =:equipeId")
     void updatePoule(@Param("equipeId") Long equipeId,

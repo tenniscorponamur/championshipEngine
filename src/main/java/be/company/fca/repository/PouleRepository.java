@@ -22,6 +22,8 @@ public interface PouleRepository extends CrudRepository<Poule,Long>{
      * Permet de supprimer les poules d'une division
      * @param division Division
      */
+    @Transactional
+    @Modifying(clearAutomatically = true)
     void deleteByDivision(Division division);
 
     @Transactional

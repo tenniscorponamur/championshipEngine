@@ -169,23 +169,7 @@ public class EquipeController {
             throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
         }
 
-        List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
-        Poule firstPoule = null;
-        if (poules.size()==0){
-            Poule poule = new Poule();
-            poule.setDivision(division);
-            poule.setNumero(1);
-            firstPoule = pouleRepository.save(poule);
-        }else{
-            Collections.sort(poules, new Comparator<Poule>() {
-                @Override
-                public int compare(Poule o1, Poule o2) {
-                    return o1.getNumero().compareTo(o2.getNumero());
-                }
-            });
-            firstPoule = poules.get(0);
-        }
-        equipe.setPoule(firstPoule);
+        equipe.setPoule(getFirstPoule(division));
 
         Club club = equipe.getClub();
         Championnat championnat = equipe.getDivision().getChampionnat();
@@ -206,6 +190,31 @@ public class EquipeController {
         }
 
         return equipeSaved;
+    }
+
+    /**
+     * Permet de recuperer la premiere poule de la division
+     * ou de la creer le cas echeant
+     * @param division
+     */
+    private Poule getFirstPoule(Division division){
+        List<Poule> poules = (List<Poule>) pouleRepository.findByDivision(division);
+        Poule firstPoule = null;
+        if (poules.size()==0){
+            Poule poule = new Poule();
+            poule.setDivision(division);
+            poule.setNumero(1);
+            firstPoule = pouleRepository.save(poule);
+        }else{
+            Collections.sort(poules, new Comparator<Poule>() {
+                @Override
+                public int compare(Poule o1, Poule o2) {
+                    return o1.getNumero().compareTo(o2.getNumero());
+                }
+            });
+            firstPoule = poules.get(0);
+        }
+        return firstPoule;
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
@@ -302,10 +311,28 @@ public class EquipeController {
         List<Equipe> equipeList = (List<Equipe>) equipeRepository.findByChampionnatAndClub(championnatId,club.getId());
 
         // Changer les noms d'equipes apres tri par division
+
+        // Dans la meme division, conserver l'ordre initial :
+        // Ex : A1, B2 division 1 C3 division 2 -> A1, B2 et C3 division 1 et non pas C1, B3, A2 division 1
+
         Collections.sort(equipeList, new Comparator<Equipe>() {
             @Override
             public int compare(Equipe o1, Equipe o2) {
-                return o1.getDivision().getNumero().compareTo(o2.getDivision().getNumero());
+                int compareDivision = o1.getDivision().getNumero().compareTo(o2.getDivision().getNumero());
+                if (compareDivision!=0){
+                    return compareDivision;
+                }else{
+                    if (o1.getCodeAlphabetique()==null){
+                        return 1;
+                    }
+                    if (o2.getCodeAlphabetique()==null){
+                        return -1;
+                    }
+                    if (o1.getCodeAlphabetique()!=null && o2.getCodeAlphabetique()!=null){
+                        return o1.getCodeAlphabetique().compareTo(o2.getCodeAlphabetique());
+                    }
+                }
+                return 0;
             }
         });
         for (int i=0;i<equipeList.size();i++){
@@ -314,6 +341,64 @@ public class EquipeController {
         }
 
         return equipeList;
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
+    @RequestMapping(value = "/private/equipe/division", method = RequestMethod.PUT)
+    public Equipe updateDivisionEquipe(Authentication authentication, @RequestParam Long equipeId, @RequestBody Division division){
+
+        Equipe equipe = equipeRepository.findById(equipeId).get();
+
+        // Operation non-permise si le calendrier est valide ou cloture
+        if (equipe.getDivision().getChampionnat().isCalendrierValide() || equipe.getDivision().getChampionnat().isCloture()){
+            throw new RuntimeException("Operation not supported - Calendrier valide ou championnat cloture");
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean divisionUpdatable = false;
+        if (adminConnected){
+            divisionUpdatable = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                divisionUpdatable=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!divisionUpdatable){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
+        Division oldDivision = equipe.getDivision();
+        Division newDivision = division;
+
+        // S'il ne s'agit pas du meme championnat, operation interdite
+        if (!oldDivision.getChampionnat().equals(newDivision.getChampionnat())){
+            throw new RuntimeException("Operation not permitted - Not the same Championship");
+        }
+
+        equipe.setDivision(newDivision);
+        equipe.setPoule(getFirstPoule(newDivision));
+
+        equipeRepository.updateDivisionAndPoule(equipe.getId(),equipe.getDivision(),equipe.getPoule());
+
+        // Test si ancienne division contient encore equipe sinon suppression poule (appel supplementaire car suppressions objets entretemps
+        List<Equipe> equipes = (List<Equipe>) equipeRepository.findByDivision(oldDivision);
+        if (equipes.size()==0){
+            pouleRepository.deleteByDivision(oldDivision);
+        }
+
+        // On signale que le calendrier doit etre rafraichi si l'equipe a change de division
+        championnatRepository.updateCalendrierARafraichir(equipe.getDivision().getChampionnat().getId(),true);
+
+        // Renommage des equipes de ce club afin que les choses soient correctes en sortie de cet appel
+        updateEquipeNamesOnly(renommageEquipesSansSauvegarde(equipe.getDivision().getChampionnat().getId(),equipe.getClub()));
+
+        return equipe;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
