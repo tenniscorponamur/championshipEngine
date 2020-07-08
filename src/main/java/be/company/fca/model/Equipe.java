@@ -49,6 +49,9 @@ public class Equipe {
     @Column( name = "hybride", nullable = false)
     private boolean hybride=false;
 
+    @Column( name =  "commentaires")
+    private String commentaires;
+
     public Long getId() {
         return id;
     }
@@ -111,6 +114,14 @@ public class Equipe {
 
     public void setHybride(boolean hybride) {
         this.hybride = hybride;
+    }
+
+    public String getCommentaires() {
+        return commentaires;
+    }
+
+    public void setCommentaires(String commentaires) {
+        this.commentaires = commentaires;
     }
 
     @Override

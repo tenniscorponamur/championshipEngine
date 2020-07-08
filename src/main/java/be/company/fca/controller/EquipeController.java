@@ -131,9 +131,10 @@ public class EquipeController {
         division.setId(divisionId);
         equipe.setDivision(division);
 
-        // Terrain, capitaine et hybride uniquement !!
+        // Terrain, capitaine, hybride et commentaires uniquement !!
+        // (legere faille de securite pour le mode hybride car le responsables pourrait le changer s'il bidouille l'appel)
 
-        equipeRepository.updateDetails(equipe.getId(),equipe.getCapitaine(),equipe.getTerrain(),equipe.isHybride());
+        equipeRepository.updateDetails(equipe.getId(),equipe.getCapitaine(),equipe.getTerrain(),equipe.isHybride(), equipe.getCommentaires());
 
         return equipe;
     }
