@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ListingEquipes" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e022fb4e-17d6-469e-8502-cf0016224dea">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tennis Corpo"/>
+	<property name="com.jaspersoft.studio.report.description" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="264"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="725"/>
+	<parameter name="championnatId" class="java.lang.Long" isForPrompting="false">
+		<defaultValueExpression><![CDATA[new Long(807)]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[select championnat.annee, championnat.type type_championnat, championnat.categorie categorie_championnat, 
+club.nom club_nom,
+ equipe.code_alphabetique equipe_code, 
+ division.numero division_numero, poule.numero poule_numero,
+ (select count(*) from poule where division_fk = division.id) nbPoules,
+ capitaine.id capitaine_id, capitaine.nom capitaine_nom, capitaine.prenom capitaine_prenom,
+capitaine.telephone capitaine_telephone, capitaine.gsm capitaine_gsm, capitaine.mail capitaine_mail,
+equipe.commentaires commentaires_equipe,
+membre.nom membre_nom, membre.prenom membre_prenom, classementcorpo.points membre_points
+from championnat 
+inner join division on division.championnat_fk = championnat.id 
+inner join equipe on equipe.division_fk = division.id
+inner join poule on equipe.poule_fk = poule.id
+inner join club on club.id = equipe.club_fk
+left join membre capitaine on equipe.capitaine_fk = capitaine.id
+left join membre_equipe on membre_equipe.equipe_fk = equipe.id
+left join membre on membre_equipe.membre_fk = membre.id
+left join classementcorpo on membre.classementcorpo_fk = classementcorpo.id
+where championnat.id =  $P{championnatId}
+order by  division_numero, poule_numero, club_nom, equipe_code]]>
+	</queryString>
+	<field name="annee" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="annee"/>
+	</field>
+	<field name="type_championnat" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="type_championnat"/>
+	</field>
+	<field name="categorie_championnat" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="categorie_championnat"/>
+	</field>
+	<field name="club_nom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="club_nom"/>
+	</field>
+	<field name="equipe_code" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="equipe_code"/>
+	</field>
+	<field name="division_numero" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="division_numero"/>
+	</field>
+	<field name="poule_numero" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="poule_numero"/>
+	</field>
+	<field name="nbpoules" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.label" value="nbpoules"/>
+	</field>
+	<field name="capitaine_id" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.label" value="capitaine_id"/>
+	</field>
+	<field name="capitaine_nom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="capitaine_nom"/>
+	</field>
+	<field name="capitaine_prenom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="capitaine_prenom"/>
+	</field>
+	<field name="capitaine_telephone" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="capitaine_telephone"/>
+	</field>
+	<field name="capitaine_gsm" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="capitaine_gsm"/>
+	</field>
+	<field name="capitaine_mail" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="capitaine_mail"/>
+	</field>
+	<field name="commentaires_equipe" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="commentaires_equipe"/>
+	</field>
+	<field name="membre_nom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="membre_nom"/>
+	</field>
+	<field name="membre_prenom" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="membre_prenom"/>
+	</field>
+	<field name="membre_points" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="membre_points"/>
+	</field>
+	<group name="division">
+		<groupExpression><![CDATA[$F{division_numero}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="0" width="555" height="30" forecolor="#FFFFFF" backcolor="#545252" uuid="4b5577e9-05dd-4229-9e86-cd2c5f7d5168"/>
+					<box padding="1">
+						<pen lineColor="#000000"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA["DIVISION " + $F{division_numero}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="equipe">
+		<groupExpression><![CDATA[$F{equipe_code}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="110" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="608845c4-1b63-411b-8bd6-bc05b3ecaef2">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7506c0c0-a7e9-4c17-bae6-65b1a55aba0c"/>
+					</reportElement>
+					<box padding="1">
+						<pen lineColor="#000000"/>
+						<topPen lineWidth="0.0"/>
+						<leftPen lineWidth="1.0"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{equipe_code}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="210" y="0" width="100" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="bf0f0b22-7094-422c-af8b-2636f9fea037">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6c921bf4-d5cd-429f-a548-b1d6f48d164d"/>
+					</reportElement>
+					<box>
+						<topPen lineWidth="0.0" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<paragraph lineSpacing="Proportional"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{capitaine_nom}!=null?($F{capitaine_nom} + " " + $F{capitaine_prenom}):""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="310" y="0" width="245" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="b1f014bf-eac4-40ef-ad7c-0e6000d7f2da">
+						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2b781176-02c2-4204-914c-33684883ec7c"/>
+					</reportElement>
+					<box padding="1">
+						<topPen lineWidth="0.0" lineColor="#000000"/>
+						<rightPen lineWidth="1.0" lineColor="#000000"/>
+					</box>
+					<textFieldExpression><![CDATA[$F{commentaires_equipe}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="110" y="0" width="100" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="46c503ed-2c6c-43ff-b99c-6eb507a39c79"/>
+					<box>
+						<topPen lineWidth="0.0" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA["Poule " + $F{poule_numero}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="10">
+				<staticText>
+					<reportElement x="0" y="0" width="555" height="10" uuid="1a110d59-1818-4ec2-9fae-3d515640d228"/>
+					<box>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0" lineColor="#000000"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<text><![CDATA[Texte Statique]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="30" width="555" height="30" backcolor="#C2C2C2" uuid="7fa576b4-5f0f-40b7-843e-67fe7d5f7cca"/>
+				<box>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type_championnat} + " " + $F{categorie_championnat} + " " + $F{annee}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#C2C2C2" uuid="7377d12a-c449-447f-916c-955a7744e151"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[LISTE DES EQUIPES]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="150" height="19" uuid="5927616e-0472-4784-8562-b96c972bd03e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bd53edf8-a9d6-4db3-9158-2d79fdb4bf1c"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="10" bottomPadding="0" rightPadding="10">
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{membre_nom}!=null?($F{membre_nom} + " " + $F{membre_prenom}):""]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="0" width="405" height="19" uuid="665c5384-913b-4e33-98c3-9783b69790d2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="610a4da0-67d0-4668-943c-10244bcf83e9"/>
+				</reportElement>
+				<box leftPadding="10">
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{membre_points}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

@@ -198,10 +198,26 @@ public class ChampionnatController {
         return false;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(path="/private/championnat/listeCapitaines", method= RequestMethod.GET)
     ResponseEntity<byte[]> getListeCapitaines(@RequestParam Long championnatId) throws Exception {
         JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getListeCapitainesTemplate());
+        Connection conn = datasource.getConnection();
+        Map params = new HashMap();
+        params.put("championnatId", championnatId);
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/championnat/listeEquipes", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getListeEquipes(@RequestParam Long championnatId) throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getListeEquipesTemplate());
         Connection conn = datasource.getConnection();
         Map params = new HashMap();
         params.put("championnatId", championnatId);
