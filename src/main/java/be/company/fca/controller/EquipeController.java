@@ -136,6 +136,13 @@ public class EquipeController {
 
         equipeRepository.updateDetails(equipe.getId(),equipe.getCapitaine(),equipe.getTerrain(),equipe.isHybride(), equipe.getCommentaires());
 
+        // On va tagguer le membre selectionne comme capitaine
+        if (equipe.getCapitaine()!=null){
+            Membre capitaine = membreRepository.findById(equipe.getCapitaine().getId()).get();
+            capitaine.setCapitaine(true);
+            membreRepository.save(capitaine);
+        }
+
         return equipe;
     }
 
