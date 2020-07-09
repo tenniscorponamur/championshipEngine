@@ -428,15 +428,57 @@ public class EquipeController {
         return equipe;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/equipe/{equipeId}/membres", method = RequestMethod.GET)
-    public List<Membre> getMembresEquipe(@PathVariable("equipeId") Long equipeId){
+    public List<Membre> getMembresEquipe(Authentication authentication, @PathVariable("equipeId") Long equipeId){
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean equipeAccessible = false;
+        if (adminConnected){
+            equipeAccessible = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            Equipe equipe = equipeRepository.findById(equipeId).get();
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                equipeAccessible=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!equipeAccessible){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
         return membreRepository.findMembresByEquipeFk(equipeId);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/equipe/{equipeId}/membre/{membreId}", method = RequestMethod.POST)
-    public boolean addMembreEquipe(@PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId){
+    public boolean addMembreEquipe(Authentication authentication, @PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId){
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean equipeAccessible = false;
+        if (adminConnected){
+            equipeAccessible = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            Equipe equipe = equipeRepository.findById(equipeId).get();
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                equipeAccessible=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!equipeAccessible){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
         MembreEquipe membreEquipe = new MembreEquipe();
         membreEquipe.setEquipeFk(equipeId);
         membreEquipe.setMembreFk(membreId);
@@ -444,9 +486,30 @@ public class EquipeController {
         return true;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/equipe/{equipeId}/membre/{membreId}", method = RequestMethod.DELETE)
-    public boolean deleteMembreEquipe(@PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId) {
+    public boolean deleteMembreEquipe(Authentication authentication, @PathVariable("equipeId") Long equipeId, @PathVariable("membreId") Long membreId) {
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        boolean adminConnected = userService.isAdmin(authentication);
+        boolean equipeAccessible = false;
+        if (adminConnected){
+            equipeAccessible = true;
+        }else{
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            Equipe equipe = equipeRepository.findById(equipeId).get();
+            if (equipe.getClub().equals(membreConnecte.getClub())){
+                equipeAccessible=true;
+            }
+        }
+
+        // Verifier que les operations concernent bien le club du membre connecte
+
+        if (!equipeAccessible){
+            throw new RuntimeException("Operation not permitted - Insuffisent rights");
+        }
+
         membreEquipeRepository.deleteByEquipeFkAndMembreFk(equipeId,membreId);
         return true;
     }
