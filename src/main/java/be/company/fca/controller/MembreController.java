@@ -209,7 +209,7 @@ public class MembreController {
 
             Membre membre = membreRepository.findById(membreId).get();
             membre.setOnlyCorpo(onlyCorpo);
-            membre.setNumeroAft(numeroClubAft);
+            membre.setNumeroClubAft(numeroClubAft);
             membreRepository.save(membre);
 
             ClassementAFT newClassementAFT = null;
