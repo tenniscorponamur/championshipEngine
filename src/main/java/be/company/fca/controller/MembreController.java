@@ -196,6 +196,57 @@ public class MembreController {
         }
     }
 
+    //@PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
+    @RequestMapping(value = "/private/membre/{membreId}/infosLimiteesAft", method = RequestMethod.PUT)
+    public ClassementAFT updateInfosAft(Authentication authentication, @PathVariable("membreId") Long membreId,
+                                  @RequestParam String codeClassementAft,
+                                  @RequestParam String numeroClubAft,
+                                  @RequestParam boolean onlyCorpo){
+        boolean autorise = privateInformationsEditables(authentication,membreId);
+
+        // Admin et responsable de club autorises
+        if (autorise){
+
+            Membre membre = membreRepository.findById(membreId).get();
+            membre.setOnlyCorpo(onlyCorpo);
+            membre.setNumeroAft(numeroClubAft);
+            membreRepository.save(membre);
+
+            ClassementAFT newClassementAFT = null;
+            EchelleAFT echelleAFT = getEchelleAFTByCode(codeClassementAft);
+            if (echelleAFT!=null){
+                newClassementAFT = new ClassementAFT();
+                newClassementAFT.setMembreFk(membreId);
+                newClassementAFT.setDateClassement(new Date());
+                newClassementAFT.setCodeClassement(echelleAFT.getCode());
+                newClassementAFT.setPoints(echelleAFT.getPoints());
+
+                // sauvegarde du nouveau classmeent (dans la liste du membre et en tant que classmenet actuel)
+                newClassementAFT = classementAFTRepository.save(newClassementAFT);
+                membreRepository.updateClassementAFT(membreId,newClassementAFT);
+            }
+
+            return newClassementAFT;
+        }else{
+            throw new ForbiddenException();
+        }
+    }
+
+    /**
+     * Permet de recuperer l'echelle AFT sur base de son code
+     * @param codeAft
+     * @return
+     */
+    private EchelleAFT getEchelleAFTByCode(String codeAft){
+        List<EchelleAFT> echellesAFT = EchelleAFT.getAllEchellesAFT();
+        for (EchelleAFT echelleAFT : echellesAFT){
+            if (echelleAFT.getCode().equals(codeAft)){
+                return echelleAFT;
+            }
+        }
+        return null;
+    }
+
     /**
      * Permet de savoir si un utilisateur connecte peut modifier les informations privees d'un membre
      * Seul un administrateur ou un responsable du club du membre peuvent les modifier
@@ -226,7 +277,7 @@ public class MembreController {
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(value = "/private/membre/{membreId}/infosAft", method = RequestMethod.PUT)
-    public Membre updateInfosAft(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
+    public Membre updateInfosAftByAdmin(@PathVariable("membreId") Long membreId, @RequestBody Membre membre){
         membreRepository.updateInfosAft(membreId,
                 membre.getNumeroAft(),
                 membre.getNumeroClubAft(),
