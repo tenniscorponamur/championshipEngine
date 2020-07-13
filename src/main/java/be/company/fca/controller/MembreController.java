@@ -199,8 +199,8 @@ public class MembreController {
     //@PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(value = "/private/membre/{membreId}/infosLimiteesAft", method = RequestMethod.PUT)
     public ClassementAFT updateInfosAft(Authentication authentication, @PathVariable("membreId") Long membreId,
-                                  @RequestParam String codeClassementAft,
-                                  @RequestParam String numeroClubAft,
+                                  @RequestParam(required = false) String codeClassementAft,
+                                  @RequestParam(required = false) String numeroClubAft,
                                   @RequestParam boolean onlyCorpo){
         boolean autorise = privateInformationsEditables(authentication,membreId);
 
@@ -213,17 +213,19 @@ public class MembreController {
             membreRepository.save(membre);
 
             ClassementAFT newClassementAFT = null;
-            EchelleAFT echelleAFT = getEchelleAFTByCode(codeClassementAft);
-            if (echelleAFT!=null){
-                newClassementAFT = new ClassementAFT();
-                newClassementAFT.setMembreFk(membreId);
-                newClassementAFT.setDateClassement(new Date());
-                newClassementAFT.setCodeClassement(echelleAFT.getCode());
-                newClassementAFT.setPoints(echelleAFT.getPoints());
+            if (codeClassementAft!=null) {
+                EchelleAFT echelleAFT = getEchelleAFTByCode(codeClassementAft);
+                if (echelleAFT != null) {
+                    newClassementAFT = new ClassementAFT();
+                    newClassementAFT.setMembreFk(membreId);
+                    newClassementAFT.setDateClassement(new Date());
+                    newClassementAFT.setCodeClassement(echelleAFT.getCode());
+                    newClassementAFT.setPoints(echelleAFT.getPoints());
 
-                // sauvegarde du nouveau classmeent (dans la liste du membre et en tant que classmenet actuel)
-                newClassementAFT = classementAFTRepository.save(newClassementAFT);
-                membreRepository.updateClassementAFT(membreId,newClassementAFT);
+                    // sauvegarde du nouveau classmeent (dans la liste du membre et en tant que classmenet actuel)
+                    newClassementAFT = classementAFTRepository.save(newClassementAFT);
+                    membreRepository.updateClassementAFT(membreId, newClassementAFT);
+                }
             }
 
             return newClassementAFT;
