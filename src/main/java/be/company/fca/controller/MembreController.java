@@ -79,6 +79,8 @@ public class MembreController {
             membres = (List<Membre>) membreRepository.findAll();
         }
 
+
+
         boolean userConnected = authentication!=null;
         boolean adminConnected = userService.isAdmin(authentication);
         Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
@@ -93,10 +95,13 @@ public class MembreController {
         */
 
         for (Membre membre : membres){
-            boolean informationsMembreAccessibles = adminConnected || isMe(membreConnecte,membre) || isResponsableMembre(membreConnecte, membre);
-            boolean contactsAccessibles = informationsMembreAccessibles || (userConnected && (membre.isResponsableClub() || membre.isCapitaine()));
-            if (adminConnected || membre.isActif()){
-                membresDto.add(new MembreDto(membre,informationsMembreAccessibles,contactsAccessibles));
+            // Ne recuperer que les vrais membres --> retirer les fictifs
+            if (!membre.isFictif()){
+                boolean informationsMembreAccessibles = adminConnected || isMe(membreConnecte,membre) || isResponsableMembre(membreConnecte, membre);
+                boolean contactsAccessibles = informationsMembreAccessibles || (userConnected && (membre.isResponsableClub() || membre.isCapitaine()));
+                if (adminConnected || membre.isActif()){
+                    membresDto.add(new MembreDto(membre,informationsMembreAccessibles,contactsAccessibles));
+                }
             }
         }
 
@@ -349,6 +354,7 @@ public class MembreController {
     @RequestMapping(value = "/private/membre", method = RequestMethod.POST)
     public Membre addMembre(@RequestBody Membre membre){
         Membre newMembre = new Membre();
+        newMembre.setAdhesionPolitique(true);
         newMembre.setPassword(PasswordUtils.DEFAULT_MEMBER_PASSWORD);
         newMembre.setGenre(membre.getGenre());
         newMembre.setPrenom(membre.getPrenom());
@@ -607,49 +613,53 @@ public class MembreController {
         for (int i=0;i<membres.size();i++){
             Membre membre = membres.get(i);
 
-            lastCell = POIUtils.write(sheet,i+1,0,membre.getNom(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,1,membre.getPrenom(),null,null);
-            if (membre.getDateNaissance()!=null){
-                lastCell = POIUtils.write(sheet,i+1,2,membre.getDateNaissance(),dateCellStyle,null);
-                String formula= "DATEDIF(" + CellReference.convertNumToColString(dateNaissanceIndex) + (i+2)+ "," + CellReference.convertNumToColString(datePivotCell.getColumnIndex())+"1" + ",\"y\")";
-                lastCell = POIUtils.writeWithFormula(sheet,i+1,3,formula);
-            }
-            lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre().toString(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,5,membre.isActif(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,6,membre.getNumeroAft(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,7,membre.isCapitaine(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,8,membre.isResponsableClub(),null,null);
-            if (membre.getClub()!=null){
-                lastCell = POIUtils.write(sheet,i+1,9,membre.getClub().getNumero(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,10,membre.getClub().getNom(),null,null);
-            }
-            lastCell = POIUtils.write(sheet,i+1,11,membre.getDateAffiliationAft(),dateCellStyle,null);
-            lastCell = POIUtils.write(sheet,i+1,12,membre.getNumeroClubAft(),null,null);
-            Cell numClubAFTCell = lastCell;
-            if (membre.getNumeroClubAft()!=null && "6045".equals(membre.getNumeroClubAft().trim())){
-                numClubAFTCell.setCellStyle(boldStyle);
-            }
-            lastCell = POIUtils.write(sheet,i+1,13,membre.isOnlyCorpo(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,14,membre.getDateAffiliationCorpo(),dateCellStyle,null);
-            lastCell = POIUtils.write(sheet,i+1,15,membre.getDateDesaffiliationCorpo(),dateCellStyle,null);
-            if (membre.getClassementCorpoActuel()!=null){
-                lastCell = POIUtils.write(sheet,i+1,16,membre.getClassementCorpoActuel().getPoints(),null,null);
-            }
-            if (membre.getClassementAFTActuel()!=null){
-                lastCell = POIUtils.write(sheet,i+1,17,membre.getClassementAFTActuel().getCodeClassement(),null,null);
-                lastCell = POIUtils.write(sheet,i+1,18,membre.getClassementAFTActuel().getPoints(),null,null);
-            }
-            lastCell = POIUtils.write(sheet,i+1,19,membre.getRue(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,20,membre.getRueNumero(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,21,membre.getRueBoite(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,22,membre.getCodePostal(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,23,membre.getLocalite(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,24, LocaliteUtils.isGrandNamur(membre.getCodePostal()),null,null);
-            lastCell = POIUtils.write(sheet,i+1,25,LocaliteUtils.isProvinceNamur(membre.getCodePostal()),null,null);
-            lastCell = POIUtils.write(sheet,i+1,26,membre.getTelephone(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,27,membre.getGsm(),null,null);
-            lastCell = POIUtils.write(sheet,i+1,28,membre.getMail(),null,null);
+            // On ne recupere pas les membres fictifs
+            if (!membre.isFictif()){
 
+                lastCell = POIUtils.write(sheet,i+1,0,membre.getNom(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,1,membre.getPrenom(),null,null);
+                if (membre.getDateNaissance()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,2,membre.getDateNaissance(),dateCellStyle,null);
+                    String formula= "DATEDIF(" + CellReference.convertNumToColString(dateNaissanceIndex) + (i+2)+ "," + CellReference.convertNumToColString(datePivotCell.getColumnIndex())+"1" + ",\"y\")";
+                    lastCell = POIUtils.writeWithFormula(sheet,i+1,3,formula);
+                }
+                lastCell = POIUtils.write(sheet,i+1,4,membre.getGenre().toString(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,5,membre.isActif(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,6,membre.getNumeroAft(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,7,membre.isCapitaine(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,8,membre.isResponsableClub(),null,null);
+                if (membre.getClub()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,9,membre.getClub().getNumero(),null,null);
+                    lastCell = POIUtils.write(sheet,i+1,10,membre.getClub().getNom(),null,null);
+                }
+                lastCell = POIUtils.write(sheet,i+1,11,membre.getDateAffiliationAft(),dateCellStyle,null);
+                lastCell = POIUtils.write(sheet,i+1,12,membre.getNumeroClubAft(),null,null);
+                Cell numClubAFTCell = lastCell;
+                if (membre.getNumeroClubAft()!=null && "6045".equals(membre.getNumeroClubAft().trim())){
+                    numClubAFTCell.setCellStyle(boldStyle);
+                }
+                lastCell = POIUtils.write(sheet,i+1,13,membre.isOnlyCorpo(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,14,membre.getDateAffiliationCorpo(),dateCellStyle,null);
+                lastCell = POIUtils.write(sheet,i+1,15,membre.getDateDesaffiliationCorpo(),dateCellStyle,null);
+                if (membre.getClassementCorpoActuel()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,16,membre.getClassementCorpoActuel().getPoints(),null,null);
+                }
+                if (membre.getClassementAFTActuel()!=null){
+                    lastCell = POIUtils.write(sheet,i+1,17,membre.getClassementAFTActuel().getCodeClassement(),null,null);
+                    lastCell = POIUtils.write(sheet,i+1,18,membre.getClassementAFTActuel().getPoints(),null,null);
+                }
+                lastCell = POIUtils.write(sheet,i+1,19,membre.getRue(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,20,membre.getRueNumero(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,21,membre.getRueBoite(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,22,membre.getCodePostal(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,23,membre.getLocalite(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,24, LocaliteUtils.isGrandNamur(membre.getCodePostal()),null,null);
+                lastCell = POIUtils.write(sheet,i+1,25,LocaliteUtils.isProvinceNamur(membre.getCodePostal()),null,null);
+                lastCell = POIUtils.write(sheet,i+1,26,membre.getTelephone(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,27,membre.getGsm(),null,null);
+                lastCell = POIUtils.write(sheet,i+1,28,membre.getMail(),null,null);
+
+            }
         }
 
         // Freeze de la premiere ligne

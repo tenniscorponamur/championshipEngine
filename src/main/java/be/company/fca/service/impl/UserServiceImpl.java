@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
                 return user.getMembre();
             } else {
                 Membre membre = membreRepository.findByNumeroAft(authentication.getName());
-                if (membre.isActif()) {
+                if (membre.isActif() && !membre.isFictif()) {
                     return membre;
                 }
             }

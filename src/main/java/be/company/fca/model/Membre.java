@@ -111,6 +111,12 @@ public class Membre {
     @Column( name =  "mail")
     private String mail;
 
+    @Column( name = "adhesion_politique", nullable = false)
+    private boolean adhesionPolitique;
+
+    @Column( name = "fictif", nullable = false)
+    private boolean fictif;
+
     public Long getId() {
         return id;
     }
@@ -325,6 +331,22 @@ public class Membre {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isAdhesionPolitique() {
+        return adhesionPolitique;
+    }
+
+    public void setAdhesionPolitique(boolean adhesionPolitique) {
+        this.adhesionPolitique = adhesionPolitique;
+    }
+
+    public boolean isFictif() {
+        return fictif;
+    }
+
+    public void setFictif(boolean fictif) {
+        this.fictif = fictif;
     }
 
     @Override

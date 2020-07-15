@@ -187,7 +187,7 @@ public class UserController {
 
         // Verifier que le numero Aft est connu
         Membre membre = membreRepository.findByNumeroAft(numeroAft);
-        if (membre==null){
+        if (membre==null || membre.isFictif()){
             return false;
         }
 

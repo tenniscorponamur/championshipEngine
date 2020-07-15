@@ -24,6 +24,7 @@ public class Tache {
     private String commentairesRefus;
 
     private boolean markAsRead;
+    private boolean archived;
 
     public Long getId() {
         return id;
@@ -143,5 +144,13 @@ public class Tache {
 
     public void setMarkAsRead(boolean markAsRead) {
         this.markAsRead = markAsRead;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

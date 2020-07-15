@@ -17,7 +17,7 @@ public class UserUtils {
      * @return
      */
     public static User getUserFromMembre(Membre membre){
-        if (membre.isActif()){
+        if (membre.isActif() && !membre.isFictif()){
             User user = new User();
             user.setUsername(membre.getNumeroAft());
             user.setPassword(membre.getPassword());

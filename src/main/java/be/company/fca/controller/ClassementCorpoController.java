@@ -268,43 +268,47 @@ public class ClassementCorpoController {
 
             for (Membre membre : membres){
 
-                ClassementJob classementJobInMemory = classementJobRepository.findById(classementJob.getId()).get();
-                if (!ClassementJobStatus.WORK_IN_PROGRESS.equals(classementJobInMemory.getStatus())){
-                    throw new RuntimeException("Arrêt forcé par l'administrateur");
+                // Ne recuperer que les vrais membres --> retirer les fictifs
+                if (!membre.isFictif()){
+
+                    ClassementJob classementJobInMemory = classementJobRepository.findById(classementJob.getId()).get();
+                    if (!ClassementJobStatus.WORK_IN_PROGRESS.equals(classementJobInMemory.getStatus())){
+                        throw new RuntimeException("Arrêt forcé par l'administrateur");
+                    }
+
+                    InfosCalculClassementDto infosCalculClassement = getClassementInfos(membre.getId(),startDate,endDate);
+
+                    // Le calcul des classements s'effectue avec une date de fin egale a la date du jour --> nouveau classement = classement actuel du membre
+
+                    if (classementJob.isAvecSauvegarde()){
+                        ClassementCorpo newClassementCorpo = new ClassementCorpo();
+                        newClassementCorpo.setDateClassement(endDate);
+                        newClassementCorpo.setMembreFk(membre.getId());
+                        Integer endPoints = infosCalculClassement.getPointsFin();
+                        newClassementCorpo.setPoints(endPoints);
+                        classementCorpoRepository.save(newClassementCorpo);
+                        membreRepository.updateClassementCorpo(membre.getId(),newClassementCorpo);
+                    }
+
+                    String trace = "";
+
+                    trace = membre.getNumeroAft() + "|"
+                            + membre.getNom() + "|"
+                            + membre.getPrenom() + "|"
+                            + (membre.getDateNaissance()!=null?DateUtils.getYearsDifference(membre.getDateNaissance()):"") + "|"
+                            + (membre.getClassementAFTActuel()!=null?membre.getClassementAFTActuel().getCodeClassement():"") + "|"
+                            + (membre.getClub()!=null?membre.getClub().getNom():"") + "|"
+                            + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu() + "|"
+                            + infosCalculClassement.getPointsDepart() + "|"
+                            + infosCalculClassement.getPointsFin();
+
+                    // Enregistrement des traces d'execution du job
+                    ClassementJobTrace classementJobTrace = new ClassementJobTrace();
+                    classementJobTrace.setClassementJob(classementJob);
+                    classementJobTrace.setMessage(sdf.format(new Date()) + " - " + trace);
+                    classementJobTraceRepository.save(classementJobTrace);
+
                 }
-
-                InfosCalculClassementDto infosCalculClassement = getClassementInfos(membre.getId(),startDate,endDate);
-
-                // Le calcul des classements s'effectue avec une date de fin egale a la date du jour --> nouveau classement = classement actuel du membre
-
-                if (classementJob.isAvecSauvegarde()){
-                    ClassementCorpo newClassementCorpo = new ClassementCorpo();
-                    newClassementCorpo.setDateClassement(endDate);
-                    newClassementCorpo.setMembreFk(membre.getId());
-                    Integer endPoints = infosCalculClassement.getPointsFin();
-                    newClassementCorpo.setPoints(endPoints);
-                    classementCorpoRepository.save(newClassementCorpo);
-                    membreRepository.updateClassementCorpo(membre.getId(),newClassementCorpo);
-                }
-
-                String trace = "";
-
-                trace = membre.getNumeroAft() + "|"
-                        + membre.getNom() + "|"
-                        + membre.getPrenom() + "|"
-                        + (membre.getDateNaissance()!=null?DateUtils.getYearsDifference(membre.getDateNaissance()):"") + "|"
-                        + (membre.getClassementAFTActuel()!=null?membre.getClassementAFTActuel().getCodeClassement():"") + "|"
-                        + (membre.getClub()!=null?membre.getClub().getNom():"") + "|"
-                        + infosCalculClassement.getCaracteristiquesMatchList().size() + "|" + infosCalculClassement.getTotalObtenu() + "|"
-                        + infosCalculClassement.getPointsDepart() + "|"
-                        + infosCalculClassement.getPointsFin();
-
-                // Enregistrement des traces d'execution du job
-                ClassementJobTrace classementJobTrace = new ClassementJobTrace();
-                classementJobTrace.setClassementJob(classementJob);
-                classementJobTrace.setMessage(sdf.format(new Date()) + " - " + trace);
-                classementJobTraceRepository.save(classementJobTrace);
-
             }
 
             ClassementJobTrace endTrace = new ClassementJobTrace();
