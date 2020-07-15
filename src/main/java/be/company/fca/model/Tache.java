@@ -8,10 +8,9 @@ public class Tache {
     private Date dateDemande;
     private TypeTache typeTache;
     private Membre demandeur;
+
     private Membre membre;
-
-    //TODO : ajouter dans Membre : adhesion politique confidentialite ET membre fictif durant periode de creation
-
+    private String codeClassementAft;
     private Integer pointsCorpo;
     private boolean desactivationMembre;
     private boolean reactivationMembre;
@@ -64,6 +63,14 @@ public class Tache {
 
     public void setMembre(Membre membre) {
         this.membre = membre;
+    }
+
+    public String getCodeClassementAft() {
+        return codeClassementAft;
+    }
+
+    public void setCodeClassementAft(String codeClassementAft) {
+        this.codeClassementAft = codeClassementAft;
     }
 
     public Integer getPointsCorpo() {

@@ -4,12 +4,11 @@ import be.company.fca.model.*;
 import be.company.fca.repository.MembreRepository;
 import be.company.fca.repository.UserRepository;
 import be.company.fca.service.UserService;
+import be.company.fca.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +28,55 @@ public class TacheController {
 
     @Autowired
     private UserService userService;
+
+    @PreAuthorize("hasAuthority('RESPONSABLE_CLUB')")
+    @RequestMapping(path = "/private/tache/nouveauMembre", method = RequestMethod.POST)
+    public boolean tacheNouveauMembre(Authentication authentication,
+                                      @RequestBody Membre membre,
+                                      @RequestParam(required = false) String codeClassementAft,
+                                      @RequestParam(required = false) Integer pointsCorpo,
+                                      @RequestParam(required = false) String commentairesDemande) {
+
+        Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+        if (membreConnecte!=null){
+            Tache tache = new Tache();
+            tache.setTypeTache(TypeTache.NOUVEAU_MEMBRE);
+            tache.setDateDemande(new Date());
+            tache.setDemandeur(membreConnecte);
+            tache.setCommentairesDemande(commentairesDemande);
+
+            // Verifier adhesion politique
+            if (!membre.isAdhesionPolitique()){
+                return false;
+            }
+
+            // Verifier numero AFT non connu
+            if (membre.getNumeroAft()!=null){
+                Membre membreConnuAft = membreRepository.findByNumeroAft(membre.getNumeroAft());
+                if (membreConnuAft!=null){
+                    return false;
+                }
+            }
+
+            // Verifier appartenance club du responsable
+            if (membreConnecte.getClub() != null && membre.getClub() != null && membreConnecte.getClub().equals(membre.getClub())){
+                membre.setPassword(PasswordUtils.DEFAULT_MEMBER_PASSWORD);
+                membre.setActif(false);
+                membre.setFictif(true);
+                membre = membreRepository.save(membre);
+                tache.setMembre(membre);
+                tache.setCodeClassementAft(codeClassementAft);
+                tache.setPointsCorpo(pointsCorpo);
+
+                //TODO : sauver la tâche
+                //tacheRepository.save(tache);
+                return true;
+            }
+
+        }
+        return false;
+    }
+
 
     @PreAuthorize("hasAuthority('RESPONSABLE_CLUB')")
     @RequestMapping(method = RequestMethod.GET, path = "/private/taches")
