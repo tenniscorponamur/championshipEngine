@@ -1,28 +1,76 @@
 package be.company.fca.model;
 
-import java.util.Date;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+
+@Entity
+@Table(name="TACHE")
 public class Tache {
 
+    @Id
+    @GenericGenerator(
+            name = "tache-sequence",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+            parameters = {
+                    @org.hibernate.annotations.Parameter(name="sequence_name",value="hibernate_sequence"),
+                    @org.hibernate.annotations.Parameter(name="increment_size",value="1")
+            }
+    )
+    @GeneratedValue(generator = "tache-sequence", strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @Column( name =  "date_demande")
     private Date dateDemande;
+
+    @Column ( name = "type_tache")
+    @Enumerated(EnumType.STRING)
     private TypeTache typeTache;
+
+    @ManyToOne
+    @JoinColumn( name = "demandeur_fk")
     private Membre demandeur;
 
+    @ManyToOne
+    @JoinColumn( name = "membre_fk")
     private Membre membre;
+
+    @Column( name =  "code_classement_aft")
     private String codeClassementAft;
+
+    @Column( name =  "points_corpo")
     private Integer pointsCorpo;
+
+    @Column( name = "desactivation_membre", nullable = false)
     private boolean desactivationMembre;
+
+    @Column( name = "reactivation_membre", nullable = false)
     private boolean reactivationMembre;
+
+    @Column( name =  "commentaires_demande")
     private String commentairesDemande;
 
+    @Column( name =  "date_traitement")
     private Date dateTraitement;
-    private User agentTraitant;
+
+    @Column( name =  "agent_traitant")
+    private String agentTraitant;
+
+    @Column( name = "validation_traitement", nullable = false)
     private boolean validationTraitement;
+
+    @Column( name = "refus_traitement", nullable = false)
     private boolean refusTraitement;
+
+    @Column( name =  "commentaires_refus")
     private String commentairesRefus;
 
+    @Column( name = "mark_as_read", nullable = false)
     private boolean markAsRead;
+
+    @Column( name = "archived", nullable = false)
     private boolean archived;
 
     public Long getId() {
@@ -113,11 +161,11 @@ public class Tache {
         this.dateTraitement = dateTraitement;
     }
 
-    public User getAgentTraitant() {
+    public String getAgentTraitant() {
         return agentTraitant;
     }
 
-    public void setAgentTraitant(User agentTraitant) {
+    public void setAgentTraitant(String agentTraitant) {
         this.agentTraitant = agentTraitant;
     }
 
@@ -159,5 +207,27 @@ public class Tache {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tache tache = (Tache) o;
+        return Objects.equals(id, tache.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Tache{" +
+                "dateDemande=" + dateDemande +
+                ", typeTache=" + typeTache +
+                ", demandeur=" + demandeur +
+                '}';
     }
 }
