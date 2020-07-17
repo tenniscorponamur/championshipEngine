@@ -106,4 +106,27 @@ public class TacheController {
         tasks.addAll(tacheRepository.findByValidationTraitementAndRefusTraitementAndArchived(false, true, false));
         return tasks;
     }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path = "/private/tache/{tacheId}", method = RequestMethod.PUT)
+    public boolean traitementTache(Authentication authentication,
+                                      @PathVariable("tacheId") Long tacheId,
+                                      @RequestParam String numeroAft,
+                                      @RequestParam boolean validation,
+                                      @RequestParam String commentairesRefus) {
+
+        // nouveau membre ->
+        //actif = true
+        //fictif = false
+
+        return false;
+
+        //TODO : dateTraitement
+        //TODO : date affiliation corpo = new Date();
+
+        //TODO : date classement AFT et Corpo
+
+    }
+
+
 }

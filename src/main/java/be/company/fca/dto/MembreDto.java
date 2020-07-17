@@ -37,6 +37,9 @@ public class MembreDto {
     private String gsm;
     private String mail;
 
+    private boolean adhesionPolitique;
+    private boolean fictif;
+
     public MembreDto() {
     }
 
@@ -61,6 +64,8 @@ public class MembreDto {
         this.classementAFTActuel = membre.getClassementAFTActuel();
         this.classementCorpoActuel = membre.getClassementCorpoActuel();
         this.responsableClub = membre.isResponsableClub();
+        this.adhesionPolitique = membre.isAdhesionPolitique();
+        this.fictif = membre.isFictif();
 
         if (withContactInformations){
             this.telephone = membre.getTelephone();
@@ -278,5 +283,21 @@ public class MembreDto {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public boolean isAdhesionPolitique() {
+        return adhesionPolitique;
+    }
+
+    public void setAdhesionPolitique(boolean adhesionPolitique) {
+        this.adhesionPolitique = adhesionPolitique;
+    }
+
+    public boolean isFictif() {
+        return fictif;
+    }
+
+    public void setFictif(boolean fictif) {
+        this.fictif = fictif;
     }
 }

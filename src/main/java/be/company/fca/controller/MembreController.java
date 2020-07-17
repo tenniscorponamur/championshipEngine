@@ -108,6 +108,15 @@ public class MembreController {
         return membresDto;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method= RequestMethod.GET, path="/private/membre")
+    public MembreDto findMembreByNumeroAft(@RequestParam String numeroAft){
+        Membre membre = membreRepository.findByNumeroAft(numeroAft);
+        if (membre!=null){
+            return new MembreDto(membre,false,false);
+        }
+        return null;
+    }
 
     /**
      * Permet de savoir si un membre connecte correspond a un autre membre (en se basant sur l'id)
