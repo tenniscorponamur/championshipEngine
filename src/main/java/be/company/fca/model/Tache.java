@@ -37,6 +37,9 @@ public class Tache {
     @JoinColumn( name = "membre_fk")
     private Membre membre;
 
+    @Column( name =  "numero_aft")
+    private String numeroAft;
+
     @Column( name =  "code_classement_aft")
     private String codeClassementAft;
 
@@ -111,6 +114,14 @@ public class Tache {
 
     public void setMembre(Membre membre) {
         this.membre = membre;
+    }
+
+    public String getNumeroAft() {
+        return numeroAft;
+    }
+
+    public void setNumeroAft(String numeroAft) {
+        this.numeroAft = numeroAft;
     }
 
     public String getCodeClassementAft() {

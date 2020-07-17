@@ -41,6 +41,7 @@ public class TacheController {
     @RequestMapping(path = "/private/tache/nouveauMembre", method = RequestMethod.POST)
     public boolean tacheNouveauMembre(Authentication authentication,
                                       @RequestBody Membre membre,
+                                      @RequestParam(required = false) String numeroAft,
                                       @RequestParam(required = false) String codeClassementAft,
                                       @RequestParam(required = false) Integer pointsCorpo,
                                       @RequestParam(required = false) String commentairesDemande) {
@@ -59,8 +60,8 @@ public class TacheController {
             }
 
             // Verifier numero AFT non connu
-            if (membre.getNumeroAft()!=null){
-                Membre membreConnuAft = membreRepository.findByNumeroAft(membre.getNumeroAft());
+            if (numeroAft!=null){
+                Membre membreConnuAft = membreRepository.findByNumeroAft(numeroAft);
                 if (membreConnuAft!=null){
                     return false;
                 }
@@ -73,6 +74,7 @@ public class TacheController {
                 membre.setFictif(true);
                 membre = membreRepository.save(membre);
                 tache.setMembre(membre);
+                tache.setNumeroAft(numeroAft);
                 tache.setCodeClassementAft(codeClassementAft);
                 tache.setPointsCorpo(pointsCorpo);
 
