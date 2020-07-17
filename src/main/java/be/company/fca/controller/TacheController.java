@@ -1,9 +1,7 @@
 package be.company.fca.controller;
 
 import be.company.fca.model.*;
-import be.company.fca.repository.MembreRepository;
-import be.company.fca.repository.TacheRepository;
-import be.company.fca.repository.UserRepository;
+import be.company.fca.repository.*;
 import be.company.fca.service.UserService;
 import be.company.fca.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,12 @@ public class TacheController {
 
     @Autowired
     private MembreRepository membreRepository;
+
+    @Autowired
+    private ClassementCorpoRepository classementCorpoRepository;
+
+    @Autowired
+    private ClassementAFTRepository classementAFTRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -94,37 +98,75 @@ public class TacheController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(method = RequestMethod.GET, path = "/private/taches/ouvertes")
-    public List<Tache> getTachesOuvertes(Authentication authentication) throws ParseException {
-        return tacheRepository.findByValidationTraitementAndRefusTraitementAndArchived(false, false, false);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(method = RequestMethod.GET, path = "/private/taches/traitees")
-    public List<Tache> getTachesFermees(Authentication authentication) throws ParseException {
-        List<Tache> tasks = tacheRepository.findByValidationTraitementAndRefusTraitementAndArchived(true, false, false);
-        tasks.addAll(tacheRepository.findByValidationTraitementAndRefusTraitementAndArchived(false, true, false));
+    @RequestMapping(method = RequestMethod.GET, path = "/private/taches/all")
+    public List<Tache> getAllTaches(Authentication authentication, @RequestParam(required = false) boolean withArchives) {
+        List<Tache> tasks = tacheRepository.findByArchived(false);
+        if (withArchives){
+            tasks.addAll(tacheRepository.findByArchived(true));
+        }
         return tasks;
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path = "/private/tache/{tacheId}", method = RequestMethod.PUT)
-    public boolean traitementTache(Authentication authentication,
+    public Tache traitementTache(Authentication authentication,
                                       @PathVariable("tacheId") Long tacheId,
-                                      @RequestParam String numeroAft,
-                                      @RequestParam boolean validation,
-                                      @RequestParam String commentairesRefus) {
+                                      @RequestParam(required = false) String numeroAft,
+                                      @RequestParam(required = false) Integer pointsCorpo,
+                                      @RequestParam(required = false) boolean validation,
+                                      @RequestParam(required = false) String commentairesRefus) {
 
-        // nouveau membre ->
-        //actif = true
-        //fictif = false
+        Tache tache = tacheRepository.findById(tacheId).get();
 
-        return false;
+        if (!tache.isValidationTraitement() && !tache.isRefusTraitement()){
+            //Si refus
+            if (!validation){
+                tache.setAgentTraitant(authentication.getName());
+                tache.setDateTraitement(new Date());
+                tache.setRefusTraitement(true);
+                tache.setCommentairesRefus(commentairesRefus);
+                tacheRepository.save(tache);
+                return tache;
+            }else{
+                if (TypeTache.NOUVEAU_MEMBRE.equals(tache.getTypeTache())) {
 
-        //TODO : dateTraitement
-        //TODO : date affiliation corpo = new Date();
+                    Membre membre = tache.getMembre();
+                    membre.setNumeroAft(numeroAft);
+                    membre.setDateAffiliationCorpo(new Date());
+                    membre.setActif(true);
+                    membre.setFictif(false);
 
-        //TODO : date classement AFT et Corpo
+                    if (tache.getCodeClassementAft() != null) {
+                        ClassementAFT classementAft = new ClassementAFT();
+                        classementAft.setMembreFk(membre.getId());
+                        classementAft.setDateClassement(new Date());
+                        EchelleAFT echelleAFT = EchelleAFT.getEchelleAFTByCode(tache.getCodeClassementAft());
+                        classementAft.setCodeClassement(echelleAFT.getCode());
+                        classementAft.setPoints(echelleAFT.getPoints());
+                        classementAft = classementAFTRepository.save(classementAft);
+                        membre.setClassementAFTActuel(classementAft);
+                    }
+
+                    ClassementCorpo classementCorpo = new ClassementCorpo();
+                    classementCorpo.setMembreFk(membre.getId());
+                    classementCorpo.setDateClassement(new Date());
+                    classementCorpo.setPoints(pointsCorpo);
+                    classementCorpo = classementCorpoRepository.save(classementCorpo);
+                    membre.setClassementCorpoActuel(classementCorpo);
+
+                    membreRepository.save(membre);
+
+                    tache.setAgentTraitant(authentication.getName());
+                    tache.setDateTraitement(new Date());
+                    tache.setValidationTraitement(true);
+                    tache.setCommentairesRefus(commentairesRefus);
+                    tacheRepository.save(tache);
+
+                    return tache;
+                }
+            }
+        }
+        return null;
 
     }
 

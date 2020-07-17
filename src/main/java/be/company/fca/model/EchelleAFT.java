@@ -34,6 +34,21 @@ public class EchelleAFT {
         return echellesAFT;
     }
 
+    /**
+     * Permet de recuperer l'echelle AFT sur base de son code
+     * @param codeAft
+     * @return
+     */
+    public static EchelleAFT getEchelleAFTByCode(String codeAft){
+        List<EchelleAFT> echellesAFT = EchelleAFT.getAllEchellesAFT();
+        for (EchelleAFT echelleAFT : echellesAFT){
+            if (echelleAFT.getCode().equals(codeAft)){
+                return echelleAFT;
+            }
+        }
+        return null;
+    }
+
     EchelleAFT(String code, int points, boolean actif) {
         this.code = code;
         this.points = points;

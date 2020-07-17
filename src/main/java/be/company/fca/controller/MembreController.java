@@ -228,7 +228,7 @@ public class MembreController {
 
             ClassementAFT newClassementAFT = null;
             if (codeClassementAft!=null) {
-                EchelleAFT echelleAFT = getEchelleAFTByCode(codeClassementAft);
+                EchelleAFT echelleAFT = EchelleAFT.getEchelleAFTByCode(codeClassementAft);
                 if (echelleAFT != null) {
                     newClassementAFT = new ClassementAFT();
                     newClassementAFT.setMembreFk(membreId);
@@ -246,21 +246,6 @@ public class MembreController {
         }else{
             throw new ForbiddenException();
         }
-    }
-
-    /**
-     * Permet de recuperer l'echelle AFT sur base de son code
-     * @param codeAft
-     * @return
-     */
-    private EchelleAFT getEchelleAFTByCode(String codeAft){
-        List<EchelleAFT> echellesAFT = EchelleAFT.getAllEchellesAFT();
-        for (EchelleAFT echelleAFT : echellesAFT){
-            if (echelleAFT.getCode().equals(codeAft)){
-                return echelleAFT;
-            }
-        }
-        return null;
     }
 
     /**
