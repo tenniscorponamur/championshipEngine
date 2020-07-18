@@ -47,7 +47,7 @@ public class TacheController {
                                       @RequestParam(required = false) String commentairesDemande) {
 
         Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
-        if (membreConnecte!=null){
+        if (membreConnecte != null) {
             Tache tache = new Tache();
             tache.setTypeTache(TypeTache.NOUVEAU_MEMBRE);
             tache.setDateDemande(new Date());
@@ -55,20 +55,20 @@ public class TacheController {
             tache.setCommentairesDemande(commentairesDemande);
 
             // Verifier adhesion politique
-            if (!membre.isAdhesionPolitique()){
+            if (!membre.isAdhesionPolitique()) {
                 return false;
             }
 
             // Verifier numero AFT non connu
-            if (numeroAft!=null){
+            if (numeroAft != null) {
                 Membre membreConnuAft = membreRepository.findByNumeroAft(numeroAft);
-                if (membreConnuAft!=null){
+                if (membreConnuAft != null) {
                     return false;
                 }
             }
 
             // Verifier appartenance club du responsable
-            if (membreConnecte.getClub() != null && membre.getClub() != null && membreConnecte.getClub().equals(membre.getClub())){
+            if (membreConnecte.getClub() != null && membre.getClub() != null && membreConnecte.getClub().equals(membre.getClub())) {
                 membre.setPassword(PasswordUtils.DEFAULT_MEMBER_PASSWORD);
                 membre.setActif(false);
                 membre.setFictif(true);
@@ -88,48 +88,78 @@ public class TacheController {
     }
 
 
-    @PreAuthorize("hasAuthority('RESPONSABLE_CLUB')")
+    @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(method = RequestMethod.GET, path = "/private/taches")
-    public List<Tache> getTaches(Authentication authentication) throws ParseException {
+    public List<Tache> getTaches(Authentication authentication, @RequestParam(required = false) boolean withArchives) throws ParseException {
+        boolean adminConnected = userService.isAdmin(authentication);
         List<Tache> tasks = new ArrayList<>();
-        Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
-        if (membreConnecte != null){
-            return tacheRepository.findByDemandeurAndArchived(membreConnecte, false);
+        if (adminConnected) {
+            tasks = tacheRepository.findByArchived(false);
+            if (withArchives) {
+                tasks.addAll(tacheRepository.findByArchived(true));
+            }
+            return tasks;
+        } else {
+            Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+            if (membreConnecte != null) {
+                tasks.addAll(tacheRepository.findByDemandeurAndArchived(membreConnecte, false));
+                if (withArchives) {
+                    tasks.addAll(tacheRepository.findByDemandeurAndArchived(membreConnecte, true));
+                }
+            }
         }
         return tasks;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(method = RequestMethod.GET, path = "/private/taches/all")
-    public List<Tache> getAllTaches(Authentication authentication, @RequestParam(required = false) boolean withArchives) {
-        List<Tache> tasks = tacheRepository.findByArchived(false);
-        if (withArchives){
-            tasks.addAll(tacheRepository.findByArchived(true));
+    @PreAuthorize("hasAuthority('RESPONSABLE_CLUB')")
+    @RequestMapping(path = "/private/tache/{tacheId}/markAsRead", method = RequestMethod.PUT)
+    public boolean markAsRead(Authentication authentication, @PathVariable("tacheId") Long tacheId) {
+        Tache tache = tacheRepository.findById(tacheId).get();
+        if (tache.isValidationTraitement() || tache.isRefusTraitement()) {
+            tache.setMarkAsRead(true);
+            tacheRepository.save(tache);
+            return true;
+        } else {
+            return false;
         }
-        return tasks;
     }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path = "/private/tache/{tacheId}/archive", method = RequestMethod.PUT)
+    public boolean archive(Authentication authentication, @PathVariable("tacheId") Long tacheId) {
+        Tache tache = tacheRepository.findById(tacheId).get();
+        // On ne va pas archiver tant que ce n'est pas marque comme lu par le demandeur
+        if (tache.isMarkAsRead()){
+            tache.setArchived(true);
+            tacheRepository.save(tache);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path = "/private/tache/{tacheId}", method = RequestMethod.PUT)
     public Tache traitementTache(Authentication authentication,
-                                      @PathVariable("tacheId") Long tacheId,
-                                      @RequestParam(required = false) String numeroAft,
-                                      @RequestParam(required = false) Integer pointsCorpo,
-                                      @RequestParam(required = false) boolean validation,
-                                      @RequestParam(required = false) String commentairesRefus) {
+                                 @PathVariable("tacheId") Long tacheId,
+                                 @RequestParam(required = false) String numeroAft,
+                                 @RequestParam(required = false) Integer pointsCorpo,
+                                 @RequestParam(required = false) boolean validation,
+                                 @RequestParam(required = false) String commentairesRefus) {
 
         Tache tache = tacheRepository.findById(tacheId).get();
 
-        if (!tache.isValidationTraitement() && !tache.isRefusTraitement()){
+        if (!tache.isValidationTraitement() && !tache.isRefusTraitement()) {
             //Si refus
-            if (!validation){
+            if (!validation) {
                 tache.setAgentTraitant(authentication.getName());
                 tache.setDateTraitement(new Date());
                 tache.setRefusTraitement(true);
                 tache.setCommentairesRefus(commentairesRefus);
                 tacheRepository.save(tache);
                 return tache;
-            }else{
+            } else {
                 if (TypeTache.NOUVEAU_MEMBRE.equals(tache.getTypeTache())) {
 
                     Membre membre = tache.getMembre();
