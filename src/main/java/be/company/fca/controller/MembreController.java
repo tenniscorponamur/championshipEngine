@@ -680,8 +680,7 @@ public class MembreController {
     }
 
 
-    @PreAuthorize("hasAuthority('ADMIN_USER')")
-    @RequestMapping(path="/private/membres/import/template", method= RequestMethod.GET)
+    @RequestMapping(path="/public/membres/import/template", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTemplateImportMembres() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
