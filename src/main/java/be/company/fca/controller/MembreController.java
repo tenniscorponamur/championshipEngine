@@ -767,8 +767,9 @@ public class MembreController {
 
                         membre.setOnlyCorpo("6045".equals(numeroClubAft));
 
-                        //TODO : voir quelle date preciser. En attendant, date du jour mise automatiquement
-                        membre.setDateAffiliationCorpo(new Date());
+                        if (membre.getDateAffiliationCorpo()==null){
+                            membre.setDateAffiliationCorpo(new Date());
+                        }
 
                         if ("9999".equals(numeroClubCorpo)){
                             membre.setActif(false);
