@@ -47,6 +47,12 @@ public class UserController {
     @RequestMapping(method=RequestMethod.GET, path="/private/user/current")
     public UserDto getCurrentUser(Principal principal) {
 
+        // Ajout d'un utilisateur admin qui est present independamment de la table users de la DB
+        if ("admin".equals(principal.getName().toLowerCase())){
+            User user = UserUtils.getAdminUser();
+            return new UserDto(user,UserUtils.getRoles(user));
+        }
+
         // Pour l'authentification des membres
         // Si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
 

@@ -30,14 +30,23 @@ public class EngineUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username.toLowerCase());
 
-        // Pour l'authentification des membres
-        // Si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+        User user = null;
 
-        if (user==null){
-            Membre membre = membreRepository.findByNumeroAft(username);
-            user = UserUtils.getUserFromMembre(membre);
+        // Ajout d'un utilisateur admin qui est present independamment de la table users de la DB
+
+        if ("admin".equals(username.toLowerCase())){
+            user = UserUtils.getAdminUser();
+        }else{
+            user = userRepository.findByUsername(username.toLowerCase());
+
+            // Pour l'authentification des membres
+            // Si le user n'existe pas, on va regarder dans les membres actifs sur base du numero AFT
+
+            if (user==null){
+                Membre membre = membreRepository.findByNumeroAft(username);
+                user = UserUtils.getUserFromMembre(membre);
+            }
         }
 
         if (user==null){

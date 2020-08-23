@@ -40,8 +40,12 @@ public class TraceServiceImpl implements TraceService {
     }
 
     private String getUsername(Authentication authentication){
+        // Ajout d'un utilisateur admin qui est present independamment de la table users de la DB
+        if ("admin".equals(authentication.getName().toLowerCase())){
+            return "admin";
+        }
         if (userService.isAdmin(authentication)){
-            User user = userRepository.findByUsername(authentication.getName());
+            User user = userRepository.findByUsername(authentication.getName().toLowerCase());
             return user.getPrenom() + " " + user.getNom();
         }else{
             Membre membreConnecte = userService.getMembreFromAuthentication(authentication);

@@ -11,6 +11,16 @@ import java.util.List;
 
 public class UserUtils {
 
+    public static User getAdminUser(){
+        User user = new User();
+        user.setUsername("admin");
+        user.setPassword(PasswordUtils.DEFAULT_ADMIN_PASSWORD);
+        user.setPrenom("Ad");
+        user.setNom("Min");
+        user.setAdmin(true);
+        return user;
+    }
+
     /**
      * Permet de construire un utilisateur sur base d'un membre
      * @param membre

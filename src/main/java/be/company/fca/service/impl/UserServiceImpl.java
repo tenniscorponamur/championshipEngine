@@ -6,6 +6,7 @@ import be.company.fca.model.User;
 import be.company.fca.repository.MembreRepository;
 import be.company.fca.repository.UserRepository;
 import be.company.fca.service.UserService;
+import be.company.fca.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,7 +40,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Membre getMembreFromAuthentication(Authentication authentication){
         if (authentication!=null) {
-            User user = userRepository.findByUsername(authentication.getName());
+            // Ajout d'un utilisateur admin qui est present independamment de la table users de la DB
+            if ("admin".equals(authentication.getName().toLowerCase())){
+                return null;
+            }
+            User user = userRepository.findByUsername(authentication.getName().toLowerCase());
             if (user != null) {
                 return user.getMembre();
             } else {
