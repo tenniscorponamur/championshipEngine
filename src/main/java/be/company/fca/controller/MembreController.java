@@ -836,6 +836,29 @@ public class MembreController {
                                 membreRepository.updateClassementAFT(membre.getId(),classementAFT);
                             }
 
+                        }else{
+                            // On va analyser si le classement connu est identique a celui precise dans le fichier
+
+                            if (!StringUtils.isEmpty(pointsAft)){
+                                try{
+                                    // S'il est different, on va l'importer
+                                    if (!membre.getClassementAFTActuel().getPoints().equals(Integer.valueOf(pointsAft))){
+                                        ClassementAFT classementAFT = new ClassementAFT();
+                                        classementAFT.setMembreFk(membre.getId());
+                                        classementAFT.setDateClassement(new Date());
+                                        classementAFT.setCodeClassement(codeClassementAft);
+                                        classementAFT.setPoints(Integer.valueOf(pointsAft));
+                                        classementAFTRepository.save(classementAFT);
+                                        membreRepository.updateClassementAFT(membre.getId(),classementAFT);
+                                    }
+
+                                }catch (Exception e){
+                                    System.err.println("Impossible de sauvegarder le nouveau classement AFT de " + membre.getNumeroAft());
+                                    e.printStackTrace();
+                                }
+                            }
+
+
                         }
 
                     }catch(Exception e){
