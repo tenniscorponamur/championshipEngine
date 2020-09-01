@@ -25,6 +25,10 @@ public class ReportUtils {
         return ReportUtils.class.getResourceAsStream("/reports/listeEquipes.jrxml");
     }
 
+    public static InputStream getListeEquipesAvecCompoTemplate(){
+        return ReportUtils.class.getResourceAsStream("/reports/listeEquipesAvecCompo.jrxml");
+    }
+
     public static InputStream getCalendrierTemplate(){
         return ReportUtils.class.getResourceAsStream("/reports/calendrier.jrxml");
     }

@@ -111,7 +111,7 @@ order by  division_numero, poule_numero, club_nom, equipe_code]]>
 		<groupHeader>
 			<band height="30">
 				<textField>
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="110" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="608845c4-1b63-411b-8bd6-bc05b3ecaef2">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="110" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="608845c4-1b63-411b-8bd6-bc05b3ecaef2">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="7506c0c0-a7e9-4c17-bae6-65b1a55aba0c"/>
 					</reportElement>
 					<box padding="1">
@@ -123,7 +123,7 @@ order by  division_numero, poule_numero, club_nom, equipe_code]]>
 					<textFieldExpression><![CDATA[$F{equipe_code}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="210" y="0" width="100" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="bf0f0b22-7094-422c-af8b-2636f9fea037">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="210" y="0" width="100" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="bf0f0b22-7094-422c-af8b-2636f9fea037">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6c921bf4-d5cd-429f-a548-b1d6f48d164d"/>
 					</reportElement>
 					<box>
@@ -135,7 +135,7 @@ order by  division_numero, poule_numero, club_nom, equipe_code]]>
 					<textFieldExpression><![CDATA[$F{capitaine_nom}!=null?($F{capitaine_nom} + " " + $F{capitaine_prenom}):""]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="310" y="0" width="245" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="b1f014bf-eac4-40ef-ad7c-0e6000d7f2da">
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="310" y="0" width="245" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="b1f014bf-eac4-40ef-ad7c-0e6000d7f2da">
 						<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2b781176-02c2-4204-914c-33684883ec7c"/>
 					</reportElement>
 					<box padding="1">
@@ -145,7 +145,7 @@ order by  division_numero, poule_numero, club_nom, equipe_code]]>
 					<textFieldExpression><![CDATA[$F{commentaires_equipe}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="110" y="0" width="100" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="46c503ed-2c6c-43ff-b99c-6eb507a39c79"/>
+					<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="110" y="0" width="100" height="30" forecolor="#000000" backcolor="#D9D9D9" uuid="46c503ed-2c6c-43ff-b99c-6eb507a39c79"/>
 					<box>
 						<topPen lineWidth="0.0" lineColor="#000000"/>
 					</box>
@@ -198,4 +198,27 @@ order by  division_numero, poule_numero, club_nom, equipe_code]]>
 			</staticText>
 		</band>
 	</title>
+	<detail>
+		<band height="19" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="150" height="19" uuid="5927616e-0472-4784-8562-b96c972bd03e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="bd53edf8-a9d6-4db3-9158-2d79fdb4bf1c"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="10" bottomPadding="0" rightPadding="10">
+					<leftPen lineWidth="1.0"/>
+				</box>
+				<textFieldExpression><![CDATA[$F{membre_nom}!=null?($F{membre_nom} + " " + $F{membre_prenom}):""]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="150" y="0" width="405" height="19" uuid="665c5384-913b-4e33-98c3-9783b69790d2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="610a4da0-67d0-4668-943c-10244bcf83e9"/>
+				</reportElement>
+				<box leftPadding="10">
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[$F{membre_points}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
 </jasperReport>

@@ -231,6 +231,22 @@ public class ChampionnatController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(path="/private/championnat/listeEquipesAvecCompo", method= RequestMethod.GET)
+    ResponseEntity<byte[]> getListeEquipesAvecCompo(@RequestParam Long championnatId) throws Exception {
+        JasperReport jasperReport = JasperCompileManager.compileReport(ReportUtils.getListeEquipesAvecCompoTemplate());
+        Connection conn = datasource.getConnection();
+        Map params = new HashMap();
+        params.put("championnatId", championnatId);
+        JasperPrint jprint = JasperFillManager.fillReport(jasperReport, params, conn);
+        byte[] pdfFile =  JasperExportManager.exportReportToPdf(jprint);
+        conn.close();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(pdfFile, headers, HttpStatus.OK);
+        return response;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
     @RequestMapping(path="/private/championnat/tableauCriterium", method= RequestMethod.GET)
     ResponseEntity<byte[]> getTableauCriterium(@RequestParam @DateTimeFormat(pattern="yyyyMMdd") Date date) throws Exception {
         TimeZone timeZone = TimeZone.getTimeZone(DateUtils.getTimeZone());
