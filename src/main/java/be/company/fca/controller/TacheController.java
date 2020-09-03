@@ -87,6 +87,87 @@ public class TacheController {
         return false;
     }
 
+    @PreAuthorize("hasAuthority('RESPONSABLE_CLUB')")
+    @RequestMapping(path = "/private/tache/activiteMembre", method = RequestMethod.POST)
+    public boolean tacheActiviteMembre(Authentication authentication,
+                                      @RequestParam(required = true) Long membreId,
+                                      @RequestParam(required = true) boolean activite,
+                                      @RequestParam(required = false) Integer pointsCorpo,
+                                      @RequestParam(required = false) String commentairesDemande) {
+
+        Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+        if (membreConnecte != null) {
+            Tache tache = new Tache();
+            if (activite){
+                tache.setTypeTache(TypeTache.REACTIVATION_MEMBRE);
+                tache.setReactivationMembre(true);
+            }else{
+                tache.setTypeTache(TypeTache.DESACTIVATION_MEMBRE);
+                tache.setDesactivationMembre(true);
+            }
+            tache.setDateDemande(new Date());
+            tache.setDemandeur(membreConnecte);
+            tache.setCommentairesDemande(commentairesDemande);
+
+            //On verifie que le membre est bien actif ou inactif selon la demande
+            Membre membre = membreRepository.findById(membreId).get();
+            if (activite){
+                if (membre.isActif()){
+                    return false;
+                }
+            }else{
+                if (!membre.isActif()){
+                    return false;
+                }
+            }
+
+            // Verifier appartenance club du responsable
+            if (membreConnecte.getClub() != null && membre.getClub() != null && membreConnecte.getClub().equals(membre.getClub())) {
+
+                tache.setMembre(membre);
+                tache.setPointsCorpo(pointsCorpo);
+
+                tacheRepository.save(tache);
+
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    @PreAuthorize("hasAuthority('RESPONSABLE_CLUB')")
+    @RequestMapping(path = "/private/tache/pointsMembre", method = RequestMethod.POST)
+    public boolean tachePointsMembre(Authentication authentication,
+                                       @RequestParam(required = true) Long membreId,
+                                       @RequestParam(required = false) Integer pointsCorpo,
+                                       @RequestParam(required = false) String commentairesDemande) {
+
+        Membre membreConnecte = userService.getMembreFromAuthentication(authentication);
+        if (membreConnecte != null) {
+            Tache tache = new Tache();
+            tache.setTypeTache(TypeTache.CHANGEMENT_POINTS_CORPO);
+            tache.setDateDemande(new Date());
+            tache.setDemandeur(membreConnecte);
+            tache.setCommentairesDemande(commentairesDemande);
+
+            //On verifie que le membre est bien actif ou inactif selon la demande
+            Membre membre = membreRepository.findById(membreId).get();
+
+            // Verifier appartenance club du responsable
+            if (membreConnecte.getClub() != null && membre.getClub() != null && membreConnecte.getClub().equals(membre.getClub())) {
+
+                tache.setMembre(membre);
+                tache.setPointsCorpo(pointsCorpo);
+
+                tacheRepository.save(tache);
+
+                return true;
+            }
+
+        }
+        return false;
+    }
 
     @PreAuthorize("hasAnyAuthority('ADMIN_USER','RESPONSABLE_CLUB')")
     @RequestMapping(method = RequestMethod.GET, path = "/private/taches")
@@ -187,6 +268,74 @@ public class TacheController {
                     membre.setClassementCorpoActuel(classementCorpo);
 
                     membreRepository.save(membre);
+
+                    tache.setAgentTraitant(authentication.getName());
+                    tache.setDateTraitement(new Date());
+                    tache.setValidationTraitement(true);
+                    tache.setCommentairesRefus(commentairesRefus);
+                    tacheRepository.save(tache);
+
+                    return tache;
+
+                } else if (TypeTache.DESACTIVATION_MEMBRE.equals(tache.getTypeTache())) {
+
+                    Membre membre = tache.getMembre();
+                    membre.setActif(false);
+                    membreRepository.save(membre);
+
+                    tache.setAgentTraitant(authentication.getName());
+                    tache.setDateTraitement(new Date());
+                    tache.setValidationTraitement(true);
+                    tache.setCommentairesRefus(commentairesRefus);
+                    tacheRepository.save(tache);
+
+                    return tache;
+
+                }else if (TypeTache.REACTIVATION_MEMBRE.equals(tache.getTypeTache())) {
+
+                    Membre membre = tache.getMembre();
+                    membre.setActif(true);
+                    membreRepository.save(membre);
+
+                    //Sauvegarde du nouveau classement eventuel
+                    if (pointsCorpo!=null){
+                        if (membre.getClassementCorpoActuel()==null || membre.getClassementCorpoActuel().getPoints() != pointsCorpo){
+                            ClassementCorpo classementCorpo = new ClassementCorpo();
+                            classementCorpo.setMembreFk(membre.getId());
+                            classementCorpo.setDateClassement(new Date());
+                            classementCorpo.setPoints(pointsCorpo);
+                            classementCorpo = classementCorpoRepository.save(classementCorpo);
+                            membre.setClassementCorpoActuel(classementCorpo);
+
+                            membreRepository.save(membre);
+                        }
+                    }
+
+                    tache.setAgentTraitant(authentication.getName());
+                    tache.setDateTraitement(new Date());
+                    tache.setValidationTraitement(true);
+                    tache.setCommentairesRefus(commentairesRefus);
+                    tacheRepository.save(tache);
+
+                    return tache;
+
+                }else if (TypeTache.CHANGEMENT_POINTS_CORPO.equals(tache.getTypeTache())) {
+
+                    Membre membre = tache.getMembre();
+
+                    //Sauvegarde du nouveau classement
+                    if (pointsCorpo!=null){
+                        if (membre.getClassementCorpoActuel()==null || membre.getClassementCorpoActuel().getPoints() != pointsCorpo){
+                            ClassementCorpo classementCorpo = new ClassementCorpo();
+                            classementCorpo.setMembreFk(membre.getId());
+                            classementCorpo.setDateClassement(new Date());
+                            classementCorpo.setPoints(pointsCorpo);
+                            classementCorpo = classementCorpoRepository.save(classementCorpo);
+                            membre.setClassementCorpoActuel(classementCorpo);
+
+                            membreRepository.save(membre);
+                        }
+                    }
 
                     tache.setAgentTraitant(authentication.getName());
                     tache.setDateTraitement(new Date());
