@@ -1335,6 +1335,26 @@ public class RencontreController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method = RequestMethod.DELETE, path = "/private/rencontre")
+    public void addRencontre(@PathVariable("rencontreId") Long rencontreId) {
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
+        if (!!rencontre.getDivision().getChampionnat().isCloture()) {
+            rencontreService.deleteById(rencontreId);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN_USER')")
+    @RequestMapping(method = RequestMethod.DELETE, path = "/private/rencontre/{rencontreId}")
+    public boolean deleteRencontre(@PathVariable("rencontreId") Long rencontreId) {
+        Rencontre rencontre = rencontreRepository.findById(rencontreId).get();
+        if (!rencontre.getDivision().getChampionnat().isCloture()) {
+            rencontreService.deleteById(rencontreId);
+            return true;
+        }
+        return false;
+    }
+
     @RequestMapping(path = "/public/rencontres/calendrier", method = RequestMethod.GET)
     ResponseEntity<byte[]> getCalendrier(@RequestParam Long championnatId, @RequestParam(required = false) boolean excel) throws Exception {
 

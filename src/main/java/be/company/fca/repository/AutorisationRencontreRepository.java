@@ -2,7 +2,11 @@ package be.company.fca.repository;
 
 import be.company.fca.model.AutorisationRencontre;
 import be.company.fca.model.Membre;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +18,10 @@ public interface AutorisationRencontreRepository extends CrudRepository<Autorisa
      * @return Liste des autorisations pour la rencontre
      */
     List<AutorisationRencontre> findByRencontreFk(Long rencontreFk);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    void deleteByRencontreFk(Long rencontreFk);
 
     /**
      * Permet de recuperer les autorisations d'un membre

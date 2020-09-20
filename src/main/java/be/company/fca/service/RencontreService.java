@@ -45,4 +45,10 @@ public interface RencontreService {
      * @param championnatId 
      */
     public void deleteByChampionnat(Long championnatId);
+
+    /**
+     * Permet de supprimer une rencontre
+     * @param rencontreId
+     */
+    public void deleteById(Long rencontreId);
 }

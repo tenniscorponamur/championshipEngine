@@ -35,6 +35,9 @@ public class RencontreServiceImpl implements RencontreService{
     @Autowired
     private MatchService matchService;
 
+    @Autowired
+    private AutorisationRencontreRepository autorisationrencontreRepository;
+
     @Override
     @Transactional(readOnly = false)
     public List<Rencontre> saveRencontres(List<Rencontre> rencontreList) {
@@ -249,4 +252,20 @@ public class RencontreServiceImpl implements RencontreService{
         matchRepository.deleteByChampionnatId(championnatId);
         rencontreRepository.deleteByChampionnatId(championnatId);
     }
+
+    @Override
+    @Transactional(readOnly = false)
+    public void deleteById(Long rencontreId) {
+        // Sets, matchs, autorisationRencontre, rencontre
+        autorisationrencontreRepository.deleteByRencontreFk(rencontreId);
+        setRepository.deleteByRencontreId(rencontreId);
+        matchRepository.deleteByRencontreId(rencontreId);
+        rencontreRepository.deleteById(rencontreId);
+    }
+
+    // Championnat, division, poule, numeroJournee, equipeVisites, equipeVisiteurs --> les autres informations (hormis interserie) sont accessibles via ecran (terrain, court, date, ...)
+    // Tester si ajout sans numero de journee --> on ne verra pas la journee sauf si aucune poule n'est precisee --> vu comme interserie
+    // Comme les interseries doivent etre crees par l'outil approprie au niveau de l'adminsitration des rencontres --> on va uniquement permettre la creation de rencontres
+    // avec numero de journee et une poule (meme si elle est unique)
+
 }

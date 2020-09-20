@@ -44,6 +44,9 @@ public class EquipeController {
     private SetRepository setRepository;
 
     @Autowired
+    private AutorisationRencontreRepository autorisationrencontreRepository;
+
+    @Autowired
     private RencontreRepository rencontreRepository;
 
     @Autowired
@@ -265,6 +268,7 @@ public class EquipeController {
         // Supprimer les rencontres associees a cette equipe sinon on ne pourra pas la supprimer :-)
         List<Rencontre> rencontresEquipe = (List<Rencontre>) rencontreRepository.findRencontresByEquipe(equipe);
         for (Rencontre rencontreEquipe : rencontresEquipe){
+            autorisationrencontreRepository.deleteByRencontreFk(rencontreEquipe.getId());
             setRepository.deleteByRencontreId(rencontreEquipe.getId());
             matchRepository.deleteByRencontreId(rencontreEquipe.getId());
             rencontreRepository.deleteById(rencontreEquipe.getId());
