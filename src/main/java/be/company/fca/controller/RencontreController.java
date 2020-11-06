@@ -288,6 +288,16 @@ public class RencontreController {
             List<Match> matchs = rencontreService.getOrCreateMatchs(rencontre);
             for (Match match : matchs){
 
+                // Retrait des joueurs eventuellement precises
+
+                if (forfaitVisiteurs){
+                    match.setJoueurVisiteurs1(null);
+                    match.setJoueurVisiteurs2(null);
+                }else{
+                    match.setJoueurVisites1(null);
+                    match.setJoueurVisites2(null);
+                }
+
                 Integer nbJeux = matchService.getNbJeuxMax(match);
 
                 List<Set> sets = new ArrayList<>();
@@ -304,6 +314,8 @@ public class RencontreController {
                     }
                     sets.add(set);
                 }
+
+                match = matchRepository.save(match);
 
                 match = matchService.updateMatchAndSets(match.getId(),false,sets);
 
